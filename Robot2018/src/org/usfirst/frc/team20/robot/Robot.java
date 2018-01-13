@@ -7,8 +7,12 @@
 
 package org.usfirst.frc.team20.robot;
 
+import java.util.ArrayList;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 ///import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SerialPort;
@@ -25,7 +29,7 @@ public class Robot extends IterativeRobot {
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
-	 */
+	 */  
 	//Classes
 	Objects ob;
 	DriveTrain drive;
@@ -36,17 +40,25 @@ public class Robot extends IterativeRobot {
 	
 	//Autonomous Variables
 	AHRS gyro = new AHRS(SerialPort.Port.kMXP); // DO NOT PUT IN ROBOT INIT
-	int startingENCClicks, autoModeSubStep = 0, startingENCClicksLeft = 0, startingENCClicksRight = 0;
+	ArrayList<String> script = new ArrayList<>();
+	EncoderGyro gy;
+	Grids grid;
+	int rocketScriptCurrentCount = 0, rocketScriptSize = 0, startingENCClicks = 0,
+			autoModeSubStep = 0, startingENCClicksLeft = 0, startingENCClicksRight = 0;
 	double rotateToAngleRate, currentRotationRate, startTime;
 	double nominalVoltage = Constants.NOMINAL_VOLTAGE;
-	boolean resetGyro = false, setStartTime = false, waitStartTime = false, gotStartingENCClicks = false, resetGyroTurn = false, done = false;
+	boolean resetGyro = false, setStartTime = false, waitStartTime = false, gotStartingENCClicks = false, resetGyroTurn = false, done = false,
+			gyroReset = false, hopperDone = false, driveDone = false;
 
 	@Override
-	public void robotInit() {
+	public void robotInit() {		
 		ob = new Objects();
 		drive = new DriveTrain(ob);
 		driverJoy = new DriverControls(drive);
 		operatorJoy = new OperatorControls();
+
+		grid = new Grids();
+		gy = new EncoderGyro(ob, 31.3125);
 	}
 
 	/**
@@ -62,9 +74,12 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+		System.out.println("RAN AUTO INIT");
+		gyro.reset();
 		//Reset all variables for the start of auto
 		autoModeSubStep = 0; startingENCClicksLeft = 0; startingENCClicksRight = 0;
 		resetGyro = false; setStartTime = false; waitStartTime = false; gotStartingENCClicks = false; resetGyroTurn = false; done = false;
+		gyroReset = false; hopperDone = false; driveDone = false;
 
 		//Switch and Scale are on the left or right?
 //		String field = DriverStation.getInstance().getGameSpecificMessage();
@@ -76,29 +91,129 @@ public class Robot extends IterativeRobot {
 //			scaleLeft = true;
 //		}
 		//Picking Which Auto Mode
-
+		script.addAll(RocketScript.splineCenterToLeftSwitch());
+		rocketScriptSize = script.size();
 	}
 
 	/**
 	 * This function is called periodically during autonomous.
 	 */
+	int counter = 0;
+	DoubleSolenoid tank = new DoubleSolenoid(2, 3);
 	@Override
 	public void autonomousPeriodic() {
-		//For Testing Purposes (without scripting)
-		if(!done){
-//			if(turn(90.0)){
-//				drive.stopDrive();
-//				done = true;
-//			}
-//			if(fastDriveStraight(0.5, 25, 0)){
-//				drive.stopDrive();
-//				done = true;
-//			}			
-//			if(fastDriveStraightTimer(0.5, 3.0, false)){
-//				System.out.println("!!!!!!! ALL DONE !!!!!!!");
-//				drive.stopDrive();
-//				done = true;
-//			}			
+		//Scripting
+		if(!gyroReset){
+			gyro.reset();
+			gyroReset = true;
+		}
+		if (rocketScriptCurrentCount < rocketScriptSize) {
+			String[] values = script.get(rocketScriptCurrentCount).split(";");
+			//Spline
+			if (Integer.parseInt(values[0]) == RobotModes.SPLINE) {
+				if(spline(Double.parseDouble(values[1]), grid.getGrid(Integer.parseInt(values[2])))){
+					rocketScriptCurrentCount++;
+				}
+			}
+			//Testing dual function capabilities (2017 hopper flaps with driving)
+			if (Integer.parseInt(values[0]) == RobotModes.HOPPER_AND_DRIVE) {
+				if(!hopperDone){
+					if (!waitStartTime) {
+						startTime = Timer.getFPGATimestamp();
+						waitStartTime = true;
+					}
+					if (Timer.getFPGATimestamp() - startTime < Double.parseDouble(values[1])) {
+						System.out.println("Hopper is trying");
+						counter++;
+						if(counter==14){
+							tank.set(DoubleSolenoid.Value.kForward);
+						}else if(counter >= 42){
+							tank.set(DoubleSolenoid.Value.kReverse);
+							counter = 0;
+						}
+					} else {
+						hopperDone = true;
+					}
+				}
+				if(!driveDone){
+					System.out.println("******************Driving");
+					if (encoderDrive(Double.parseDouble(values[2]),
+							Double.parseDouble(values[3]) - Constants.STOPPING_INCHES, Double.parseDouble(values[4]))) {
+						gotStartingENCClicks = false;
+						gyro.reset();
+						driveDone = true;
+					}					
+				}
+				if(hopperDone && driveDone){
+					rocketScriptCurrentCount++;
+				}
+			}
+			//Driving using encoders
+			if (Integer.parseInt(values[0]) == RobotModes.ENCODER_DRIVE) {
+				if (encoderDrive(Double.parseDouble(values[1]),
+						Double.parseDouble(values[2]) - Constants.STOPPING_INCHES, Double.parseDouble(values[3]))) {
+					gotStartingENCClicks = false;
+					gyro.reset();
+					rocketScriptCurrentCount++;
+				}
+			}
+			if(Integer.parseInt(values[0]) == RobotModes.HOPPER){
+				if (!waitStartTime) {
+					startTime = Timer.getFPGATimestamp();
+					waitStartTime = true;
+				}
+				if (Timer.getFPGATimestamp() - startTime < Double.parseDouble(values[1])) {
+					counter++;
+					if(counter==14){
+						tank.set(DoubleSolenoid.Value.kForward);
+					}else if(counter >= 42){
+						tank.set(DoubleSolenoid.Value.kReverse);
+						counter = 0;
+					}
+				} else {
+					rocketScriptCurrentCount++;
+				}
+
+			}
+			
+			//Turn to an angle
+			if (Integer.parseInt(values[0]) == RobotModes.TURN) {
+				System.out.println("******************************** " + gyro.getYaw());
+				if (turn(Double.parseDouble(values[1]))) {
+					setStartTime = false;
+					resetGyroTurn = false;
+					rocketScriptCurrentCount++;
+				}
+			}
+			//Wait for a time period
+			if (Integer.parseInt(values[0]) == RobotModes.WAIT) {
+				System.out.println("WAITING");
+				if (!waitStartTime) {
+					startTime = Timer.getFPGATimestamp();
+					waitStartTime = true;
+				}
+				if (Timer.getFPGATimestamp() - startTime > Double.parseDouble(values[1])) {
+					System.out.println("******************************DONE WAITING");
+					waitStartTime = false;
+					rocketScriptCurrentCount++;
+				}
+			}
+			//Drive for a time period
+			if (Integer.parseInt(values[0]) == RobotModes.TIME_DRIVE) {
+				if (timeDrive(Double.parseDouble(values[1]), Double.parseDouble(values[2]), true)) {
+					rocketScriptCurrentCount++;
+				}
+			}
+			//Shift to low gear
+			if (Integer.parseInt(values[0]) == RobotModes.LOW_GEAR) {
+				drive.shiftLow();
+				rocketScriptCurrentCount++;
+			}
+			//Shift to high gear
+			if (Integer.parseInt(values[0]) == RobotModes.HIGH_GEAR) {
+				drive.shiftHigh();
+				rocketScriptCurrentCount++;
+			}
 		}
 	}
 
@@ -114,14 +229,22 @@ public class Robot extends IterativeRobot {
 	/**
 	 * This function is called periodically during test mode.
 	 */
+	
+	@Override
+	public void testInit(){
+		System.out.println("*******************************Test Init Ran*************************");
+		gyro.reset();
+	}
 	@Override
 	public void testPeriodic() {
-//		System.out.println("NavX Angle: " + gyro.getYaw());
+		System.out.println("NavX Angle: " + gyro.getYaw());
 //		System.out.println("Encoder Position Left: " + ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX));	
 //		System.out.println("Encoder Position Right: " + ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX));	
+		System.out.println("Encoder Gyro Angle: " + gy.updateAngle(ob.driveMasterLeft.getSelectedSensorPosition(0),
+				ob.driveMasterRight.getSelectedSensorPosition(0)));
 	}
 	
-	// Auto Methods
+	// Auto Methods 
 	public boolean turn(double angleToDrive) {
 		double pValue = 0.2;
 		if (gyro.getYaw() < angleToDrive) {
@@ -160,7 +283,7 @@ public class Robot extends IterativeRobot {
 	}
 
 
-	public boolean fastDriveStraightTimer(double speed, double howMuchTime, boolean withGyro) {
+	public boolean timeDrive(double speed, double howMuchTime, boolean withGyro) {
 		if (!setStartTime) {
 			startTime = Timer.getFPGATimestamp();
 			setStartTime = true;
@@ -185,7 +308,7 @@ public class Robot extends IterativeRobot {
 		return false;
 	}
 
-	public boolean fastDriveStraight(double speed, double inches, double angleToDrive) {
+	public boolean encoderDrive(double speed, double inches, double angleToDrive) {
 		System.out.println("Encoder Position: " + ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX));
 		if (gotStartingENCClicks == false) {
 			gyro.reset();
@@ -215,45 +338,47 @@ public class Robot extends IterativeRobot {
 	public boolean spline(double speed, RobotGrid spline) {
 		if (gotStartingENCClicks == false) {
 			gotStartingENCClicks = true;
-			startingENCClicksLeft = ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX);
-			startingENCClicksRight = -ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX);
+			startingENCClicksLeft = ob.driveMasterLeft.getSelectedSensorPosition(0);
+			startingENCClicksRight = ob.driveMasterRight.getSelectedSensorPosition(0);
 		}
-		if (spline.getDistance() <= (((ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksLeft)/ Constants.TICKS_PER_INCH + (-ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksRight)/ Constants.TICKS_PER_INCH))/2 || ((ob.driveMasterRight.getOutputCurrent() > 30) && ((ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksLeft)/ Constants.TICKS_PER_INCH + (-ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksRight)/ Constants.TICKS_PER_INCH)/2 > .5*spline.getDistance())) {
+		System.out.println("****************Left: " + ob.driveMasterLeft.getSelectedSensorPosition(0));
+		System.out.println("****************Right: " + ob.driveMasterRight.getSelectedSensorPosition(0));
+		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
+		System.out.println("****************RobotDistance: " + robotDistance);
+		if (spline.getDistance() <= robotDistance) {
 			ob.driveMasterLeft.set(ControlMode.PercentOutput, 0.00);
 			ob.driveMasterRight.set(ControlMode.PercentOutput, 0.00);
 			System.out.println("Final NavX Angle: " + gyro.getYaw());
-			System.out.println("Enc value after speed 0 " + ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX));
+			System.out.println("Enc value after speed 0 " + ob.driveMasterLeft.getSelectedSensorPosition(0));
 			//System.out.println(spline.toString());
 			gotStartingENCClicks = false;
 			return true;
 		} else {
 			double angleToDrive;
-			if (spline.getDistance()-(((ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksLeft)/ Constants.TICKS_PER_INCH + (-ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksRight)/ Constants.TICKS_PER_INCH)/2) <(20*speed))
-				speed *= spline.getDistance()-(((ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksLeft)/ Constants.TICKS_PER_INCH + (-ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksRight)/ Constants.TICKS_PER_INCH)/2)/(20*speed);
 			if (speed > 0)
-				angleToDrive = (spline.getAngle(Math.abs(((ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksLeft)/ Constants.TICKS_PER_INCH + (-ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksRight)/ Constants.TICKS_PER_INCH))/2));
+				angleToDrive = (spline.getAngle(robotDistance));
 			else
-				angleToDrive = (spline.getReverseAngle(Math.abs(((ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksLeft)/ Constants.TICKS_PER_INCH + (-ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksRight)/ Constants.TICKS_PER_INCH))/2));
+				angleToDrive = (spline.getReverseAngle(robotDistance));
 			if (spline.getDistance() > 0) {
-				if (spline.getDistance() > Math.abs(((ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksLeft)/ Constants.TICKS_PER_INCH + (-ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicksRight)/ Constants.TICKS_PER_INCH))/2)
+				if (spline.getDistance() > robotDistance);
 				{
 				System.out.println("speed = " + speed);
 				System.out.println("angle = " + gyro.getYaw());
+				System.out.println("Target Angle = " + spline.getAngle(robotDistance));				
 					if(angleToDrive < -90 && gyro.getYaw() > 90){
 						double temp = -180 - angleToDrive;
 						temp += -(180 - gyro.getYaw());
-						arcadeDrive(speed, -temp /360*8);
+						arcadeDrive(speed, temp /360*8);
 					} else if (angleToDrive > 90 && gyro.getYaw() < -90){
 						double temp = 180 - angleToDrive;
 						temp += (180 + gyro.getYaw());
-						arcadeDrive(speed, -temp /360*8);					
+						arcadeDrive(speed, temp /360*8);					
 					} else {
-						arcadeDrive(speed, -((gyro.getYaw() - angleToDrive) /360*8));
+						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*8));
 					}
-					//System.out.println(gyro.getYaw() - angleToDrive);
 				}
 			} else {
-				arcadeDrive(-speed, -((gyro.getYaw() - angleToDrive) /360*8));
+				arcadeDrive(-speed, ((gyro.getYaw() - angleToDrive) /360*8));
 			}
 		}
 		return false;

@@ -14,17 +14,17 @@ public class Objects {
 		driveMasterLeft.setInverted(false);
 		driveMasterLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, Constants.PIDIDX, 1000);
 
-		driveMasterRight = new TalonSRX(4);
-		driveMasterRight.setInverted(false);
-		driveMasterRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, Constants.PIDIDX, 1000);
+		driveMasterRight = new TalonSRX(2);
+		driveMasterRight.setInverted(true); //TODO encoder should be on this one
 
 		driveFollowerLeft = new TalonSRX(9);
 		driveFollowerLeft.follow(driveMasterLeft);
 		driveFollowerLeft.setInverted(true);
 		
-		driveFollowerRight = new TalonSRX(2);		
+		driveFollowerRight = new TalonSRX(4);		
 		driveFollowerRight.follow(driveMasterRight);
-		driveFollowerRight.setInverted(true);
+		driveFollowerRight.setInverted(false);
+		driveMasterRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, Constants.PIDIDX, 1000);
 		
 		driveFollowerLeftTwo = new TalonSRX(8);
 		driveFollowerLeftTwo.follow(driveMasterLeft);

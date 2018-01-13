@@ -11,11 +11,13 @@ public class RobotGrid {
         path = new ArrayList<Position>();
         path.add(new Position(x, y, angle));
         precision = p;
+    	System.out.println("I made a spline");
     }
     public RobotGrid(double x, double y, double angle, double p, double distance){
     	path = new ArrayList<Position>();
         path.add(new Position(x, y, angle, distance));
         precision = p;
+    	System.out.println("I made a spline");
     }
     //NO ARCS OVER 90 DEGREES
     public void addLinearPoint(double x, double y, double angle) {//when initalizing x and y do not matter it is just a way to set the zero of the field and that zero can be wherever you want it to be
@@ -25,6 +27,7 @@ public class RobotGrid {
     }
 //NO ARCS OVER 90 DEGREES
     public void addPoint(double x, double y, double angle) {//NO ARCS OVER 90 DEGREES
+    	System.out.println("I'm adding a point");
         Position p1 = path.get(path.size() - 1);
         Position p2;
         Position p3 = new Position(x, y, angle);
@@ -47,6 +50,7 @@ public class RobotGrid {
             pointAngle = Math.toDegrees(Math.atan2(pointY-path.get(path.size()-1).getY(),pointX-path.get(path.size()-1).getX()));
             path.add(new Position(pointX,pointY,pointAngle, Math.sqrt(Math.pow(pointX-path.get(path.size()-1).getX(),2) + Math.pow(pointY-path.get(path.size()-1).getY(),2))+path.get(path.size()-1).getDistance()));
         }
+    	System.out.println("Point has been added");
     }
     
 //NO ARCS OVER 90 DEGREES
