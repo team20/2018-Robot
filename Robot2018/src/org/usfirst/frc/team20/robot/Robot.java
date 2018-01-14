@@ -91,7 +91,7 @@ public class Robot extends IterativeRobot {
 //			scaleLeft = true;
 //		}
 		//Picking Which Auto Mode
-		script.addAll(RocketScript.splineCenterToLeftSwitch());
+		script.addAll(RocketScript.splineCenterToRightSwitch());
 		rocketScriptSize = script.size();
 	}
 
@@ -112,11 +112,13 @@ public class Robot extends IterativeRobot {
 			//Spline
 			if (Integer.parseInt(values[0]) == RobotModes.SPLINE) {
 				if(spline(Double.parseDouble(values[1]), grid.getGrid(Integer.parseInt(values[2])))){
+					System.out.println("*******SPLINE IS DONE************");
 					rocketScriptCurrentCount++;
 				}
 			}
 			//Testing dual function capabilities (2017 hopper flaps with driving)
-			if (Integer.parseInt(values[0]) == RobotModes.HOPPER_AND_DRIVE) {
+			if (Integer.parseInt(values[0]) == RobotModes.DRIVE_AND_ELEVATOR) {
+				//TODO make this elevator code
 				if(!hopperDone){
 					if (!waitStartTime) {
 						startTime = Timer.getFPGATimestamp();
@@ -157,7 +159,8 @@ public class Robot extends IterativeRobot {
 					rocketScriptCurrentCount++;
 				}
 			}
-			if(Integer.parseInt(values[0]) == RobotModes.HOPPER){
+			if(Integer.parseInt(values[0]) == RobotModes.MOVE_ELEVATOR){
+				//TODO make the hopper code into elevator code
 				if (!waitStartTime) {
 					startTime = Timer.getFPGATimestamp();
 					waitStartTime = true;
@@ -345,6 +348,7 @@ public class Robot extends IterativeRobot {
 		System.out.println("****************Right: " + ob.driveMasterRight.getSelectedSensorPosition(0));
 		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
 		System.out.println("****************RobotDistance: " + robotDistance);
+		System.out.println("****************Travel Distance: " + spline.getDistance());
 		if (spline.getDistance() <= robotDistance) {
 			ob.driveMasterLeft.set(ControlMode.PercentOutput, 0.00);
 			ob.driveMasterRight.set(ControlMode.PercentOutput, 0.00);
@@ -368,17 +372,17 @@ public class Robot extends IterativeRobot {
 					if(angleToDrive < -90 && gyro.getYaw() > 90){
 						double temp = -180 - angleToDrive;
 						temp += -(180 - gyro.getYaw());
-						arcadeDrive(speed, temp /360*8);
+						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);
 					} else if (angleToDrive > 90 && gyro.getYaw() < -90){
 						double temp = 180 - angleToDrive;
 						temp += (180 + gyro.getYaw());
-						arcadeDrive(speed, temp /360*8);					
+						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);					
 					} else {
-						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*8));
+						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
 					}
 				}
 			} else {
-				arcadeDrive(-speed, ((gyro.getYaw() - angleToDrive) /360*8));
+				arcadeDrive(-speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
 			}
 		}
 		return false;

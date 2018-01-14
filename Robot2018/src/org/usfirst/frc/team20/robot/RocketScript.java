@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class RocketScript {
 	static public ArrayList<String> flap(){
 		ArrayList<String> auto = new ArrayList<>();
-		auto.add(RobotModes.HOPPER + ";" + "3.0");
+		auto.add(RobotModes.MOVE_ELEVATOR + ";" + "3.0");
 		return auto;
 	}	
 	static public ArrayList<String> drive(){
@@ -15,7 +15,7 @@ public class RocketScript {
 	}
 	static public ArrayList<String> flapAndDrive(){
 		ArrayList<String> auto = new ArrayList<>();
-		auto.add(RobotModes.HOPPER_AND_DRIVE + ";" + "8.0" + ";" + "0.75" + ";" + "30.0" + ";" + "0.0");
+		auto.add(RobotModes.DRIVE_AND_ELEVATOR + ";" + "8.0" + ";" + "0.75" + ";" + "30.0" + ";" + "0.0");
 		return auto;
 	}
 	static public ArrayList<String> splineTest(){
@@ -26,15 +26,29 @@ public class RocketScript {
 	static public ArrayList<String> splineCenterToLeftSwitch(){
 		ArrayList<String> auto = new ArrayList<>();
 		auto.add(RobotModes.SPLINE + ";" + "0.75"+ ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SWITCH);
-		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SWITCH);
-		auto.add(Integer.toString(RobotModes.PLACE));
+//		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SWITCH);
+//		auto.add(Integer.toString(RobotModes.PLACE));
 		return auto;
 	}
 	static public ArrayList<String> splineCenterToRightSwitch(){
 		ArrayList<String> auto = new ArrayList<>();
 		auto.add(RobotModes.SPLINE + ";" + "0.75"+ ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SWITCH);
-		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SWITCH);
-		auto.add(Integer.toString(RobotModes.PLACE));
+//		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SWITCH);
+//		auto.add(Integer.toString(RobotModes.PLACE));
+		return auto;
+	}
+	static public ArrayList<String> splineCenterToLeftSwitchToLeftScale(){ //TODO move elevator down while doing the spline
+		ArrayList<String> auto = new ArrayList<>();
+		auto.add(RobotModes.SPLINE + ";" + "0.75"+ ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SWITCH_SIDE);
+//		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SWITCH);
+//		auto.add(Integer.toString(RobotModes.PLACE));
+		return auto;
+	}
+	static public ArrayList<String> splineCenterToRightSwitchToRightScale(){ //TODO move elevator down while doing the spline
+		ArrayList<String> auto = new ArrayList<>();
+		auto.add(RobotModes.SPLINE + ";" + "0.75"+ ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SWITCH_SIDE);
+//		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SWITCH);
+//		auto.add(Integer.toString(RobotModes.PLACE));
 		return auto;
 	}
 }

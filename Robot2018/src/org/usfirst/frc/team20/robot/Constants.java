@@ -9,6 +9,7 @@ public class Constants {
 	public static final double TURNING_DEADBAND = 2.0; //Mars - 2.0
 	public static final double TICKS_PER_INCH = 650; //Scorpio Base - 650, Mars - 650
 	public static final double STOPPING_INCHES = 0.0;
+	public static final int SPLINE_FACTOR = 7;
 
 	public static final int PIDIDX = 0; //TODO what is this???
 	//20920, 4667
