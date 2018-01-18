@@ -75,8 +75,8 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		System.out.println("RAN AUTO INIT");
-		gyro.reset();
 		//Reset all variables for the start of auto
+		gyro.reset();
 		autoModeSubStep = 0; startingENCClicksLeft = 0; startingENCClicksRight = 0;
 		resetGyro = false; setStartTime = false; waitStartTime = false; gotStartingENCClicks = false; resetGyroTurn = false; done = false;
 		gyroReset = false; hopperDone = false; driveDone = false;
@@ -91,7 +91,7 @@ public class Robot extends IterativeRobot {
 //			scaleLeft = true;
 //		}
 		//Picking Which Auto Mode
-		script.addAll(RocketScript.splineCenterToRightSwitch());
+		script.addAll(RocketScript.splineCenterToLeftScale());
 		rocketScriptSize = script.size();
 	}
 
@@ -349,6 +349,7 @@ public class Robot extends IterativeRobot {
 		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
 		System.out.println("****************RobotDistance: " + robotDistance);
 		System.out.println("****************Travel Distance: " + spline.getDistance());
+		speed *= spline.speedMultiplier(robotDistance, gyro.getYaw());
 		if (spline.getDistance() <= robotDistance) {
 			ob.driveMasterLeft.set(ControlMode.PercentOutput, 0.00);
 			ob.driveMasterRight.set(ControlMode.PercentOutput, 0.00);

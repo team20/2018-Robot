@@ -114,4 +114,8 @@ public class RobotGrid {
     public double getDistance(){
         return path.get(path.size()-1).getDistance();
     }
+    public double speedMultiplier(double distance, double angle){
+    	double angleTarget = getAngle(distance + 15);
+    	return 1 - Math.abs((angleTarget-angle)/115);
+    }
 }

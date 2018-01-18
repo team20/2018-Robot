@@ -25,30 +25,40 @@ public class RocketScript {
 	}
 	static public ArrayList<String> splineCenterToLeftSwitch(){
 		ArrayList<String> auto = new ArrayList<>();
-		auto.add(RobotModes.SPLINE + ";" + "0.75"+ ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SWITCH);
+		auto.add(RobotModes.SPLINE + ";" + "1.0"+ ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SWITCH);
 //		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SWITCH);
 //		auto.add(Integer.toString(RobotModes.PLACE));
 		return auto;
 	}
 	static public ArrayList<String> splineCenterToRightSwitch(){
 		ArrayList<String> auto = new ArrayList<>();
-		auto.add(RobotModes.SPLINE + ";" + "0.75"+ ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SWITCH);
+		auto.add(RobotModes.SPLINE + ";" + "1.0"+ ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SWITCH);
 //		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SWITCH);
 //		auto.add(Integer.toString(RobotModes.PLACE));
 		return auto;
 	}
 	static public ArrayList<String> splineCenterToLeftSwitchToLeftScale(){ //TODO move elevator down while doing the spline
 		ArrayList<String> auto = new ArrayList<>();
-		auto.add(RobotModes.SPLINE + ";" + "0.75"+ ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SWITCH_SIDE);
+		auto.add(RobotModes.SPLINE + ";" + "1.0"+ ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SWITCH_SIDE);
 //		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SWITCH);
 //		auto.add(Integer.toString(RobotModes.PLACE));
 		return auto;
 	}
 	static public ArrayList<String> splineCenterToRightSwitchToRightScale(){ //TODO move elevator down while doing the spline
 		ArrayList<String> auto = new ArrayList<>();
-		auto.add(RobotModes.SPLINE + ";" + "0.75"+ ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SWITCH_SIDE);
+		auto.add(RobotModes.SPLINE + ";" + "1.0"+ ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SWITCH_SIDE);
 //		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SWITCH);
 //		auto.add(Integer.toString(RobotModes.PLACE));
+		return auto;
+	}
+	static public ArrayList<String> splineCenterToRightScale(){
+		ArrayList<String> auto = new ArrayList<>();
+		auto.add(RobotModes.SPLINE + ";" + "1.0" + ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SCALE);
+		return auto;
+	}
+	static public ArrayList<String> splineCenterToLeftScale(){
+		ArrayList<String> auto = new ArrayList<>();
+		auto.add(RobotModes.SPLINE + ";" + "1.0" + ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SCALE);
 		return auto;
 	}
 }

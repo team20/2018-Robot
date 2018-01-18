@@ -27,4 +27,6 @@ public class RobotModes {
 	public static final int SPLINE_CENTER_TO_RIGHT_SWITCH_SIDE = 4;
 	public static final int SPLINE_LEFT_SWITCH_SIDE_TO_LEFT_SCALE = 5;
 	public static final int SPLINE_RIGHT_SWITCH_SIDE_TO_RIGHT_SCALE = 6;
+	public static final int SPLINE_CENTER_TO_RIGHT_SCALE = 7;
+	public static final int SPLINE_CENTER_TO_LEFT_SCALE = 8;
 }
