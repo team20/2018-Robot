@@ -103,6 +103,7 @@ public class RobotGrid {
             }
         	return path.get(path.size()-1).getAngle();
     }
+    
     public double getReverseAngle(double distance){
     	double angle = getAngle(distance);
     	if (angle>=0)
@@ -111,6 +112,7 @@ public class RobotGrid {
     		angle += 180;
     	return angle;
     }
+
     public double getDistance(){
         return path.get(path.size()-1).getDistance();
     }

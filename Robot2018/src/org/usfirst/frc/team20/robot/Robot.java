@@ -7,16 +7,15 @@
 
 package org.usfirst.frc.team20.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import java.util.ArrayList;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.kauailabs.navx.frc.AHRS;
-
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-///import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -33,6 +32,8 @@ public class Robot extends IterativeRobot {
 	//Classes
 	Objects ob;
 	DriveTrain drive;
+	Collector collector;
+	Elevator elevator;
 
 	//Controllers
 	DriverControls driverJoy;
@@ -45,18 +46,21 @@ public class Robot extends IterativeRobot {
 	Grids grid;
 	int rocketScriptCurrentCount = 0, rocketScriptSize = 0, startingENCClicks = 0,
 			autoModeSubStep = 0, startingENCClicksLeft = 0, startingENCClicksRight = 0;
-	double rotateToAngleRate, currentRotationRate, startTime;
+	double rotateToAngleRate, currentRotationRate, startTime, waitTime;
 	double nominalVoltage = Constants.NOMINAL_VOLTAGE;
 	boolean resetGyro = false, setStartTime = false, waitStartTime = false, gotStartingENCClicks = false, resetGyroTurn = false, done = false,
-			gyroReset = false, hopperDone = false, driveDone = false;
+			gyroReset = false, elevatorDone = false, driveDone = false, splineDone = false, elevatorSet = false;
 
 	@Override
 	public void robotInit() {		
 		ob = new Objects();
 		drive = new DriveTrain(ob);
+		collector = new Collector(ob);
+		elevator = new Elevator(ob);
+		
 		driverJoy = new DriverControls(drive);
-		operatorJoy = new OperatorControls();
-
+		operatorJoy = new OperatorControls(collector);
+		
 		grid = new Grids();
 		gy = new EncoderGyro(ob, 31.3125);
 	}
@@ -79,7 +83,7 @@ public class Robot extends IterativeRobot {
 		gyro.reset();
 		autoModeSubStep = 0; startingENCClicksLeft = 0; startingENCClicksRight = 0;
 		resetGyro = false; setStartTime = false; waitStartTime = false; gotStartingENCClicks = false; resetGyroTurn = false; done = false;
-		gyroReset = false; hopperDone = false; driveDone = false;
+		gyroReset = false; elevatorDone = false; driveDone = false; splineDone = false; elevatorSet = false;
 
 		//Switch and Scale are on the left or right?
 //		String field = DriverStation.getInstance().getGameSpecificMessage();
@@ -91,15 +95,40 @@ public class Robot extends IterativeRobot {
 //			scaleLeft = true;
 //		}
 		//Picking Which Auto Mode
-		script.addAll(RocketScript.splineCenterToLeftScale());
+//		boolean button1 = SmartDashboard.getBoolean("DB/Button 0", false);
+//		boolean button2 = SmartDashboard.getBoolean("DB/Button 1", false);
+//		double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
+		waitTime = 2*SmartDashboard.getNumber("DB/Slider 1", 0.0);
+//		if(position == 0){
+//			if(switchLeft){
+//				
+//			} else {
+//				
+//			}
+//		} else if (position == 2.5){
+//			if(button2 == false){
+//				if(button1 == false){
+//					
+//				} else {
+//					
+//				}
+//			} else {
+//				if(button1 == false){
+//						
+//				} else {
+//					
+//				}
+//			}
+//		} else if (position == 5){
+//			
+//		}
+		script.addAll(RocketScript.splineLeftToLeftSwitch());
 		rocketScriptSize = script.size();
 	}
 
 	/**
 	 * This function is called periodically during autonomous.
 	 */
-	int counter = 0;
-	DoubleSolenoid tank = new DoubleSolenoid(2, 3);
 	@Override
 	public void autonomousPeriodic() {
 		//Scripting
@@ -110,32 +139,44 @@ public class Robot extends IterativeRobot {
 		if (rocketScriptCurrentCount < rocketScriptSize) {
 			String[] values = script.get(rocketScriptCurrentCount).split(";");
 			//Spline
+			if (Integer.parseInt(values[0]) == RobotModes.SPLINE_AND_ELEVATOR) {
+				if(!splineDone){
+					if(spline(Double.parseDouble(values[1]), grid.getGrid(Integer.parseInt(values[2])))){
+						System.out.println("*******SPLINE IS DONE************" + Timer.getMatchTime());
+						splineDone = true;
+					}					
+				}
+//				if(!elevatorDone){
+//					if(!elevatorSet){
+//						elevator.setPosition(ob.elevator.getSelectedSensorPosition(0) + Integer.parseInt(values[3]));
+//						elevatorSet = true;
+						elevatorDone = true; //TODO remove once we have an encoder
+//					}
+//					if(ob.elevator.getSelectedSensorPosition(0) > Integer.parseInt(values[3])-Constants.ELEVATOR_DEADBAND 
+//							&& ob.elevator.getSelectedSensorPosition(0) < Integer.parseInt(values[3])+Constants.ELEVATOR_DEADBAND){
+//						elevatorDone = true;
+//						elevatorSet = false;
+//					}
+//					System.out.println("RUNNING ELEVATOR");
+//				}
+				if(splineDone && elevatorDone){
+					ob.elevator.set(ControlMode.PercentOutput, 0.0);
+					rocketScriptCurrentCount++;
+					splineDone = false;
+					elevatorDone = false;
+				}
+			}
 			if (Integer.parseInt(values[0]) == RobotModes.SPLINE) {
 				if(spline(Double.parseDouble(values[1]), grid.getGrid(Integer.parseInt(values[2])))){
-					System.out.println("*******SPLINE IS DONE************");
+					System.out.println("*******SPLINE IS DONE************" + Timer.getMatchTime());
 					rocketScriptCurrentCount++;
 				}
 			}
-			//Testing dual function capabilities (2017 hopper flaps with driving)
 			if (Integer.parseInt(values[0]) == RobotModes.DRIVE_AND_ELEVATOR) {
 				//TODO make this elevator code
-				if(!hopperDone){
-					if (!waitStartTime) {
-						startTime = Timer.getFPGATimestamp();
-						waitStartTime = true;
-					}
-					if (Timer.getFPGATimestamp() - startTime < Double.parseDouble(values[1])) {
-						System.out.println("Hopper is trying");
-						counter++;
-						if(counter==14){
-							tank.set(DoubleSolenoid.Value.kForward);
-						}else if(counter >= 42){
-							tank.set(DoubleSolenoid.Value.kReverse);
-							counter = 0;
-						}
-					} else {
-						hopperDone = true;
-					}
+				if(!elevatorDone){
+					//TODO add elevator code
+					System.out.println("RUNNING ELEVATOR");
 				}
 				if(!driveDone){
 					System.out.println("******************Driving");
@@ -146,7 +187,7 @@ public class Robot extends IterativeRobot {
 						driveDone = true;
 					}					
 				}
-				if(hopperDone && driveDone){
+				if(elevatorDone && driveDone){
 					rocketScriptCurrentCount++;
 				}
 			}
@@ -160,31 +201,35 @@ public class Robot extends IterativeRobot {
 				}
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.MOVE_ELEVATOR){
-				//TODO make the hopper code into elevator code
-				if (!waitStartTime) {
-					startTime = Timer.getFPGATimestamp();
-					waitStartTime = true;
+				if(!elevatorSet){
+					elevator.setPosition(ob.elevator.getSelectedSensorPosition(0) + Integer.parseInt(values[1]));
+					elevatorSet = true;
 				}
-				if (Timer.getFPGATimestamp() - startTime < Double.parseDouble(values[1])) {
-					counter++;
-					if(counter==14){
-						tank.set(DoubleSolenoid.Value.kForward);
-					}else if(counter >= 42){
-						tank.set(DoubleSolenoid.Value.kReverse);
-						counter = 0;
-					}
-				} else {
+				if(ob.elevator.getSelectedSensorPosition(0) > Integer.parseInt(values[1])-Constants.ELEVATOR_DEADBAND 
+						&& ob.elevator.getSelectedSensorPosition(0) < Integer.parseInt(values[1])+Constants.ELEVATOR_DEADBAND){
 					rocketScriptCurrentCount++;
+					elevatorSet = false;
 				}
-
 			}
-			
 			//Turn to an angle
 			if (Integer.parseInt(values[0]) == RobotModes.TURN) {
 				System.out.println("******************************** " + gyro.getYaw());
 				if (turn(Double.parseDouble(values[1]))) {
 					setStartTime = false;
 					resetGyroTurn = false;
+					rocketScriptCurrentCount++;
+				}
+			}
+			//wait for the time period on the dashboard
+			if (Integer.parseInt(values[0]) == RobotModes.WAIT_ENTERED) {
+				System.out.println("WAITING");
+				if (!waitStartTime) {
+					startTime = Timer.getFPGATimestamp();
+					waitStartTime = true;
+				}
+				if (Timer.getFPGATimestamp() - startTime > waitTime) {
+					System.out.println("******************************DONE WAITING");
+					waitStartTime = false;
 					rocketScriptCurrentCount++;
 				}
 			}
@@ -217,6 +262,32 @@ public class Robot extends IterativeRobot {
 				drive.shiftHigh();
 				rocketScriptCurrentCount++;
 			}
+			if(Integer.parseInt(values[0]) == RobotModes.PLACE){
+				if (!waitStartTime) {
+					startTime = Timer.getFPGATimestamp();
+					waitStartTime = true;
+					collector.outtake();
+				}
+				if (Timer.getFPGATimestamp() - startTime > 0.25) {
+					collector.open();
+					collector.stopRollers();
+					waitStartTime = false;
+					rocketScriptCurrentCount++;
+				}
+			}
+			if(Integer.parseInt(values[0]) == RobotModes.INTAKE){
+				if (!waitStartTime) {
+					startTime = Timer.getFPGATimestamp();
+					waitStartTime = true;
+					collector.intake();
+					collector.close();
+				}
+				if (Timer.getFPGATimestamp() - startTime > 0.5) {
+					collector.stopRollers();
+					waitStartTime = false;
+					rocketScriptCurrentCount++;
+				}
+			}
 		}
 	}
 
@@ -227,7 +298,7 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
  		driverJoy.driverControls();
  		operatorJoy.operatorControls();
-	}
+ 	}
 
 	/**
 	 * This function is called periodically during test mode.
@@ -240,11 +311,11 @@ public class Robot extends IterativeRobot {
 	}
 	@Override
 	public void testPeriodic() {
-		System.out.println("NavX Angle: " + gyro.getYaw());
+//		System.out.println("NavX Angle: " + gyro.getYaw());
 //		System.out.println("Encoder Position Left: " + ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX));	
 //		System.out.println("Encoder Position Right: " + ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX));	
-		System.out.println("Encoder Gyro Angle: " + gy.updateAngle(ob.driveMasterLeft.getSelectedSensorPosition(0),
-				ob.driveMasterRight.getSelectedSensorPosition(0)));
+//		System.out.println("Encoder Gyro Angle: " + gy.updateAngle(ob.driveMasterLeft.getSelectedSensorPosition(0),
+//				ob.driveMasterRight.getSelectedSensorPosition(0)));
 	}
 	
 	// Auto Methods 
@@ -349,7 +420,9 @@ public class Robot extends IterativeRobot {
 		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
 		System.out.println("****************RobotDistance: " + robotDistance);
 		System.out.println("****************Travel Distance: " + spline.getDistance());
-		speed *= spline.speedMultiplier(robotDistance, gyro.getYaw());
+		if(speed > 0){
+			speed *= Math.abs(spline.speedMultiplier(robotDistance, gyro.getYaw()));			
+		}
 		if (spline.getDistance() <= robotDistance) {
 			ob.driveMasterLeft.set(ControlMode.PercentOutput, 0.00);
 			ob.driveMasterRight.set(ControlMode.PercentOutput, 0.00);
@@ -485,3 +558,6 @@ public class Robot extends IterativeRobot {
 		ob.driveMasterRight.set(ControlMode.PercentOutput, -rightMotorSpeed);
 	}
 }
+
+
+

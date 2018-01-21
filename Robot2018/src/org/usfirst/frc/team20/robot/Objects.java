@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class Objects {
 	TalonSRX driveMasterLeft, driveMasterRight, driveFollowerLeft, driveFollowerRight, driveFollowerLeftTwo, driveFollowerRightTwo;
-	DoubleSolenoid driveShifter;
+	TalonSRX collector;
+	TalonSRX elevator;
+	DoubleSolenoid driveShifter, grabber;//, piston45, piston180;
 	public Objects(){
 		//DriveTrain - each group is all the information for a motor
 		driveMasterLeft = new TalonSRX(10);
@@ -35,5 +37,16 @@ public class Objects {
 		driveFollowerRightTwo.setInverted(true);
 		
 		driveShifter = new DoubleSolenoid(0, 1);		
+
+		collector = new TalonSRX(1);
+		grabber = new DoubleSolenoid(5, 4);
+//		piston45 = new DoubleSolenoid(2, 3);
+//		piston180 = new DoubleSolenoid(0, 1);
+		
+		elevator = new TalonSRX(7);
+		elevator.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, Constants.PIDIDX, 1000);
+		elevator.config_kP(0, 1/16000, 1000);
+		elevator.config_kI(0, 0.0, 1000);
+		elevator.config_kD(0, 0.0, 1000);
 	}
 }
