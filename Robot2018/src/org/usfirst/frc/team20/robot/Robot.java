@@ -49,6 +49,8 @@ public class Robot extends IterativeRobot {
 	double nominalVoltage = Constants.NOMINAL_VOLTAGE;
 	boolean resetGyro = false, setStartTime = false, waitStartTime = false, gotStartingENCClicks = false, resetGyroTurn = false, done = false,
 			gyroReset = false, hopperDone = false, driveDone = false;
+	
+	Arduino arduino;	//Arduino to get sensor information via I2C
 
 	@Override
 	public void robotInit() {		
@@ -59,6 +61,8 @@ public class Robot extends IterativeRobot {
 
 		grid = new Grids();
 		gy = new EncoderGyro(ob, 31.3125);
+		
+		arduino = new Arduino(1);
 	}
 
 	/**
@@ -224,6 +228,10 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
  		driverJoy.driverControls();
  		operatorJoy.operatorControls();
+ 		arduino.getSensorData();
+ 		if (arduino.getIRSensor()) {
+ 			//TODO add code here to grab cube
+ 		}
 	}
 
 	/**
