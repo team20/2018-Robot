@@ -2,37 +2,24 @@ package org.usfirst.frc.team20.robot;
 
 public class DriverControls {
 	DriveTrain drive;
-	Controller driverJoy;
+	Objects ob;
 	double speedStraight = 0, speedLeft = 0, speedRight = 0;
 	
-	public DriverControls(DriveTrain d){
+	public DriverControls(DriveTrain d, Objects o){
 		drive = d;
-		driverJoy = new Controller(0);
+		ob = o;
 	}
 	
 	public void driverControls(){
-		if (driverJoy.getRightTriggerAxis() > 0.1) {
-			speedStraight = driverJoy.getRightTriggerAxis()*0.75;
-		} else if (driverJoy.getLeftTriggerAxis() > 0.1) {
-			speedStraight = -driverJoy.getLeftTriggerAxis()*0.75;
-		} else {
-			speedStraight = 0.0;
+		speedStraight = -ob.driverJoy.getLeftYAxis();
+		speedLeft = ob.driverJoy.getLeftTriggerAxis();
+		speedRight = ob.driverJoy.getRightTriggerAxis();
+		drive.drive(speedStraight, speedRight, speedLeft);
+		if(ob.driverJoy.getButtonY()){
+			drive.shiftHigh();
 		}
-		if (driverJoy.getLeftXAxis() < -0.1) {
-			speedLeft = -driverJoy.getLeftXAxis()*0.75;
-		} else {
-			speedLeft = 0.0;
+		if(ob.driverJoy.getButtonB()){
+			drive.shiftLow();
 		}
-		if (driverJoy.getLeftXAxis() > 0.1) {
-			speedRight = driverJoy.getLeftXAxis()*0.75;
-		} else {
-			speedRight = 0.0;
-		}
-		if (speedStraight > 0 || speedStraight < 0 || speedLeft > 0 || speedRight > 0) {
-			drive.drive(speedStraight, speedRight, speedLeft);
-		} else {
-			drive.stopDrive();
-		}
-
 	}
 }
