@@ -18,8 +18,11 @@ public class DriveTrain {
 			rightTurn *= .95;
 			leftTurn *= .95;
 		}
-		ob.driveMasterRight.set(ControlMode.PercentOutput ,speed - rightTurn + leftTurn);
+		ob.driveMasterRight.set(ControlMode.PercentOutput, speed - rightTurn + leftTurn);
 		ob.driveMasterLeft.set(ControlMode.PercentOutput, -speed + leftTurn - rightTurn);
+        ob.updateLeftSide(speed - rightTurn + leftTurn);
+        ob.updateRightSide(-speed + leftTurn - rightTurn);
+
 	}
 	
 	public void stopDrive() {

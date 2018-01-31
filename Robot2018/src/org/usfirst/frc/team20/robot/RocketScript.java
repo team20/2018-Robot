@@ -3,14 +3,23 @@ package org.usfirst.frc.team20.robot;
 import java.util.ArrayList;
 
 public class RocketScript {
+	
+	static public ArrayList<String> testElevator(){
+		ArrayList<String> auto = new ArrayList<>();
+		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SWITCH);
+		return auto;
+	}
+	
 	static public ArrayList<String> crossAutoLine(){
 		ArrayList<String> auto = new ArrayList<>();
+		auto.add(Integer.toString(RobotModes.WAIT_ENTERED));
 		auto.add(RobotModes.ENCODER_DRIVE + ";" + 1.0 + ";" + 120);
 		return auto;
 	}	
 
 	static public ArrayList<String> splineCenterToLeftSwitch(){
 		ArrayList<String> auto = new ArrayList<>();
+		auto.add(Integer.toString(RobotModes.WAIT_ENTERED));
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + "1.0"+ ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SWITCH + ";" + RobotModes.POSITION_SWITCH);
 		auto.add(Integer.toString(RobotModes.PLACE));
 		return auto;
@@ -18,6 +27,7 @@ public class RocketScript {
 	
 	static public ArrayList<String> splineCenterToRightSwitch(){
 		ArrayList<String> auto = new ArrayList<>();
+		auto.add(Integer.toString(RobotModes.WAIT_ENTERED));
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + "1.0"+ ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SWITCH + ";" + RobotModes.POSITION_SWITCH);
 		auto.add(Integer.toString(RobotModes.PLACE));
 		return auto;
@@ -25,6 +35,7 @@ public class RocketScript {
 	
 	static public ArrayList<String> splineCenterToRightScale(){
 		ArrayList<String> auto = new ArrayList<>();
+		auto.add(Integer.toString(RobotModes.WAIT_ENTERED));
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + "1.0" + ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SCALE + ";" + RobotModes.POSITION_SCALE);
 		auto.add(Integer.toString(RobotModes.PLACE));
 		return auto;
@@ -32,6 +43,7 @@ public class RocketScript {
 
 	static public ArrayList<String> splineCenterToLeftScale(){
 		ArrayList<String> auto = new ArrayList<>();
+		auto.add(Integer.toString(RobotModes.WAIT_ENTERED));
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + "1.0" + ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SCALE + ";" + RobotModes.POSITION_SCALE);
 		auto.add(Integer.toString(RobotModes.PLACE));
 		return auto;

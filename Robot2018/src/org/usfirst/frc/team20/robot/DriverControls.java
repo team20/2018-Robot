@@ -2,18 +2,24 @@ package org.usfirst.frc.team20.robot;
 
 public class DriverControls {
 	DriveTrain drive;
-	Controller driverJoy;
+	Objects ob;
 	double speedStraight = 0, speedLeft = 0, speedRight = 0;
 	
-	public DriverControls(DriveTrain d){
+	public DriverControls(DriveTrain d, Objects o){
 		drive = d;
-		driverJoy = new Controller(0);
+		ob = o;
 	}
 	
 	public void driverControls(){
-		speedStraight = -driverJoy.getLeftYAxis();
-		speedLeft = driverJoy.getLeftTriggerAxis();
-		speedRight = driverJoy.getRightTriggerAxis();
+		speedStraight = -ob.driverJoy.getLeftYAxis();
+		speedLeft = ob.driverJoy.getLeftTriggerAxis();
+		speedRight = ob.driverJoy.getRightTriggerAxis();
 		drive.drive(speedStraight, speedRight, speedLeft);
+		if(ob.driverJoy.getButtonY()){
+			drive.shiftHigh();
+		}
+		if(ob.driverJoy.getButtonB()){
+			drive.shiftLow();
+		}
 	}
 }

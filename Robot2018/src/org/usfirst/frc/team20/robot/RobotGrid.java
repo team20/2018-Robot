@@ -1,6 +1,7 @@
 package org.usfirst.frc.team20.robot;
-
 import java.util.ArrayList;
+
+
 
 public class RobotGrid {
 //NO ARCS OVER 90 DEGREES
@@ -35,15 +36,15 @@ public class RobotGrid {
         }else{
         	tempX = p3.intersectX(p1);
         }
-        if(((p1.getAngle() > 88 && p1.getAngle() < 92) || (p1.getAngle()>268 && p1.getAngle()<272)) && ((p3.getAngle()>-2 && p3.getAngle() <2) || (p3.getAngle() >178 && p3.getAngle() <182))){
+        if(((Math.abs(p1.getAngle()) > 88 && Math.abs(p1.getAngle()) < 92) || (Math.abs(p1.getAngle())>268 && Math.abs(p1.getAngle())<272)) && ((Math.abs(p3.getAngle())>-2 && Math.abs(p3.getAngle()) <2) || (Math.abs(p3.getAngle()) >178 && Math.abs(p3.getAngle()) <182))){
         	System.out.println("right angle");
         	tempX = p1.getX();
         	tempY = p3.getY();
-        }else if(((p3.getAngle() > 88 && p3.getAngle() < 92) || (p3.getAngle()>268 && p3.getAngle()<272)) && ((p1.getAngle()>-2 && p1.getAngle() <2) || (p1.getAngle() >178 && p1.getAngle() <182))){
+        }else if(((Math.abs(p3.getAngle()) > 88 && Math.abs(p3.getAngle()) < 92) || (Math.abs(p3.getAngle())>268 && Math.abs(p3.getAngle())<272)) && ((Math.abs(p1.getAngle())>-2 && Math.abs(p1.getAngle()) <2) || (Math.abs(p1.getAngle()) >178 && Math.abs(p1.getAngle()) <182))){
         	System.out.println("right angle");
         	tempX = p3.getX();
         	tempY = p1.getY();
-        }else if (p1.getAngle() == 90 || p1.getAngle() == 270) {
+        }else if (Math.abs(p1.getAngle()) == 90 || Math.abs(p1.getAngle()) == 270) {
             System.out.println("handled normal");
         	tempY = p3.getSlope() * (tempX - p3.getX()) + p3.getY();
         } else{
@@ -103,7 +104,6 @@ public class RobotGrid {
             }
         	return path.get(path.size()-1).getAngle();
     }
-    
     public double getReverseAngle(double distance){
     	double angle = getAngle(distance);
     	if (angle>=0)
@@ -112,12 +112,59 @@ public class RobotGrid {
     		angle += 180;
     	return angle;
     }
-
     public double getDistance(){
         return path.get(path.size()-1).getDistance();
     }
     public double speedMultiplier(double distance, double angle){
     	double angleTarget = getAngle(distance + 15);
-    	return 1 - Math.abs((angleTarget-angle)/115);
+    	return Math.abs(1-Math.abs((angleTarget-angle)/115));
+    }
+    public double getLeftIPS(double distance,double angle,double baseIPS, EncoderGyro change){//inches per second
+    	double t = 10/baseIPS;
+    	double leftDistance;
+    	double angleChange;
+    	if(baseIPS>0){
+    		if (getAngle(distance+10)>90 && angle < -90){
+    			angleChange = 180-getAngle(distance+10);
+    			angleChange += 180 + angle;
+    		}else if(angle > 90 && getAngle(distance + 10) < -90){
+    			angleChange = 180-angle;
+    			angleChange += 180 + getAngle(distance +10);
+    		}else angleChange = getAngle(distance +10)-angle;
+    	}else {
+    		if (getReverseAngle(distance+10)>90 && angle < -90){
+        		angleChange = 180-getReverseAngle(distance+10);
+        		angleChange += 180 + angle;
+        	}else if(angle > 90 && getReverseAngle(distance + 10) < -90){
+        		angleChange = 180-angle;
+        		angleChange += 180 + getReverseAngle(distance +10);
+        	}else angleChange = getReverseAngle(distance +10)-angle;
+    	}
+    	leftDistance = change.angleToDistance(angleChange)+10;
+    	return leftDistance /t;
+    }
+    public double getRightIPS(double distance,double angle,double baseIPS, EncoderGyro change){//inches per second
+    	double t = 10/baseIPS;
+    	double rightDistance;
+    	double angleChange;
+    	if(baseIPS>0){
+    		if (getAngle(distance+10)>90 && angle < -90){
+    		angleChange = 180-getAngle(distance+10);
+    		angleChange += 180 + angle;
+    		}else if(angle > 90 && getAngle(distance + 10) < -90){
+    		angleChange = 180-angle;
+    		angleChange += 180 + getAngle(distance +10);
+    		}else angleChange = getAngle(distance +10)-angle;
+    	}else {
+    		if (getReverseAngle(distance+10)>90 && angle < -90){
+        		angleChange = 180-getReverseAngle(distance+10);
+        		angleChange += 180 + angle;
+        	}else if(angle > 90 && getReverseAngle(distance + 10) < -90){
+        		angleChange = 180-angle;
+        		angleChange += 180 + getReverseAngle(distance +10);
+        	}else angleChange = getReverseAngle(distance +10)-angle;
+    	}
+    	rightDistance =  change.angleToDistance(angleChange)-10;
+    	return rightDistance /t;
     }
 }

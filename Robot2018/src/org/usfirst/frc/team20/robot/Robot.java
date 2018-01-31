@@ -7,11 +7,10 @@
 
 package org.usfirst.frc.team20.robot;
 
-import edu.wpi.first.wpilibj.DriverStation;
+//import edu.wpi.first.wpilibj.DriverStation;
 import java.util.ArrayList;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
@@ -44,6 +43,7 @@ public class Robot extends IterativeRobot {
 	ArrayList<String> script = new ArrayList<>();
 	EncoderGyro gy;
 	Grids grid;
+	DriverVision cam, cam1;
 	int rocketScriptCurrentCount = 0, rocketScriptSize = 0, startingENCClicks = 0,
 			autoModeSubStep = 0, startingENCClicksLeft = 0, startingENCClicksRight = 0;
 	double rotateToAngleRate, currentRotationRate, startTime, waitTime;
@@ -51,6 +51,11 @@ public class Robot extends IterativeRobot {
 	boolean resetGyro = false, setStartTime = false, waitStartTime = false, gotStartingENCClicks = false, resetGyroTurn = false, done = false,
 			gyroReset = false, elevatorDone = false, driveDone = false, splineDone = false, elevatorSet = false;
 
+	//Blackbox
+	Logger logger;
+	boolean socket = false;
+	boolean beenEnabled = false;
+	
 	@Override
 	public void robotInit() {		
 		ob = new Objects();
@@ -58,27 +63,46 @@ public class Robot extends IterativeRobot {
 		collector = new Collector(ob);
 		elevator = new Elevator(ob);
 		
-		driverJoy = new DriverControls(drive);
-		operatorJoy = new OperatorControls(collector);
+		driverJoy = new DriverControls(drive, ob);
+		operatorJoy = new OperatorControls(collector, elevator, ob);
 		
 		grid = new Grids();
-		gy = new EncoderGyro(ob, 31.3125);
+		gy = new EncoderGyro(ob, 28.75); //TODO inside to inside wheel on 2018
+		
+//		try{
+//			cam = new DriverVision("camera on stick", 0);
+//			cam.startUSBCamera();
+//			cam1 = new DriverVision("cam1", 1);
+//			cam1.startUSBCamera();
+//		} catch(Exception e){
+//			
+//		} finally {
+//			System.out.println("Camera Isn't Working!!!");
+//		}
+		logger = new Logger();
+		logger.register(ob);
+		logger.startSocket();
+		socket = true;
 	}
 
-	/**
-	 * This autonomous (along with the chooser code above) shows how to select
-	 * between different autonomous modes using the dashboard. The sendable
-	 * chooser code works with the Java SmartDashboard. If you prefer the
-	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-	 * getString line to get the auto name from the text box below the Gyro
-	 *
-	 * <p>You can add additional auto modes by adding additional comparisons to
-	 * the switch structure below with additional strings. If using the
-	 * SendableChooser make sure to add them to the chooser code above as well.
-	 */
+	public void disabledInit(){
+		if(beenEnabled){
+			try {
+				logger.closeSocket(); socket = false;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		beenEnabled = false;
+	}
 	@Override
 	public void autonomousInit() {
 		System.out.println("RAN AUTO INIT");
+		//logger stuff!
+		if(!socket){
+			logger.startSocket(); socket = true;
+		}
+		beenEnabled = true;		
 		//Reset all variables for the start of auto
 		gyro.reset();
 		autoModeSubStep = 0; startingENCClicksLeft = 0; startingENCClicksRight = 0;
@@ -87,42 +111,74 @@ public class Robot extends IterativeRobot {
 
 		//Switch and Scale are on the left or right?
 //		String field = DriverStation.getInstance().getGameSpecificMessage();
-//		boolean switchLeft = false, scaleLeft = false;
-//		if(field.charAt(0) == 'L'){
-//			switchLeft = true;
-//		}
-//		if(field.charAt(1) == 'L'){
-//			scaleLeft = true;
-//		}
+		String field = FMSReplicate.getGameSpecificMessage();
+		boolean switchLeft = false, scaleLeft = false;
+		if(field.charAt(0) == 'L'){
+			switchLeft = true;
+		}
+		if(field.charAt(1) == 'L'){
+			scaleLeft = true;
+		}
 		//Picking Which Auto Mode
-//		boolean button1 = SmartDashboard.getBoolean("DB/Button 0", false);
-//		boolean button2 = SmartDashboard.getBoolean("DB/Button 1", false);
-//		double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
+		boolean scalePriority = SmartDashboard.getBoolean("DB/Button 0", false);
+		boolean highOnly = SmartDashboard.getBoolean("DB/Button 1", false);
+		double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
 		waitTime = 2*SmartDashboard.getNumber("DB/Slider 1", 0.0);
-//		if(position == 0){
-//			if(switchLeft){
-//				
-//			} else {
-//				
-//			}
-//		} else if (position == 2.5){
-//			if(button2 == false){
-//				if(button1 == false){
-//					
-//				} else {
-//					
-//				}
-//			} else {
-//				if(button1 == false){
-//						
-//				} else {
-//					
-//				}
-//			}
-//		} else if (position == 5){
-//			
-//		}
-		script.addAll(RocketScript.splineLeftToLeftSwitch());
+		if(position == 0){
+			if(switchLeft){
+				script.addAll(RocketScript.splineLeftToLeftSwitch());
+			} else {
+				script.addAll(RocketScript.splineLeftToRightSwitch());
+			}
+		} else if (position == 2.5){
+			if(!highOnly){
+				if(scaleLeft && switchLeft){
+					script.addAll(RocketScript.splineCenterToLeftSwitchToLeftScale());
+				} else if (!scaleLeft && !switchLeft){
+					script.addAll(RocketScript.splineCenterToRightSwitchToRightScale());
+				} else {
+					if(!scalePriority){
+						if(switchLeft){
+							script.addAll(RocketScript.splineCenterToLeftSwitch());
+						} else {
+							script.addAll(RocketScript.splineCenterToRightSwitch());
+						}
+					} else {
+						if(scaleLeft){
+							script.addAll(RocketScript.splineCenterToLeftScale());
+						} else {
+							script.addAll(RocketScript.splineCenterToRightScale());
+						}
+					}
+				}
+			} else {
+				if(!scalePriority){
+					if(switchLeft){
+						script.addAll(RocketScript.splineCenterToLeftSwitch());
+					} else {
+						script.addAll(RocketScript.splineCenterToRightSwitch());
+					}
+				} else {
+					if(scaleLeft){
+						script.addAll(RocketScript.splineCenterToLeftScale());
+					} else {
+						script.addAll(RocketScript.splineCenterToRightScale());
+					}
+				}				
+			}
+		} else if (position == 5){
+			script.addAll(RocketScript.crossAutoLine());
+		}
+//		double p = Double.parseDouble(SmartDashboard.getString("DB/String 0", "0.0"));
+//		System.out.println("P: " + p);
+//		double i = Double.parseDouble(SmartDashboard.getString("DB/String 1", "0.0"));
+//		System.out.println("I: " + i);
+//		double d = Double.parseDouble(SmartDashboard.getString("DB/String 2", "0.0"));
+//		System.out.println("D: " + d);
+//		double f = Double.parseDouble(SmartDashboard.getString("DB/String 3", "0.0"));
+//		System.out.println("F: " + f);
+//		elevator.setPID(p, i, d, f);
+//		script.addAll(RocketScript.testElevator());
 		rocketScriptSize = script.size();
 	}
 
@@ -131,6 +187,8 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		logger.log();
+		ob.updateGyroAngle(gyro.getYaw());
 		//Scripting
 		if(!gyroReset){
 			gyro.reset();
@@ -148,16 +206,14 @@ public class Robot extends IterativeRobot {
 				}
 //				if(!elevatorDone){
 //					if(!elevatorSet){
-//						elevator.setPosition(ob.elevator.getSelectedSensorPosition(0) + Integer.parseInt(values[3]));
+//						elevator.getAutoPosition(Integer.parseInt(values[1]));
 //						elevatorSet = true;
-						elevatorDone = true; //TODO remove once we have an encoder
 //					}
-//					if(ob.elevator.getSelectedSensorPosition(0) > Integer.parseInt(values[3])-Constants.ELEVATOR_DEADBAND 
-//							&& ob.elevator.getSelectedSensorPosition(0) < Integer.parseInt(values[3])+Constants.ELEVATOR_DEADBAND){
-//						elevatorDone = true;
+//					if(ob.elevator.getSelectedSensorPosition(0) > elevator.getSetPosition()-Constants.ELEVATOR_DEADBAND 
+//						&& ob.elevator.getSelectedSensorPosition(0) < elevator.getSetPosition()+Constants.ELEVATOR_DEADBAND){
 //						elevatorSet = false;
+						elevatorDone = true;
 //					}
-//					System.out.println("RUNNING ELEVATOR");
 //				}
 				if(splineDone && elevatorDone){
 					ob.elevator.set(ControlMode.PercentOutput, 0.0);
@@ -172,25 +228,6 @@ public class Robot extends IterativeRobot {
 					rocketScriptCurrentCount++;
 				}
 			}
-			if (Integer.parseInt(values[0]) == RobotModes.DRIVE_AND_ELEVATOR) {
-				//TODO make this elevator code
-				if(!elevatorDone){
-					//TODO add elevator code
-					System.out.println("RUNNING ELEVATOR");
-				}
-				if(!driveDone){
-					System.out.println("******************Driving");
-					if (encoderDrive(Double.parseDouble(values[2]),
-							Double.parseDouble(values[3]) - Constants.STOPPING_INCHES, Double.parseDouble(values[4]))) {
-						gotStartingENCClicks = false;
-						gyro.reset();
-						driveDone = true;
-					}					
-				}
-				if(elevatorDone && driveDone){
-					rocketScriptCurrentCount++;
-				}
-			}
 			//Driving using encoders
 			if (Integer.parseInt(values[0]) == RobotModes.ENCODER_DRIVE) {
 				if (encoderDrive(Double.parseDouble(values[1]),
@@ -202,13 +239,19 @@ public class Robot extends IterativeRobot {
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.MOVE_ELEVATOR){
 				if(!elevatorSet){
-					elevator.setPosition(ob.elevator.getSelectedSensorPosition(0) + Integer.parseInt(values[1]));
+					System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Set the elevator position");
+					elevator.getAutoPosition(Integer.parseInt(values[1]));
 					elevatorSet = true;
 				}
-				if(ob.elevator.getSelectedSensorPosition(0) > Integer.parseInt(values[1])-Constants.ELEVATOR_DEADBAND 
-						&& ob.elevator.getSelectedSensorPosition(0) < Integer.parseInt(values[1])+Constants.ELEVATOR_DEADBAND){
+				System.out.println("Encoder Position: " + ob.driveMasterLeft.getSelectedSensorPosition(0));
+				System.out.println("                                 Output Voltage: " + ob.driveMasterLeft.getOutputCurrent());
+//				if(ob.elevator.getSelectedSensorPosition(0) > elevator.getSetPosition()-Constants.ELEVATOR_DEADBAND 
+//						&& ob.elevator.getSelectedSensorPosition(0) < elevator.getSetPosition()+Constants.ELEVATOR_DEADBAND){
+				if(Math.abs(ob.driveMasterLeft.getSelectedSensorPosition(0) - elevator.getSetPosition()) < Constants.ELEVATOR_DEADBAND){
+					elevator.stop();
 					rocketScriptCurrentCount++;
 					elevatorSet = false;
+					System.out.println("((((((((((((((((((((((((((((((((((((Elevator Done: " + ob.driveMasterLeft.getSelectedSensorPosition(0));
 				}
 			}
 			//Turn to an angle
@@ -295,8 +338,22 @@ public class Robot extends IterativeRobot {
 	 * This function is called periodically during operator control.
 	 */
 	@Override
+	public void teleopInit(){
+		drive.shiftHigh();
+		if(!socket){
+			logger.startSocket(); socket = true;
+		}
+	}
+	@Override
 	public void teleopPeriodic() {
- 		driverJoy.driverControls();
+		logger.log();
+		try{
+			ob.updateGyroAngle(gyro.getYaw());
+		} catch (Exception e){
+		} finally {
+			System.out.println("NavX Crashed");
+		}
+		driverJoy.driverControls();
  		operatorJoy.operatorControls();
  	}
 
@@ -312,9 +369,9 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void testPeriodic() {
 //		System.out.println("NavX Angle: " + gyro.getYaw());
-//		System.out.println("Encoder Position Left: " + ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX));	
-//		System.out.println("Encoder Position Right: " + ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX));	
-//		System.out.println("Encoder Gyro Angle: " + gy.updateAngle(ob.driveMasterLeft.getSelectedSensorPosition(0),
+		System.out.println("Encoder Position Follower: " + ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX));	
+		System.out.println("Encoder Position Master: " + ob.driveFollowerRight.getSelectedSensorPosition(Constants.PIDIDX));	
+//		System.out.println("Encoder Gyro Angle: " + gy.updateAngle(ob.driveMasterLeft.getSelectedSensorPosition(0), ob.driveMasterRight.getSelectedSensorPosition(0)));
 //				ob.driveMasterRight.getSelectedSensorPosition(0)));
 	}
 	
@@ -330,6 +387,7 @@ public class Robot extends IterativeRobot {
 			gyro.reset();
 			resetGyroTurn = true;
 			nominalVoltage = Constants.NOMINAL_VOLTAGE;
+			ob.updateGyroSetpoint(gyro.getYaw() - angleToDrive);
 		}
 		if (Math.abs(gyro.getYaw() - angleToDrive) < Constants.TURNING_DEADBAND) {
 			System.out.println("*************************************HIT TURNING DEADBAND");
@@ -368,6 +426,7 @@ public class Robot extends IterativeRobot {
 			if (Math.abs(speed) > 0.00) {
 				if (withGyro){
 					arcadeDrive(speed, -(gyro.getYaw() * Constants.DRIVING_P));
+					ob.updateGyroSetpoint(gyro.getYaw());
 					System.out.println("------------------------Arcade Drive is Over");
 				} else {
 					arcadeDrive(speed, 0);
@@ -389,6 +448,8 @@ public class Robot extends IterativeRobot {
 			gotStartingENCClicks = true;
 			startingENCClicks = ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX);
 			System.out.println("Start ENC click value = " + startingENCClicks);
+			ob.updateLeftSetpoint(inches*Constants.TICKS_PER_INCH);
+			ob.updateRightSetpoint(inches*Constants.TICKS_PER_INCH);
 		}
 		if (Math.abs((double) (ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicks)) > Math
 				.abs(inches * Constants.TICKS_PER_INCH)) {
@@ -398,6 +459,7 @@ public class Robot extends IterativeRobot {
 			System.out.println("Enc value after speed 0 " + ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX));
 			return true;
 		} else {
+			ob.updateGyroSetpoint(gyro.getYaw() - angleToDrive);
 			if (inches > 0) {
 				if (Math.abs((double) (ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX) - startingENCClicks)) < Math
 						.abs(inches * Constants.TICKS_PER_INCH))
@@ -430,6 +492,8 @@ public class Robot extends IterativeRobot {
 			System.out.println("Enc value after speed 0 " + ob.driveMasterLeft.getSelectedSensorPosition(0));
 			//System.out.println(spline.toString());
 			gotStartingENCClicks = false;
+			ob.updateLeftSetpoint(ob.driveMasterLeft.getSelectedSensorPosition(0));
+			ob.updateRightSetpoint(ob.driveMasterRight.getSelectedSensorPosition(0));
 			return true;
 		} else {
 			double angleToDrive;
@@ -437,6 +501,7 @@ public class Robot extends IterativeRobot {
 				angleToDrive = (spline.getAngle(robotDistance));
 			else
 				angleToDrive = (spline.getReverseAngle(robotDistance));
+			ob.updateGyroSetpoint(gyro.getYaw() - angleToDrive);
 			if (spline.getDistance() > 0) {
 				if (spline.getDistance() > robotDistance);
 				{
@@ -500,6 +565,8 @@ public class Robot extends IterativeRobot {
         System.out.println("		Right: " + rightMotorSpeed);
         ob.driveMasterLeft.set(ControlMode.PercentOutput, -leftMotorSpeed);
         ob.driveMasterRight.set(ControlMode.PercentOutput, rightMotorSpeed);
+        ob.updateLeftSide(-leftMotorSpeed);
+        ob.updateRightSide(rightMotorSpeed);
 	}
 
 	public double limit(double num){
@@ -556,6 +623,9 @@ public class Robot extends IterativeRobot {
 		System.out.println("		RightMotorSpeed: " + rightMotorSpeed);
 		ob.driveMasterLeft.set(ControlMode.PercentOutput, leftMotorSpeed);
 		ob.driveMasterRight.set(ControlMode.PercentOutput, -rightMotorSpeed);
+        ob.updateLeftSide(-leftMotorSpeed);
+        ob.updateRightSide(rightMotorSpeed);
+
 	}
 }
 

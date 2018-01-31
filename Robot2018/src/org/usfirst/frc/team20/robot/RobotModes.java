@@ -12,9 +12,8 @@ public class RobotModes {
 	public static final int PLACE = 7;
 	public static final int MOVE_ELEVATOR = 8;
 	public static final int SPLINE_AND_ELEVATOR = 9;
-	public static final int DRIVE_AND_ELEVATOR = 10;
-	public static final int INTAKE = 11;
-	public static final int WAIT_ENTERED = 12;
+	public static final int INTAKE = 10;
+	public static final int WAIT_ENTERED = 11;
 	
 	//Elevator Positions - encoder ticks
 	public static final int POSITION_SWITCH = 0;

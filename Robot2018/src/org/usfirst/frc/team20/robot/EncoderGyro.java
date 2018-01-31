@@ -12,10 +12,8 @@ public class EncoderGyro {
 		startingDistanceLeft = ob.driveMasterLeft.getSelectedSensorPosition(0)/Constants.TICKS_PER_INCH;
 		startingDistanceRight = ob.driveMasterRight.getSelectedSensorPosition(0)/Constants.TICKS_PER_INCH;
 	}
-	public double updateAngle(double leftPosition, double rightPosition){
-		double leftDistance = leftPosition/Constants.TICKS_PER_INCH;
-		double rightDistance = rightPosition/Constants.TICKS_PER_INCH;
-		double wheelArc = ((leftDistance - startingDistanceLeft) - (rightDistance - startingDistanceRight)) / 2;
+	public double updateAngle(double leftDistance, double rightDistance){
+		double wheelArc = ((leftDistance/Constants.TICKS_PER_INCH - startingDistanceLeft) - (rightDistance/Constants.TICKS_PER_INCH - startingDistanceRight)) / 2;
 		double radians = wheelArc/radius;
 		angle = Math.toDegrees(radians);
 		angle %= 360;
@@ -25,10 +23,14 @@ public class EncoderGyro {
 			angle = (angle%180)+180;
 		return angle;
 	}
+	public double angleToDistance(double angle){
+		double radians = Math.toRadians(angle);
+		return radians*radius;
+	}
 	public double getAngle(){
 		return angle;
 	}
 	public double getRadius(){
 		return radius;
-	} 
+	}
 }

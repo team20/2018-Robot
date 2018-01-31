@@ -30,18 +30,18 @@ public class Collector {
 		ob.grabber.set(Value.kForward);
 	}
 	
-//	public void arm45(){
+	public void arm45(){
 //		ob.piston45.set(Value.kForward);
 //		ob.piston180.set(Value.kReverse);
-//	}
-//	
-//	public void arm100(){
+	}
+	
+	public void arm100(){
 //		ob.piston45.set(Value.kReverse);
 //		ob.piston180.set(Value.kForward);
-//	}
-//
-//	public void arm180(){
+	}
+
+	public void arm180(){
 //		ob.piston45.set(Value.kForward);
 //		ob.piston180.set(Value.kForward);
-//	}
+	}
 }
