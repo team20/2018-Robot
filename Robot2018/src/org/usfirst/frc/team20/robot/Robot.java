@@ -50,6 +50,7 @@ public class Robot extends IterativeRobot {
 	double nominalVoltage = Constants.NOMINAL_VOLTAGE;
 	boolean resetGyro = false, setStartTime = false, waitStartTime = false, gotStartingENCClicks = false, resetGyroTurn = false, done = false,
 			gyroReset = false, elevatorDone = false, driveDone = false, splineDone = false, elevatorSet = false;
+	Arduino arduino;	//Arduino to get sensor information via I2C
 
 	//Blackbox
 	Logger logger;
@@ -67,6 +68,7 @@ public class Robot extends IterativeRobot {
 		operatorJoy = new OperatorControls(collector, elevator, ob);
 		
 		grid = new Grids();
+		arduino = new Arduino(1);
 		gy = new EncoderGyro(ob, 28.75); //TODO inside to inside wheel on 2018
 		
 //		try{
@@ -355,7 +357,10 @@ public class Robot extends IterativeRobot {
 		}
 		driverJoy.driverControls();
  		operatorJoy.operatorControls();
- 	}
+ 		arduino.getSensorData();
+//  		if (arduino.getIRSensor()) {
+//  			//TODO add code here to grab cube
+//  		}
 
 	/**
 	 * This function is called periodically during test mode.
