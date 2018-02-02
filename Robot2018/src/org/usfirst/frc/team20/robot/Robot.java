@@ -39,6 +39,7 @@ public class Robot extends IterativeRobot {
 	OperatorControls operatorJoy;
 	
 	//Autonomous Variables
+	PIDController headingPID;
 	AHRS gyro = new AHRS(SerialPort.Port.kMXP); // DO NOT PUT IN ROBOT INIT
 	ArrayList<String> script = new ArrayList<>();
 	EncoderGyro gy;
@@ -47,6 +48,7 @@ public class Robot extends IterativeRobot {
 	int rocketScriptCurrentCount = 0, rocketScriptSize = 0, startingENCClicks = 0,
 			autoModeSubStep = 0, startingENCClicksLeft = 0, startingENCClicksRight = 0;
 	double rotateToAngleRate, currentRotationRate, startTime, waitTime;
+	double kP = 0.00, kI = 0.00, kD = 0.00;
 	double nominalVoltage = Constants.NOMINAL_VOLTAGE;
 	boolean resetGyro = false, setStartTime = false, waitStartTime = false, gotStartingENCClicks = false, resetGyroTurn = false, done = false,
 			gyroReset = false, elevatorDone = false, driveDone = false, splineDone = false, elevatorSet = false;
@@ -66,6 +68,11 @@ public class Robot extends IterativeRobot {
 		
 		driverJoy = new DriverControls(drive, ob);
 		operatorJoy = new OperatorControls(collector, elevator, ob);
+		
+		headingPID = new PIDController(kP, kI, kD, gyro, this);
+		headingPID.setInputRange(-180, 180);
+		headingPID.setContinuous();
+		headingPID.setOutputRange(-1.0, 1.0);
 		
 		grid = new Grids();
 		arduino = new Arduino(1);
@@ -419,6 +426,16 @@ public class Robot extends IterativeRobot {
 		return false;
 	}
 
+	public boolean pidTurn(double speed, double heading) {
+		headingPID.setSetpoint(heading);
+		headingPID.enable();
+		turn(rotateToAngleRate);
+		if (headingPID.onTarget()) {
+			headingPID.disable();		//also turn off motors
+			return true;
+		}
+		return false;
+	}
 
 	public boolean timeDrive(double speed, double howMuchTime, boolean withGyro) {
 		if (!setStartTime) {
@@ -575,12 +592,7 @@ public class Robot extends IterativeRobot {
 	}
 
 	public double limit(double num){
-		if(num > 1.0){
-			num = 1.0;
-		} else if(num < -1.0){
-			num = -1.0;
-		}
-		return num;
+		return Math.max(-1.0, Math.min(1.0, num));
 	}
 	public void arcadeTurn(double rotateValue) {
 		System.out.println("Rotate Value: " + rotateValue);
