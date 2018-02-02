@@ -11,8 +11,9 @@ package org.usfirst.frc.team20.robot;
 import java.util.ArrayList;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -644,6 +645,12 @@ public class Robot extends IterativeRobot implements PIDOutput{
         ob.updateLeftSide(-leftMotorSpeed);
         ob.updateRightSide(rightMotorSpeed);
 
+	}
+
+	@Override
+	public void pidWrite(double output) {
+		rotateToAngleRate = output;
+		
 	}
 }
 
