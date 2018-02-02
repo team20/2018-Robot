@@ -11,6 +11,7 @@ package org.usfirst.frc.team20.robot;
 import java.util.ArrayList;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
@@ -23,7 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * creating this project, you must also update the build.properties file in the
  * project.
  */
-public class Robot extends IterativeRobot {
+public class Robot extends IterativeRobot implements PIDOutput{
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
