@@ -230,7 +230,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 //					}
 //				}
 				if(splineDone && elevatorDone){
-					ob.elevator.set(ControlMode.PercentOutput, 0.0);
+					ob.elevatorMaster.set(ControlMode.PercentOutput, 0.0);
 					rocketScriptCurrentCount++;
 					splineDone = false;
 					elevatorDone = false;
