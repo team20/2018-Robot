@@ -1,6 +1,6 @@
+package org.usfirst.frc.team20.robot;
 
-
-public class Position implements Comparable{
+public class Position implements Comparable<Object>{
     private double x;
     private double y;
     private double angle;

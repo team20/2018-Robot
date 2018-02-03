@@ -66,10 +66,22 @@ public class Logger extends Thread {
 	 * Get bytes for the string 
 	 * Send the bytes
 	 */
-	public void sendLog() throws IOException {
+	private void sendLog() throws IOException {
 		try {
 			InetAddress IPAddress = InetAddress.getByName(COMPUTER_IP);
 			byte[] data = log.getBytes();
+			DatagramPacket sendPacket = new DatagramPacket(data, data.length, IPAddress, COMPUTER_PORT);
+			clientSocket.send(sendPacket);
+			System.out.println("SENT A PACKET");
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void sendLog(String toSend) throws IOException {
+		try {
+			InetAddress IPAddress = InetAddress.getByName(COMPUTER_IP);
+			byte[] data = toSend.getBytes();
 			DatagramPacket sendPacket = new DatagramPacket(data, data.length, IPAddress, COMPUTER_PORT);
 			clientSocket.send(sendPacket);
 			System.out.println("SENT A PACKET");

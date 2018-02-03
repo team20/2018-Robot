@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 public class Elevator {
 	Objects ob;
 	private int setPosition = 0;
+	private static final int TICKS_PER_INCH = 200;
 	public Elevator(Objects o){
 		ob = o;
 	}
@@ -60,6 +61,16 @@ public class Elevator {
 		setPosition = ob.driveMasterLeft.getSelectedSensorPosition(0);
 		ob.updateElevatorSetpoint(setPosition);
 		ob.driveMasterLeft.set(ControlMode.Position, setPosition);		
+	}
+	public void upIncrement(){
+		setPosition = ob.driveMasterLeft.getSelectedSensorPosition(0) + 12*TICKS_PER_INCH;
+		ob.updateElevatorSetpoint(setPosition);
+		ob.driveMasterLeft.set(ControlMode.Position, setPosition);
+	}
+	public void downIncrement(){
+		setPosition = ob.driveMasterLeft.getSelectedSensorPosition(0) - 12*TICKS_PER_INCH;
+		ob.updateElevatorSetpoint(setPosition);
+		ob.driveMasterLeft.set(ControlMode.Position, setPosition);
 	}
 	public int getSetPosition(){
 		return setPosition;
