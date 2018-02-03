@@ -74,7 +74,8 @@ public class RobotGrid {
         }
     }
     public void addRelativePoint(double distance, double angle){
-    	path.add(new Position(distance,angle,true));
+    	if(distance > 1 + getDistance())
+    	 		 path.add(new Position(distance,angle,true));
     }
 //NO ARCS OVER 90 DEGREES
     public String toString() {
