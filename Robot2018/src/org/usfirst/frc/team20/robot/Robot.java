@@ -70,8 +70,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		collector = new Collector(ob);
 		elevator = new Elevator(ob);
 		
-		driverJoy = new DriverControls(drive, collector, ob);
-		operatorJoy = new OperatorControls(collector, elevator, arduino, ob);
+		driverJoy = new DriverControls(drive, ob);
+		operatorJoy = new OperatorControls(collector, elevator, ob);
 		
 		headingPID = new PIDController(kP, kI, kD, gyro, this);
 		headingPID.setInputRange(-180, 180);
@@ -83,7 +83,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		gy = new EncoderGyro(ob, 28.75); //TODO inside to inside wheel on 2018
 		
 //		try{
-//			cam = new DriverVision("camera on stick", 0); //TODO uncomment camera code (once we have cameras)
+//			cam = new DriverVision("camera on stick", 0);
 //			cam.startUSBCamera();
 //			cam1 = new DriverVision("cam1", 1);
 //			cam1.startUSBCamera();
@@ -101,7 +101,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	public void disabledInit(){
 		if(beenEnabled){
 			try {
-				logger.sendLog(path.toCode());
 				logger.closeSocket(); socket = false;
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -359,7 +358,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			logger.startSocket(); socket = true;
 		}
 	}
-
 	@Override
 	public void teleopPeriodic() {
 		logger.log();
@@ -371,11 +369,14 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		}
 		driverJoy.driverControls();
  		operatorJoy.operatorControls();
-
+ 		arduino.getSensorData();
  		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0)) + (ob.driveMasterRight.getSelectedSensorPosition(0)))/Constants.TICKS_PER_INCH)/2)-startingDistance;
  		path.addRelativePoint(robotDistance, gyro.getYaw());
 	}
-	
+//  		if (arduino.getIRSensor()) {
+//  			//TODO add code here to grab cube
+//  		}
+
 	/**
 	 * This function is called periodically during test mode.
 	 */
@@ -599,12 +600,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	}
 
 	public double limit(double num){
-		if(num > 1.0){
-			num = 1.0;
-		} else if(num < -1.0){
-			num = -1.0;
-		}
-		return num;
+		return Math.max(-1.0, Math.min(1.0, num));
 	}
 	public void arcadeTurn(double rotateValue) {
 		System.out.println("Rotate Value: " + rotateValue);
