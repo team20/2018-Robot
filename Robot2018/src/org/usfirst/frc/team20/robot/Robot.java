@@ -55,7 +55,9 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	boolean resetGyro = false, setStartTime = false, waitStartTime = false, gotStartingENCClicks = false, resetGyroTurn = false, done = false,
 			gyroReset = false, elevatorDone = false, driveDone = false, splineDone = false, elevatorSet = false;
 	Arduino arduino;	//Arduino to get sensor information via I2C
-
+	//Spline
+	RobotGrid path;
+	double startingDistance;
 	//Blackbox
 	Logger logger;
 	boolean socket = false;
@@ -75,7 +77,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		headingPID.setInputRange(-180, 180);
 		headingPID.setContinuous();
 		headingPID.setOutputRange(-1.0, 1.0);
-		
+		path = new RobotGrid(0,0,0,0);
 		grid = new Grids();
 		arduino = new Arduino(1);
 		gy = new EncoderGyro(ob, 28.75); //TODO inside to inside wheel on 2018
@@ -350,6 +352,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	 */
 	@Override
 	public void teleopInit(){
+		startingDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
 		drive.shiftHigh();
 		if(!socket){
 			logger.startSocket(); socket = true;
@@ -367,6 +370,9 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		driverJoy.driverControls();
  		operatorJoy.operatorControls();
  		arduino.getSensorData();
+ 		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2)-startingDistance;
+ 		path.addRelativePoint(robotDistance, gyro.getYaw());
+	}
 //  		if (arduino.getIRSensor()) {
 //  			//TODO add code here to grab cube
 //  		}
