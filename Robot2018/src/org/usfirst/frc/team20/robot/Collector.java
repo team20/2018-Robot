@@ -29,6 +29,11 @@ public class Collector {
 	public void open(){
 		ob.grabber.set(Value.kForward);
 	}
+
+	public void armIntakePosition(){
+//		ob.piston45.set(Value.kReverse);
+//		ob.piston180.set(Value.kReverse);
+	}
 	
 	public void arm45(){
 //		ob.piston45.set(Value.kForward);

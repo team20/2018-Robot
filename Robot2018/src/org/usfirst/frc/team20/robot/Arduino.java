@@ -5,10 +5,9 @@ import edu.wpi.first.wpilibj.I2C.Port;
 
 public class Arduino {
 	I2C Wire;									//initializes I2C communication on port 1
-	final int numOfBytes = 1;					//number of bytes stored in sensorData
-	byte[] sensorData = new byte[numOfBytes];	//all data from sensors is stored here
-	byte IRSensor;								//data from IR sensor
-	byte[] writeData = new byte[1];				//data to be written to the Arduino
+	private final int numOfBytes = 1;					//number of bytes stored in sensorData
+	private byte[] sensorData = new byte[numOfBytes];	//all data from sensors is stored here
+	private byte IRSensor;								//data from IR sensor
 	
 	Arduino(int port) {
 		Wire = new I2C(Port.kOnboard, port);
@@ -28,5 +27,23 @@ public class Arduino {
 	
 	public void write(byte[] writeData) {	//writes an array of bytes to the Arduino
 		Wire.writeBulk(writeData);
+	}
+	
+	public void lights(boolean redAlliance, boolean cube, boolean climbing, boolean current, boolean off){
+		byte[] send = new byte[1];
+		if(current){
+			send[0] = 5;
+		} else if (climbing){
+			send[0] = 4;
+		} else if (cube) {
+			send[0] = 3;
+		} else if (redAlliance){
+			send[0] = 1;
+		} else if(!redAlliance){
+			send[0] = 2;
+		} else {
+			send[0] = 0;
+		}
+		write(send);
 	}
 }

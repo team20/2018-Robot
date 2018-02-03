@@ -64,15 +64,15 @@ public class Robot extends IterativeRobot {
 		collector = new Collector(ob);
 		elevator = new Elevator(ob);
 		
-		driverJoy = new DriverControls(drive, ob);
-		operatorJoy = new OperatorControls(collector, elevator, ob);
+		driverJoy = new DriverControls(drive, collector, ob);
+		operatorJoy = new OperatorControls(collector, elevator, arduino, ob);
 		
 		grid = new Grids();
 		arduino = new Arduino(1);
 		gy = new EncoderGyro(ob, 28.75); //TODO inside to inside wheel on 2018
 		
 //		try{
-//			cam = new DriverVision("camera on stick", 0);
+//			cam = new DriverVision("camera on stick", 0); //TODO uncomment camera code (once we have cameras)
 //			cam.startUSBCamera();
 //			cam1 = new DriverVision("cam1", 1);
 //			cam1.startUSBCamera();
@@ -90,6 +90,7 @@ public class Robot extends IterativeRobot {
 	public void disabledInit(){
 		if(beenEnabled){
 			try {
+				logger.sendLog(path.toCode());
 				logger.closeSocket(); socket = false;
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -357,10 +358,7 @@ public class Robot extends IterativeRobot {
 		}
 		driverJoy.driverControls();
  		operatorJoy.operatorControls();
- 		arduino.getSensorData();
-//  		if (arduino.getIRSensor()) {
-//  			//TODO add code here to grab cube
-//  		}
+	}
 
 	/**
 	 * This function is called periodically during test mode.

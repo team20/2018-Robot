@@ -2,11 +2,13 @@ package org.usfirst.frc.team20.robot;
 
 public class DriverControls {
 	DriveTrain drive;
+	Collector collector;
 	Objects ob;
 	double speedStraight = 0, speedLeft = 0, speedRight = 0;
 	
-	public DriverControls(DriveTrain d, Objects o){
+	public DriverControls(DriveTrain d, Collector c, Objects o){
 		drive = d;
+		collector = c;
 		ob = o;
 	}
 	
@@ -20,6 +22,12 @@ public class DriverControls {
 		}
 		if(ob.driverJoy.getButtonB()){
 			drive.shiftLow();
+		}
+		if(ob.driverJoy.getLeftYAxis() > 0.5){
+			collector.outtake();
+		}
+		if(ob.driverJoy.getLeftYAxis() > -0.5){
+			collector.open();
 		}
 	}
 }
