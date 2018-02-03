@@ -51,7 +51,9 @@ public class Robot extends IterativeRobot {
 	boolean resetGyro = false, setStartTime = false, waitStartTime = false, gotStartingENCClicks = false, resetGyroTurn = false, done = false,
 			gyroReset = false, elevatorDone = false, driveDone = false, splineDone = false, elevatorSet = false;
 	Arduino arduino;	//Arduino to get sensor information via I2C
-
+	//Spline
+	RobotGrid path;
+	double startingDistance;
 	//Blackbox
 	Logger logger;
 	boolean socket = false;
