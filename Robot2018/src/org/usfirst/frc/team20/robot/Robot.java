@@ -352,7 +352,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	 */
 	@Override
 	public void teleopInit(){
-		startingDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
+		startingDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0)) + (ob.driveMasterRight.getSelectedSensorPosition(0)))/Constants.TICKS_PER_INCH)/2);
 		drive.shiftHigh();
 		if(!socket){
 			logger.startSocket(); socket = true;
@@ -370,7 +370,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		driverJoy.driverControls();
  		operatorJoy.operatorControls();
  		arduino.getSensorData();
- 		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2)-startingDistance;
+ 		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0)) + (ob.driveMasterRight.getSelectedSensorPosition(0)))/Constants.TICKS_PER_INCH)/2)-startingDistance;
  		path.addRelativePoint(robotDistance, gyro.getYaw());
 	}
 //  		if (arduino.getIRSensor()) {
