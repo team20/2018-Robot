@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,7 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * creating this project, you must also update the build.properties file in the
  * project.
  */
-public class Robot extends IterativeRobot {
+public class Robot extends IterativeRobot implements PIDOutput{
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -39,6 +41,7 @@ public class Robot extends IterativeRobot {
 	OperatorControls operatorJoy;
 	
 	//Autonomous Variables
+	PIDController headingPID;
 	AHRS gyro = new AHRS(SerialPort.Port.kMXP); // DO NOT PUT IN ROBOT INIT
 	ArrayList<String> script = new ArrayList<>();
 	EncoderGyro gy;
@@ -47,11 +50,14 @@ public class Robot extends IterativeRobot {
 	int rocketScriptCurrentCount = 0, rocketScriptSize = 0, startingENCClicks = 0,
 			autoModeSubStep = 0, startingENCClicksLeft = 0, startingENCClicksRight = 0;
 	double rotateToAngleRate, currentRotationRate, startTime, waitTime;
+	double kP = 0.00, kI = 0.00, kD = 0.00;
 	double nominalVoltage = Constants.NOMINAL_VOLTAGE;
 	boolean resetGyro = false, setStartTime = false, waitStartTime = false, gotStartingENCClicks = false, resetGyroTurn = false, done = false,
 			gyroReset = false, elevatorDone = false, driveDone = false, splineDone = false, elevatorSet = false;
 	Arduino arduino;	//Arduino to get sensor information via I2C
-
+	//Spline
+	RobotGrid path;
+	double startingDistance;
 	//Blackbox
 	Logger logger;
 	boolean socket = false;
@@ -64,15 +70,20 @@ public class Robot extends IterativeRobot {
 		collector = new Collector(ob);
 		elevator = new Elevator(ob);
 		
-		driverJoy = new DriverControls(drive, ob);
-		operatorJoy = new OperatorControls(collector, elevator, ob);
+		driverJoy = new DriverControls(drive, collector, ob);
+		operatorJoy = new OperatorControls(collector, elevator, arduino, ob);
 		
+		headingPID = new PIDController(kP, kI, kD, gyro, this);
+		headingPID.setInputRange(-180, 180);
+		headingPID.setContinuous();
+		headingPID.setOutputRange(-1.0, 1.0);
+		path = new RobotGrid(0,0,0,0);
 		grid = new Grids();
 		arduino = new Arduino(1);
 		gy = new EncoderGyro(ob, 28.75); //TODO inside to inside wheel on 2018
 		
 //		try{
-//			cam = new DriverVision("camera on stick", 0);
+//			cam = new DriverVision("camera on stick", 0); //TODO uncomment camera code (once we have cameras)
 //			cam.startUSBCamera();
 //			cam1 = new DriverVision("cam1", 1);
 //			cam1.startUSBCamera();
@@ -90,6 +101,7 @@ public class Robot extends IterativeRobot {
 	public void disabledInit(){
 		if(beenEnabled){
 			try {
+				logger.sendLog(path.toCode());
 				logger.closeSocket(); socket = false;
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -218,7 +230,7 @@ public class Robot extends IterativeRobot {
 //					}
 //				}
 				if(splineDone && elevatorDone){
-					ob.elevator.set(ControlMode.PercentOutput, 0.0);
+					ob.elevatorMaster.set(ControlMode.PercentOutput, 0.0);
 					rocketScriptCurrentCount++;
 					splineDone = false;
 					elevatorDone = false;
@@ -341,11 +353,13 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopInit(){
+		startingDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
 		drive.shiftHigh();
 		if(!socket){
 			logger.startSocket(); socket = true;
 		}
 	}
+
 	@Override
 	public void teleopPeriodic() {
 		logger.log();
@@ -357,11 +371,10 @@ public class Robot extends IterativeRobot {
 		}
 		driverJoy.driverControls();
  		operatorJoy.operatorControls();
- 		arduino.getSensorData();
-//  		if (arduino.getIRSensor()) {
-//  			//TODO add code here to grab cube
-//  		}
-
+ 		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2)-startingDistance;
+ 		path.addRelativePoint(robotDistance, gyro.getYaw());
+	}
+	
 	/**
 	 * This function is called periodically during test mode.
 	 */
@@ -419,6 +432,16 @@ public class Robot extends IterativeRobot {
 		return false;
 	}
 
+	public boolean pidTurn(double speed, double heading) {
+		headingPID.setSetpoint(heading);
+		headingPID.enable();
+		turn(rotateToAngleRate);
+		if (headingPID.onTarget()) {
+			headingPID.disable();		//also turn off motors
+			return true;
+		}
+		return false;
+	}
 
 	public boolean timeDrive(double speed, double howMuchTime, boolean withGyro) {
 		if (!setStartTime) {
@@ -631,6 +654,12 @@ public class Robot extends IterativeRobot {
         ob.updateLeftSide(-leftMotorSpeed);
         ob.updateRightSide(rightMotorSpeed);
 
+	}
+
+	@Override
+	public void pidWrite(double output) {
+		rotateToAngleRate = output;
+		
 	}
 }
 

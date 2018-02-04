@@ -10,7 +10,7 @@ public class Position implements Comparable<Object>{
         this.x = x;
         this.y = y;
         this.angle = angle;
-        if(angle%180 == 90){
+        if(angle%180 == 90 || angle%180 == -90){
             slope = Double.MAX_VALUE;
         }else
         slope = Math.tan(Math.toRadians(angle));
@@ -21,7 +21,7 @@ public class Position implements Comparable<Object>{
         this.y = y;
         this.angle = angle;
         this.distance = distance;
-        if(angle%180 == 90){
+        if(angle%180 == 90 || angle%180 == -90){
             slope = Double.MAX_VALUE;
         } else {
         	slope = Math.tan(Math.toRadians(angle));
@@ -31,6 +31,10 @@ public class Position implements Comparable<Object>{
     public Position(double x,double y){
         this.x = x;
         this.y = y;
+    }
+    public Position(double distance, double angle , boolean value){
+    	this.distance = distance;
+    	this.angle = angle;
     }
     
     public double getX(){
@@ -57,6 +61,9 @@ public class Position implements Comparable<Object>{
     @Override
     public String toString(){
         return " x " + x+ " y " + y + " angle " + angle + " slope " + slope + " distance " + distance;
+    }
+    public String toCode(){
+    	return "name.addRelativePoint(" + distance + "," + angle + ",true);";
     }
     public double intersectX(Position other){
         double returnValue;

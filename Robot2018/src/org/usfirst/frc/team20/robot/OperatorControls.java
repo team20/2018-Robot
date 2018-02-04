@@ -3,17 +3,35 @@ package org.usfirst.frc.team20.robot;
 public class OperatorControls {
 	Collector collector;
 	Elevator elevator;
+	Arduino arduino;
 	Objects ob;
 	boolean override;
 	
-	public OperatorControls(Collector c, Elevator e, Objects o){
+	public OperatorControls(Collector c, Elevator e, Arduino a, Objects o){
 		collector = c;
 		elevator = e;
 		ob = o;
+		arduino = a;
 		override = false;
 	}
 	
 	public void operatorControls(){
+		//automated
+		if(ob.operatorJoy.getRightYAxis() < 0.1 && ob.operatorJoy.getRightYAxis() > -0.1){
+			try{
+				arduino.getSensorData();
+				if(arduino.getIRSensor()){
+					collector.close();
+				} else {
+					collector.open();
+				}			
+			} catch (Exception e){
+				
+			} finally {
+				System.out.println("Arudino Sensor Not Working");
+			}
+		}
+		//controlled
 		if(ob.operatorJoy.getButtonY()){
 			collector.intake();
 		}
@@ -39,13 +57,13 @@ public class OperatorControls {
 			elevator.setIntake();
 		}
 		if(ob.operatorJoy.getRightYAxis() > 0.5) {
-			collector.open();
+			collector.arm45();
 		}		
 		if(ob.operatorJoy.getRightYAxis() < -0.5) {
-			collector.close();
+			collector.armIntakePosition();
 		}
-		if(ob.operatorJoy.getLeftYAxis() > 0.1 || ob.operatorJoy.getLeftYAxis() < -0.1){
-			elevator.moveSpeed(ob.operatorJoy.getLeftYAxis());
+		if((ob.operatorJoy.getLeftYAxis() > 0.1 || ob.operatorJoy.getLeftYAxis() < -0.1) && ob.operatorJoy.getLeftAxisButton()){
+			elevator.moveSpeed(ob.operatorJoy.getLeftYAxis()/2);
 			override = true;
 		} else {
 			if(override == true){
@@ -53,11 +71,20 @@ public class OperatorControls {
 				override = false;
 			}
 		}
+		if(ob.operatorJoy.getLeftYAxis() > 0.5){
+			elevator.upIncrement();
+		}
+		if(ob.operatorJoy.getLeftYAxis() < -0.5){
+			elevator.downIncrement();
+		}
 		if(ob.operatorJoy.getButtonStart() && ob.flipSwitch.get()){
 			collector.arm180();
 		}
-		if(ob.operatorJoy.getButtonX()){
-			collector.arm45();
+		if(ob.operatorJoy.getLeftTriggerAxis() > 0.1){
+			collector.open();
+		}
+		if(ob.operatorJoy.getRightTriggerAxis() > 0.1){
+			collector.close();
 		}
 	}	
 }

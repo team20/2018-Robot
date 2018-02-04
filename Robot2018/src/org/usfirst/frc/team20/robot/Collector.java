@@ -11,23 +11,28 @@ public class Collector {
 	}
 	
 	public void intake(){
-		ob.collector.set(ControlMode.PercentOutput, 1.0);
+		ob.collectorMaster.set(ControlMode.PercentOutput, 1.0);
 	}
 
 	public void outtake(){
-		ob.collector.set(ControlMode.PercentOutput, -1.0);
+		ob.collectorMaster.set(ControlMode.PercentOutput, -1.0);
 	}
 	
 	public void stopRollers(){
-		ob.collector.set(ControlMode.PercentOutput, 0.0);
+		ob.collectorMaster.set(ControlMode.PercentOutput, 0.0);
 	}
 	
 	public void close(){
-		ob.grabber.set(Value.kReverse);
+//		ob.grabber.set(Value.kReverse);
 	}
 
 	public void open(){
-		ob.grabber.set(Value.kForward);
+//		ob.grabber.set(Value.kForward);
+	}
+
+	public void armIntakePosition(){
+//		ob.piston45.set(Value.kReverse);
+//		ob.piston180.set(Value.kReverse);
 	}
 	
 	public void arm45(){

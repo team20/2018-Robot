@@ -1,7 +1,6 @@
 package org.usfirst.frc.team20.robot;
+
 import java.util.ArrayList;
-
-
 
 public class RobotGrid {
 //NO ARCS OVER 90 DEGREES
@@ -73,12 +72,22 @@ public class RobotGrid {
             path.add(new Position(pointX,pointY,pointAngle, Math.sqrt(Math.pow(pointX-path.get(path.size()-1).getX(),2) + Math.pow(pointY-path.get(path.size()-1).getY(),2))+path.get(path.size()-1).getDistance()));
         }
     }
-    
+    public void addRelativePoint(double distance, double angle){
+    	if(distance > 1 + getDistance())
+    	 		 path.add(new Position(distance,angle,true));
+    }
 //NO ARCS OVER 90 DEGREES
     public String toString() {
         String temp = "";
         for (Position pos : path) {
             temp += pos.toString() + "\n";
+        }
+        return temp;
+    }
+    public String toCode(){
+    	String temp = "";
+        for (Position pos : path) {
+            temp += pos.toCode() + "\n";
         }
         return temp;
     }
@@ -125,7 +134,7 @@ public class RobotGrid {
     	double angleChange;
     	if(baseIPS>0){
     		if (getAngle(distance+10)>90 && angle < -90){
-    			angleChange = 180-getAngle(distance+10);
+     			angleChange = 180-getAngle(distance+10);
     			angleChange += 180 + angle;
     		}else if(angle > 90 && getAngle(distance + 10) < -90){
     			angleChange = 180-angle;
@@ -167,4 +176,5 @@ public class RobotGrid {
     	rightDistance =  change.angleToDistance(angleChange)-10;
     	return rightDistance /t;
     }
+    
 }
