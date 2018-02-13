@@ -13,22 +13,41 @@ public class Arduino {
 		Wire = new I2C(Port.kOnboard, port);
 	}
 	
+	/**
+	 * get array of data from Arduino and sets each variable to the correct value
+	 */
 	public void getSensorData() {
-		Wire.read(1, numOfBytes, sensorData);	//gets array of data from Arduino
-		IRSensor = sensorData[0];				//sets each variable to the correct value (for now there is just one)
+		Wire.read(1, numOfBytes, sensorData);
+		IRSensor = sensorData[0];
 	}
 	
-	public boolean getIRSensor() {	//checks for the presence of an object in front of the IR sensor
+	/**
+	 * checks for the presence of an object in front of the IR sensor
+	 * @return true if there is an object in front of the IR sensor
+	 */
+	public boolean getIRSensor() {
 		if (IRSensor == 1)
 			return true;
 		else
 			return false;
 	}
 	
-	public void write(byte[] writeData) {	//writes an array of bytes to the Arduino
+	/**
+	 * 
+	 * @param writeData: data that needs to be written to the Arduino
+	 */
+	public void write(byte[] writeData) {
 		Wire.writeBulk(writeData);
 	}
-	
+	/**
+	 * 
+	 * @param redAlliance: are we on the red alliance?
+	 * @param cube: do we have a cube?
+	 * @param climbing: are we climbing?
+	 * @param current: are we over our current draw limit?
+	 * @param off: should the lights be off?
+	 * sends the code for the needed light pattern to the Arduino
+	 */
 	public void lights(boolean redAlliance, boolean cube, boolean climbing, boolean current, boolean off){
 		byte[] send = new byte[1];
 		if(current){

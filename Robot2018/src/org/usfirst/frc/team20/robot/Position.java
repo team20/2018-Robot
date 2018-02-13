@@ -6,6 +6,7 @@ public class Position implements Comparable<Object>{
     private double angle;
     private double slope;
     private double distance;
+
     public Position(double x,double y , double angle){
         this.x = x;
         this.y = y;
@@ -16,6 +17,7 @@ public class Position implements Comparable<Object>{
         slope = Math.tan(Math.toRadians(angle));
         distance = 0;
     }
+    
     public Position(double x, double y, double angle, double distance){
         this.x = x;	
         this.y = y;
@@ -63,7 +65,7 @@ public class Position implements Comparable<Object>{
         return " x " + x+ " y " + y + " angle " + angle + " slope " + slope + " distance " + distance;
     }
     public String toCode(){
-    	return "name.addRelativePoint(" + distance + "," + angle + ",true);";
+    	return "name.addRelativePoint(" + distance + ", " + angle + ", true);";
     }
     public double intersectX(Position other){
         double returnValue;
