@@ -442,7 +442,36 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		arcadeTurn(-((gyro.getYaw() - angleToDrive) * pValue));
 		return false;
 	}
-
+	
+	/**
+	 * turns to an angle using a PID loop
+	 * @param tolerance: tolerance in degrees
+	 * @param heading: the yaw to turn to
+	 * @param speed: the (forwards) speed to move while turning
+	 * @return true if the turn is done
+	*/
+	public boolean pidTurn(double heading, double tolerance, double speed) {
+		headingPID.setSetpoint(heading);
+		headingPID.setAbsoluteTolerance(tolerance);
+		headingPID.enable();
+		arcadeDrive(speed, rotateToAngleRate);
+		if (headingPID.onTarget()) {
+			headingPID.disable();
+			arcadeDrive(0, 0);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * turns to an angle using a PID loop
+	 * @param tolerance: tolerance in degrees
+	 * @param heading: the yaw to turn to
+	 * @return true if the turn is done
+	*/
+	public boolean pidTurn(double heading, double tolerance) {	
+		return pidTurn(heading, tolerance, 0);
+	}
 
 	/**
 	 * drives for a certain amount of time
