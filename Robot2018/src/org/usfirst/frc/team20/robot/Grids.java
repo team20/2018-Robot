@@ -1,10 +1,11 @@
 package org.usfirst.frc.team20.robot;
 
 public class Grids {
-	static final double WIDTH = 16, LENGTH = 28; //2017 (16, 28), 2018 (33.5/2, 38.5)
+	static final double WIDTH = 27/2, LENGTH = 32; //2017 (16, 28), 2018 (33.5/2, 38.5), 2018 w/o bumpers (27/2, 32)
 	static RobotGrid centerToLeftSwitch, centerToRightSwitch, centerToLeftSwitchSide, centerToRightSwitchSide,
 	centerToRightScale, centerToLeftScale, backupFromRightSwitch, rightSwitchToCube, rightSwitchBackup2, rightSwitchToScale,
 	backupFromLeftSwitch, leftSwitchToCube, leftSwitchBackup2, leftSwitchToScale, leftToLeftSwitch, leftToRightSwitch;
+
 	public Grids(){
 		centerToLeftSwitch = centerToLeftSwitch();
 		centerToRightSwitch = centerToRightSwitch();
@@ -23,6 +24,11 @@ public class Grids {
 		leftToLeftSwitch = leftToLeftSwitch();
 		leftToRightSwitch = leftToRightSwitch();
 	}
+	
+	/**
+	 * @param gridPath: integer corresponding to the desired path
+	 * @return corresponding RobotGrid
+	 */
 	public RobotGrid getGrid(int gridPath){
 		switch(gridPath){
 			case RobotModes.SPLINE_CENTER_TO_LEFT_SWITCH:

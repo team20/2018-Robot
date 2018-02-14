@@ -6,11 +6,16 @@ import edu.wpi.first.wpilibj.CameraServer;
 public class DriverVision {
 	int usbPort;
 	String name;
+	
 	public DriverVision(String name, int usbPort){
 		this.name = name;
 		this.usbPort = usbPort;
 	}
- 	public void startUSBCamera(){
+	
+ 	/**
+ 	 * initializes the USB camera and starts streaming to the dashboard
+ 	 */
+	public void startUSBCamera(){
 		try{
 			CameraServer server = CameraServer.getInstance();
 			server.startAutomaticCapture(name, usbPort);

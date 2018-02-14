@@ -1,6 +1,7 @@
 //Author: Atharva Gawde
 package org.usfirst.frc.team20.robot;
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
 
 public class Controller {
@@ -67,5 +68,8 @@ public class Controller {
 	}
 	public boolean getRightAxisButton(){
 		return joy.getRawButton(10);
+	}
+	public void vibrate(){
+		joy.setRumble(RumbleType.kLeftRumble, 1.0);	
 	}
 }

@@ -13,8 +13,8 @@ public class SplineFollower {
 	private double startingPositionLeft;
 	private double startingPositionRight;
 	private Timer time;
-	Objects ob;
-	public SplineFollower (Objects o, EncoderGyro change, double maxVelocity){
+	Zenith ob;
+	public SplineFollower (Zenith o, EncoderGyro change, double maxVelocity){
 		this.change = change;
 		this.maxVelocity = maxVelocity;
 		gotStartingPosition = false;
