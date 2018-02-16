@@ -4,10 +4,10 @@ public class OperatorControls {
 	Collector collector;
 	Elevator elevator;
 	Arduino arduino;
-	Objects ob;
+	Zenith ob;
 	boolean override;
 	
-	public OperatorControls(Collector c, Elevator e, Arduino a, Objects o){
+	public OperatorControls(Collector c, Elevator e, Arduino a, Zenith o){
 		collector = c;
 		elevator = e;
 		ob = o;
@@ -15,30 +15,40 @@ public class OperatorControls {
 		override = false;
 	}
 	
+	/**
+	 * runs all of the controls of the operator
+	 */
 	public void operatorControls(){
+		System.out.println("Position: " + ob.elevatorMaster.getSelectedSensorPosition(0));
+		System.out.println("                                      Set Position: " + elevator.getSetPosition());
 		//automated
 		if(ob.operatorJoy.getRightYAxis() < 0.1 && ob.operatorJoy.getRightYAxis() > -0.1){
 			try{
 				arduino.getSensorData();
 				if(arduino.getIRSensor()){
+					collector.intake();
 					collector.close();
+					ob.operatorJoy.vibrate();
+					ob.updateCube(true);
 				} else {
 					collector.open();
+					ob.updateCube(false);
 				}			
 			} catch (Exception e){
 				
 			} finally {
-				System.out.println("Arudino Sensor Not Working");
+//				System.out.println("Arudino Sensor Not Working");
 			}
 		}
 		//controlled
-		if(ob.operatorJoy.getButtonY()){
+		if(ob.operatorJoy.getButtonA()){
 			collector.intake();
+			ob.operatorJoy.vibrate();
 		}
 		if(ob.operatorJoy.getButtonB()){
 			collector.stopRollers();
 		}
-		if(ob.operatorJoy.getButtonA()){
+		if(ob.operatorJoy.getButtonY()){
 			collector.outtake();
 		}
 		if(ob.operatorJoy.getButtonDUp()){
@@ -62,28 +72,29 @@ public class OperatorControls {
 		if(ob.operatorJoy.getRightYAxis() < -0.5) {
 			collector.armIntakePosition();
 		}
-		if((ob.operatorJoy.getLeftYAxis() > 0.1 || ob.operatorJoy.getLeftYAxis() < -0.1) && ob.operatorJoy.getLeftAxisButton()){
-			elevator.moveSpeed(ob.operatorJoy.getLeftYAxis()/2);
+		if(Math.abs(ob.operatorJoy.getLeftYAxis()) > 0.1 && ob.operatorJoy.getLeftAxisButton()){
+			System.out.println("Overriding");
+			elevator.moveSpeed(ob.operatorJoy.getLeftYAxis());
 			override = true;
 		} else {
-			if(override == true){
+			if(override){
 				elevator.moveSpeed(0.0);
 				override = false;
 			}
 		}
-		if(ob.operatorJoy.getLeftYAxis() > 0.5){
+		if(ob.operatorJoy.getLeftYAxis() > 0.5 && !ob.operatorJoy.getLeftAxisButton() && !override){
 			elevator.upIncrement();
 		}
-		if(ob.operatorJoy.getLeftYAxis() < -0.5){
+		if(ob.operatorJoy.getLeftYAxis() < -0.5 && !ob.operatorJoy.getLeftAxisButton() && !override){
 			elevator.downIncrement();
 		}
 		if(ob.operatorJoy.getButtonStart() && ob.flipSwitch.get()){
 			collector.arm180();
 		}
-		if(ob.operatorJoy.getLeftTriggerAxis() > 0.1){
+		if(ob.operatorJoy.getRightTriggerAxis() > 0.1){
 			collector.open();
 		}
-		if(ob.operatorJoy.getRightTriggerAxis() > 0.1){
+		if(ob.operatorJoy.getLeftTriggerAxis() > 0.1){
 			collector.close();
 		}
 	}	

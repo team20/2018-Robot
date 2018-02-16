@@ -15,6 +15,9 @@ public class Logger extends Thread {
 	String log = "";
 	static DatagramSocket clientSocket;
 	
+	/**
+	 * runs the Blackbox thread
+	 */
 	@Override
 	public void run(){
 		logging = true;
@@ -28,6 +31,9 @@ public class Logger extends Thread {
 		}
 	}
 
+	/**
+	 * creates the socket to communicate with the Driver Station
+	 */
 	public void startSocket(){
 		try{
 			clientSocket = new DatagramSocket(COMPUTER_PORT);
@@ -54,6 +60,10 @@ public class Logger extends Thread {
 		}
 	}
 
+	/**
+	 * registers an object that needs to be logged
+	 * @param thingToLog: the object that needs to be logged
+	 */
 	public void register(Loggable thingToLog) {
 		if (!logging) {
 			System.out.println("                             thingToLog: " + thingToLog);
@@ -72,24 +82,31 @@ public class Logger extends Thread {
 			byte[] data = log.getBytes();
 			DatagramPacket sendPacket = new DatagramPacket(data, data.length, IPAddress, COMPUTER_PORT);
 			clientSocket.send(sendPacket);
-			System.out.println("SENT A PACKET");
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * sends the specified String through Blackbox
+	 * @param toSend: string to be sent to the Driver Station
+	 * @throws IOException
+	 */
 	public void sendLog(String toSend) throws IOException {
 		try {
 			InetAddress IPAddress = InetAddress.getByName(COMPUTER_IP);
 			byte[] data = toSend.getBytes();
 			DatagramPacket sendPacket = new DatagramPacket(data, data.length, IPAddress, COMPUTER_PORT);
 			clientSocket.send(sendPacket);
-			System.out.println("SENT A PACKET");
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * closes the socket and informs the Driver Station the robot has been disabled
+	 * @throws IOException
+	 */
 	public void closeSocket() throws IOException{
 		try {
 			logging = false;

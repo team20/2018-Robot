@@ -3,6 +3,9 @@ package org.usfirst.frc.team20.robot;
 import java.util.ArrayList;
 
 public class RocketScript {
+	/*
+	 * each method returns an auto mode script in the form of an ArrayList of Strings
+	 */
 	
 	static public ArrayList<String> testElevator(){
 		ArrayList<String> auto = new ArrayList<>();
@@ -32,7 +35,7 @@ public class RocketScript {
 		auto.add(Integer.toString(RobotModes.PLACE));
 		return auto;
 	}
-	
+
 	static public ArrayList<String> splineCenterToRightScale(){
 		ArrayList<String> auto = new ArrayList<>();
 		auto.add(Integer.toString(RobotModes.WAIT_ENTERED));
