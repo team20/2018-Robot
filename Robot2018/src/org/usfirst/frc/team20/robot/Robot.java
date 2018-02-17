@@ -11,6 +11,10 @@ package org.usfirst.frc.team20.robot;
 import java.util.ArrayList;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
@@ -62,7 +66,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	Logger logger;
 	boolean socket = false;
 	boolean beenEnabled = false;
-	
+	Alliance alliance;
 	@Override
 	public void robotInit() {		
 		ob = new Zenith();
@@ -78,8 +82,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		headingPID.setContinuous();
 		headingPID.setOutputRange(-1.0, 1.0);
 		grid = new Grids();
-		arduino = new Arduino(1);
-		gy = new EncoderGyro(ob, 28.75); //TODO inside to inside wheel on 2018
+		arduino = new Arduino(1, ob);
+ 		gy = new EncoderGyro(ob, 28.75); //TODO inside to inside wheel on 2018
 		ob.elevatorMaster.setSelectedSensorPosition(0, 0, 1000);
 //		try{
 //			cam = new DriverVision("camera on stick", 0); //TODO uncomment camera code (once we have cameras)
@@ -95,6 +99,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		logger.register(ob);
 		logger.startSocket();
 		socket = true;
+		alliance = DriverStation.getInstance().getAlliance();
+		
+		Compressor compressor = new Compressor();
+		compressor.setClosedLoopControl(true);
 	}
 
 	public void disabledInit(){
@@ -123,34 +131,75 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		autoModeSubStep = 0; startingENCClicksLeft = 0; startingENCClicksRight = 0;
 		resetGyro = false; setStartTime = false; waitStartTime = false; gotStartingENCClicks = false; resetGyroTurn = false; done = false;
 		gyroReset = false; elevatorDone = false; driveDone = false; splineDone = false; elevatorSet = false;
+		collector.armIntakePosition();
+		
+//		double p = Double.parseDouble(SmartDashboard.getString("DB/String 0", "0.0"));
+//		System.out.println("P: " + p);
+//		double i = Double.parseDouble(SmartDashboard.getString("DB/String 1", "0.0"));
+//		System.out.println("I: " + i);
+//		double d = Double.parseDouble(SmartDashboard.getString("DB/String 2", "0.0"));
+//		System.out.println("D: " + d);
+//		double f = Double.parseDouble(SmartDashboard.getString("DB/String 3", "0.0"));
+//		System.out.println("F: " + f);
+//		elevator.setPID(p, i, d, f);
+//		script.addAll(RocketScript.testElevator());
+	}
 
-		//Switch and Scale are on the left or right?
-//		String field = DriverStation.getInstance().getGameSpecificMessage();
-//		String field = FMSReplicate.getGameSpecificMessage();
-//		boolean switchLeft = false, scaleLeft = false;
-//		if(field.charAt(0) == 'L'){
-//			switchLeft = true;
-//		}
-//		if(field.charAt(1) == 'L'){
-//			scaleLeft = true;
-//		}
-//		//Picking Which Auto Mode
-//		boolean scalePriority = SmartDashboard.getBoolean("DB/Button 0", false);
-//		boolean highOnly = SmartDashboard.getBoolean("DB/Button 1", false);
-//		double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
-//		waitTime = 2*SmartDashboard.getNumber("DB/Slider 1", 0.0);
-//		if(position == 0){
-//			if(switchLeft){
-//				script.addAll(RocketScript.splineLeftToLeftSwitch());
-//			} else {
-//				script.addAll(RocketScript.splineLeftToRightSwitch());
+	/**
+	 * This function is called periodically during autonomous.
+	 */
+	@Override
+	public void autonomousPeriodic() {
+ 		arduino.lights(alliance, ob.cube, driverJoy.climbing, ob.currentLimit(), false, elevator.elevatorMoving());
+		logger.log();
+		ob.updateGyroAngle(gyro.getYaw());
+		//Scripting
+		if(!gyroReset){
+			gyro.reset();
+			gyroReset = true;
+
+			//Switch and Scale are on the left or right?
+//			String field = DriverStation.getInstance().getGameSpecificMessage();
+//			String field = FMSReplicate.getGameSpecificMessage();
+//			boolean switchLeft = false, scaleLeft = false;
+//			if(field.charAt(0) == 'L'){
+//				switchLeft = true;
 //			}
-//		} else if (position == 2.5){
-//			if(!highOnly){
-//				if(scaleLeft && switchLeft){
-//					script.addAll(RocketScript.splineCenterToLeftSwitchToLeftScale());
-//				} else if (!scaleLeft && !switchLeft){
-//					script.addAll(RocketScript.splineCenterToRightSwitchToRightScale());
+//			if(field.charAt(1) == 'L'){
+//				scaleLeft = true;
+//			}
+//			//Picking Which Auto Mode
+//			boolean scalePriority = SmartDashboard.getBoolean("DB/Button 0", false);
+//			boolean highOnly = SmartDashboard.getBoolean("DB/Button 1", false);
+//			double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
+//			waitTime = 2*SmartDashboard.getNumber("DB/Slider 1", 0.0);
+//			if(position == 0){
+//				if(switchLeft){
+//					script.addAll(RocketScript.splineLeftToLeftSwitch());
+//				} else {
+//					script.addAll(RocketScript.splineLeftToRightSwitch());
+//				}
+//			} else if (position == 2.5){
+//				if(!highOnly){
+//					if(scaleLeft && switchLeft){
+//						script.addAll(RocketScript.splineCenterToLeftSwitchToLeftScale());
+//					} else if (!scaleLeft && !switchLeft){
+//						script.addAll(RocketScript.splineCenterToRightSwitchToRightScale());
+//					} else {
+//						if(!scalePriority){
+//							if(switchLeft){
+//								script.addAll(RocketScript.splineCenterToLeftSwitch());
+//							} else {
+//								script.addAll(RocketScript.splineCenterToRightSwitch());
+//							}
+//						} else {
+//							if(scaleLeft){
+//								script.addAll(RocketScript.splineCenterToLeftScale());
+//							} else {
+//								script.addAll(RocketScript.splineCenterToRightScale());
+//							}
+//						}
+//					}
 //				} else {
 //					if(!scalePriority){
 //						if(switchLeft){
@@ -164,51 +213,12 @@ public class Robot extends IterativeRobot implements PIDOutput{
 //						} else {
 //							script.addAll(RocketScript.splineCenterToRightScale());
 //						}
-//					}
+//					}				
 //				}
-//			} else {
-//				if(!scalePriority){
-//					if(switchLeft){
-//						script.addAll(RocketScript.splineCenterToLeftSwitch());
-//					} else {
-//						script.addAll(RocketScript.splineCenterToRightSwitch());
-//					}
-//				} else {
-//					if(scaleLeft){
-//						script.addAll(RocketScript.splineCenterToLeftScale());
-//					} else {
-//						script.addAll(RocketScript.splineCenterToRightScale());
-//					}
-//				}				
+//			} else if (position == 5){
+//				script.addAll(RocketScript.crossAutoLine());
 //			}
-//		} else if (position == 5){
-//			script.addAll(RocketScript.crossAutoLine());
-//		}
-//		double p = Double.parseDouble(SmartDashboard.getString("DB/String 0", "0.0"));
-//		System.out.println("P: " + p);
-//		double i = Double.parseDouble(SmartDashboard.getString("DB/String 1", "0.0"));
-//		System.out.println("I: " + i);
-//		double d = Double.parseDouble(SmartDashboard.getString("DB/String 2", "0.0"));
-//		System.out.println("D: " + d);
-//		double f = Double.parseDouble(SmartDashboard.getString("DB/String 3", "0.0"));
-//		System.out.println("F: " + f);
-//		elevator.setPID(p, i, d, f);
-//		script.addAll(RocketScript.testElevator());
-		script.addAll(RocketScript.splineCenterToRightSwitch());
-		rocketScriptSize = script.size();
-	}
-
-	/**
-	 * This function is called periodically during autonomous.
-	 */
-	@Override
-	public void autonomousPeriodic() {
-		logger.log();
-		ob.updateGyroAngle(gyro.getYaw());
-		//Scripting
-		if(!gyroReset){
-			gyro.reset();
-			gyroReset = true;
+//			rocketScriptSize = script.size();
 		}
 		if (rocketScriptCurrentCount < rocketScriptSize) {
 			String[] values = script.get(rocketScriptCurrentCount).split(";");
@@ -365,6 +375,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 
 	@Override
 	public void teleopPeriodic() {
+		arduino.lights(alliance, ob.cube, driverJoy.climbing, ob.currentLimit(), false, elevator.elevatorMoving());
 		logger.log();
 		try{
 			ob.updateGyroAngle(gyro.getYaw());
@@ -372,10 +383,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		} finally {
 //			System.out.println("NavX Crashed");
 		}
-		driverJoy.driverControls();
-		operatorJoy.operatorControls();
- 		double robotDistance = Math.abs(((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2)-startingDistance);
- 		path.addRelativePoint(robotDistance, gyro.getYaw());
+		driverJoy.driverControlsPS4();
+		operatorJoy.operatorControlsPS4();
+// 		double robotDistance = Math.abs(((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2)-startingDistance);
+// 		path.addRelativePoint(robotDistance, gyro.getYaw());
 	}
 	
 	/**

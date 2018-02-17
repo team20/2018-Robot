@@ -35,14 +35,14 @@ public class Collector {
 	 * closes the manipulator
 	 */
 	public void close(){
-//		ob.grabber.set(Value.kReverse);
+//		ob.grabber.set(Value.kForward);
 	}
 
 	/**
 	 * opens the manipulator
 	 */
 	public void open(){
-//		ob.grabber.set(Value.kForward);
+//		ob.grabber.set(Value.kReverse);
 	}
 
 	/**

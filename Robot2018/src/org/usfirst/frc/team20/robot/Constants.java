@@ -13,11 +13,12 @@ public class Constants {
 	public static final int SPLINE_FACTOR = 6;
 	
 	public static final int INTAKE_POSITION = 0;
-	public static final int EXCHANGE_POSITION = 0;
 	public static final int SWITCH_POSITION = 12510;
 	public static final int SCALE_LOW_POSITION = 33360;
 	public static final int SCALE_MID_POSITION = 41700;
 	public static final int SCALE_HIGH_POSITION = 50040;
+	public static final int ELEVATOR_MAX_POSITION = 60812;
+	public static final double CURRENT_LIMIT = 500000;
 
 	public static final int PIDIDX = 0; //TODO what is this???
 }
