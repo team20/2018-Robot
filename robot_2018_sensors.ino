@@ -16,14 +16,16 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(20, ledStripPin, NEO_RGB + NEO_KHZ80
 byte sensorData[1];                   //array of data collected from sensors to be sent to the RoboRio
 byte pattern = 0;                     //number that controls what light pattern will be displayed
 byte prevPattern;                     //previous value of pattern to set pattern back to if it is equal to 1
-byte prevCorrectPattern;              //previous correct value of pattern to set pattern back to after case 4 (five white flashes)
+byte prevCorrectPattern;//previous correct value of pattern to set pattern back to after case 4 (five white flashes)
+byte elevatorNum = 0;
+byte prevElevatorNum = 0;
 uint32_t off = strip.Color(0, 0, 0);  //constant RGB values for different colors (max is 255) (for some reason the order is "GRB" ???)
 uint32_t red = strip.Color(0, 255, 0);
 //uint32_t orange = strip.Color(63, 255, 0);
 uint32_t yellow = strip.Color(0, 255, 127);
 uint32_t green = strip.Color(0, 0, 255);
 uint32_t blue = strip.Color(255, 0, 0);
-uint32_t purple = strip.Color(255, 127, 0);
+uint32_t purple = strip.Color(128, 128, 0);
 uint32_t white = strip.Color(255, 255, 255);
                                       //__variables for light patterns__
                                       //_autonomous (case 2)_
@@ -53,12 +55,18 @@ void loop() { //loops infinitely until power supply is removed
 
 void receiveEvent() {       //called when the Arduino receives data from the RoboRio
   prevPattern = pattern;
-  pattern = Wire.read();    //sets the value of <pattern> to the correct value
+  pattern = Wire.read(); //sets the value of <pattern> to the correct value
+  
   if (pattern == 1)
     pattern = prevPattern;
-  if (pattern != 4)
+  if (pattern != 24)
     prevCorrectPattern = pattern;
-    Serial.println("Pattern:" + pattern);
+  if (prevPattern == 29)
+    if (pattern < 20){
+      elevatorNum = pattern;
+    }
+    prevPattern = pattern;
+  Serial.println("Pattern:" + elevatorNum);
 }
 
 void requestEvent() {         //called when data is requested from the Arduino by the RoboRio
@@ -79,16 +87,15 @@ byte IRSensor() { //returns input from IR sensor as a byte
 
 void lights() { //displays different patterns on the LED strip depending on the value of <pattern>
   /*
-     0 - off
+     21 - off
      2 - autonomous mode
-     3 - red alliance
-     4 - blue alliance
-     5 - cube acquired
-     6 - climbing
-     7 - drawing too much current from battery
-     8 - demo
+     23 - red alliance
+     24 - blue alliance
+     25 - cube acquired
+     26 - climbing
+     27 - drawing too much current from battery
+     28 - demo
   */
- // pattern = 8;
   if (!case5flash) {
     if (pattern == 5)               //if pattern is "five white flashes" but it already ran...
       pattern = prevCorrectPattern; //set pattern to what it was before
@@ -116,27 +123,27 @@ void lights() { //displays different patterns on the LED strip depending on the 
       }
       strip.show();
       break;
-    case 3:                         //red alliance - red chasing
+    case 23:                         //red alliance - red chasing
       for (byte i = 0; i < pixelSpacing; i ++) {
         for (byte j = i; j <= strip.numPixels(); j += pixelSpacing) {
           strip.setPixelColor(j, red);
           strip.setPixelColor(j - 1, off);
         }
         strip.show();
-        delay(30);
+        delay(70);
       }
       break;
-    case 4:                         //blue alliance - blue chasing
+    case 24:                         //blue alliance - blue chasing
       for (byte i = 0; i < pixelSpacing; i ++) {
         for (byte j = i; j <= strip.numPixels(); j += pixelSpacing) {
           strip.setPixelColor(j, blue);
           strip.setPixelColor(j - 1, off);
         }
         strip.show();
-        delay(30);
+        delay(70);
       }
       break;
-    case 5:                         //cube acquired - 5 fast white flashes
+    case 25:                         //cube acquired - 5 fast white flashes
       if (case5flash) {
         for (byte i = 0; i < 5; i ++) {
           for (byte j = 0; j < strip.numPixels(); j ++)
@@ -151,7 +158,7 @@ void lights() { //displays different patterns on the LED strip depending on the 
         case5flash = false;
       }
       break;
-    case 6:                         //climbing - green moving up and down
+    case 26:                         //climbing - green moving up and down
       for (byte i = 0; i < strip.numPixels(); i ++) {
         strip.setPixelColor(i, green);
         strip.show();
@@ -163,23 +170,7 @@ void lights() { //displays different patterns on the LED strip depending on the 
         delay(10);
       }
       break;
-    case 7:                         //drawing too much current from battery - yellow alternating
-//      for (byte i = 0; i < strip.numPixels(); i ++) {
-//       if (i % 2 == 0)
-//         strip.setPixelColor(i, yellow);
-//        else
-//          strip.setPixelColor(i, off);
-//      }
-//     strip.show();
-//     delay(500);
-//      for (byte i = 0; i < strip.numPixels(); i ++) { //       if (i % 2 == 0)
-//          strip.setPixelColor(i, off);
-//        else
-//          strip.setPixelColor(i, yellow);
-//      }
-//      strip.show();
-//      delay(500);
-
+    case 27:                         //drawing too much current from battery - Yellow Flashing
         for (byte i = 0; i < 5; i ++) {
           for (byte j = 0; j < strip.numPixels(); j ++)
             strip.setPixelColor(j, yellow);
@@ -194,7 +185,7 @@ void lights() { //displays different patterns on the LED strip depending on the 
       
 
       break;
-    case 8:                         //demo - chasing rainbow pattern (I have no idea how this works...)
+    case 28:                         //demo - chasing rainbow pattern (I have no idea how this works...)
       for (byte i = 0; i < 256; i ++) {
         for (byte j = 0; j < strip.numPixels(); j ++) {
           strip.setPixelColor(j, colorWheel(((j * 256 / strip.numPixels()) + i) & 255));
@@ -203,6 +194,21 @@ void lights() { //displays different patterns on the LED strip depending on the 
         delay(20);
       }
       break;
+
+    case 29:
+      Serial.println(elevatorNum);
+      for (byte i = 0; i < elevatorNum; i++) {
+        strip.setPixelColor(i, purple);
+        strip.show();
+        //delay(10);
+      }
+      if (prevElevatorNum != elevatorNum){
+        for (byte j = 0; j < strip.numPixels(); j++) {
+          strip.setPixelColor(j, off);
+          strip.show();
+        }
+      }
+      prevElevatorNum = elevatorNum;
   }
 }
 
@@ -217,5 +223,4 @@ uint32_t colorWheel(byte wheelPosition) {
   wheelPosition -= 170;
   return strip.Color(wheelPosition * 3, 255 - wheelPosition * 3, 0);
 }
-
 
