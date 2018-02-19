@@ -13,8 +13,8 @@ public class Collector {
 	/**
 	 * runs the rollers in order to collect a cube
 	 */
-	public void intake(){
-		ob.collectorMaster.set(ControlMode.PercentOutput, 1.0);
+	public void intake(double speed){
+		ob.collectorMaster.set(ControlMode.PercentOutput, speed);
 	}
 
 	/**
