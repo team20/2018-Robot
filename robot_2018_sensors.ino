@@ -13,7 +13,7 @@
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(20, ledStripPin, NEO_RGB + NEO_KHZ800);  //initializes LED strip object
 
-byte sensorData[1];                   //array of data collected from sensors to be sent to the RoboRio
+//byte sensorData[1];                   //array of data collected from sensors to be sent to the RoboRio
 byte pattern = 0;                     //number that controls what light pattern will be displayed
 byte prevPattern;                     //previous value of pattern to set pattern back to if it is equal to 1
 byte prevCorrectPattern;//previous correct value of pattern to set pattern back to after case 4 (five white flashes)
@@ -40,10 +40,10 @@ boolean case5flash = true;            //used to make it run only once
 void setup() {                        //everything in here runs once, every time the program is started
   Serial.begin(9600);                 //initializes the serial monitor
   Serial.println("program started");  //prints to the serial monitor
-  pinMode(IRSensorPin, INPUT_PULLUP); //sets the pin used for the IR sensor as and input with a virtual pullup resistor
+//  pinMode(IRSensorPin, INPUT_PULLUP); //sets the pin used for the IR sensor as and input with a virtual pullup resistor
   Wire.begin(1);                      //initializes I2C communication on port 1
   Wire.onReceive(receiveEvent);       //sets a method to call when the Arduino receives data
-  Wire.onRequest(requestEvent);       //sets a method to call when data is requested from the Arduino
+//  Wire.onRequest(requestEvent);       //sets a method to call when data is requested from the Arduino
   strip.begin();                      //initializes LED strip
   strip.setBrightness(127);           //sets brightness (out of 255)
   strip.show();                       //sets all pixels to "off" state
@@ -69,21 +69,21 @@ void receiveEvent() {       //called when the Arduino receives data from the Rob
   Serial.println("Pattern:" + elevatorNum);
 }
 
-void requestEvent() {         //called when data is requested from the Arduino by the RoboRio
-  getSensorData();            //gets data from the IR sensor
-  Wire.write(sensorData[0]);  //sends data to the RoboRio
-}
+// void requestEvent() {         //called when data is requested from the Arduino by the RoboRio
+//   getSensorData();            //gets data from the IR sensor
+//   Wire.write(sensorData[0]);  //sends data to the RoboRio
+// }
 
-void getSensorData() {
-  sensorData[0] = IRSensor();
-}
+// void getSensorData() {
+//   sensorData[0] = IRSensor();
+// }
 
-byte IRSensor() { //returns input from IR sensor as a byte
-  if (digitalRead(IRSensorPin))
-    return 0;
-  else
-    return 1;
-}
+// byte IRSensor() { //returns input from IR sensor as a byte
+//   if (digitalRead(IRSensorPin))
+//     return 0;
+//   else
+//     return 1;
+// }
 
 void lights() { //displays different patterns on the LED strip depending on the value of <pattern>
   /*
