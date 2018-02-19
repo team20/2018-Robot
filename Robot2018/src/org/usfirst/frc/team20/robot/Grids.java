@@ -1,7 +1,7 @@
 package org.usfirst.frc.team20.robot;
 
 public class Grids {
-	static final double WIDTH = 27/2, LENGTH = 32; //2017 (16, 28), 2018 (33.5/2, 38.5), 2018 w/o bumpers (27/2, 32)
+	static final double WIDTH = 33.5/2, LENGTH = 38.5; //2018 (33.5/2, 38.5), 2018 w/o bumpers (27/2, 32)
 	static RobotGrid centerToLeftSwitch, centerToRightSwitch, centerToLeftSwitchSide, centerToRightSwitchSide,
 	centerToRightScale, centerToLeftScale, backupFromRightSwitch, rightSwitchToCube, rightSwitchBackup2, rightSwitchToScale,
 	backupFromLeftSwitch, leftSwitchToCube, leftSwitchBackup2, leftSwitchToScale, leftToLeftSwitch, leftToRightSwitch;

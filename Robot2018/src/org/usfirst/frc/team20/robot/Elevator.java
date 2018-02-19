@@ -53,15 +53,6 @@ public class Elevator {
 	}
 	
 	/**
-	 * sets the elevator to the exchange position
-	 */
-	public void setExchange(){
-		setPosition = Constants.EXCHANGE_POSITION;
-		ob.updateElevatorSetpoint(setPosition);
-		ob.elevatorMaster.set(ControlMode.Position, setPosition);
-	}
-
-	/**
 	 * sets the elevator to the switch position
 	 */
 	public void setSwitch(){
@@ -98,7 +89,7 @@ public class Elevator {
 	}
 
 	/**
-	 * sets the elevator position to its current position
+	 * sets the elevator set position to its current position
 	 */
 	public void stop(){
 		setPosition = ob.elevatorMaster.getSelectedSensorPosition(0);
@@ -125,10 +116,26 @@ public class Elevator {
 	}
 
 	/**
+	 * 
+	 */
+	public void flipPosition(){
+		setPosition -= 15*TICKS_PER_INCH;
+		ob.updateElevatorSetpoint(setPosition);
+		ob.elevatorMaster.set(ControlMode.Position, setPosition);
+	}
+	
+	/**
 	 * @return the set point of the elevator
 	 */
 	public int getSetPosition(){
 		return setPosition;
+	}
+	
+	/**
+	 * @return true if the elevator is within deadband of its set position
+	 */
+	public boolean elevatorMoving(){
+		return Math.abs(setPosition - ob.elevatorMaster.getSelectedSensorPosition(0)) < Constants.ELEVATOR_DEADBAND;
 	}
 
 	/**

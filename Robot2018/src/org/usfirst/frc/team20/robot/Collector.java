@@ -13,8 +13,8 @@ public class Collector {
 	/**
 	 * runs the rollers in order to collect a cube
 	 */
-	public void intake(){
-		ob.collectorMaster.set(ControlMode.PercentOutput, 1.0);
+	public void intake(double speed){
+		ob.collectorMaster.set(ControlMode.PercentOutput, speed);
 	}
 
 	/**
@@ -35,14 +35,14 @@ public class Collector {
 	 * closes the manipulator
 	 */
 	public void close(){
-//		ob.grabber.set(Value.kReverse);
+//		ob.grabber.set(Value.kForward);
 	}
 
 	/**
 	 * opens the manipulator
 	 */
 	public void open(){
-//		ob.grabber.set(Value.kForward);
+//		ob.grabber.set(Value.kReverse);
 	}
 
 	/**
