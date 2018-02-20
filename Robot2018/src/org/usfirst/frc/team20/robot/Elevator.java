@@ -6,10 +6,11 @@ public class Elevator {
 	Zenith ob;
 	private int setPosition = 0;
 	private static final int TICKS_PER_INCH = 695;
-	
+
 	public Elevator(Zenith o){
 		ob = o;
 		setPosition = ob.elevatorMaster.getSelectedSensorPosition(0);
+		setPID(0.05, 0.0, 1.0, 0.0); //0.05, 0.00001, 0.0, 0.0
 	}
 	
 	/**
@@ -145,4 +146,21 @@ public class Elevator {
 	public void moveSpeed(double speed){
 		ob.elevatorMaster.set(ControlMode.PercentOutput, speed);
 	}
+	
+	/**
+	 * resets the elevator to the intake position,
+	 * waits for the current to spike,
+	 * zeros the elevator encoder
+	 */
+//	public boolean reset(){
+//		ob.elevatorMaster.set(ControlMode.PercentOutput, -.1); // tune the value for going down
+//		if(ob.elevatorMaster.getOutputCurrent() > 10) { // tune the value for the current threshold
+//			ob.elevatorMaster.set(ControlMode.PercentOutput, 0);
+//			ob.elevatorMaster.setSelectedSensorPosition(0);
+//			return true;
+//		}else {
+//			return false;
+//		}
+//	}
+	 
 }

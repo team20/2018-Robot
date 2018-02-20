@@ -34,14 +34,14 @@ public class DriveTrain {
 	/**
 	 * puts the drive train in high gear (fast)
 	 */
-	public void shiftHigh() { // shifts into high gear ratio
-//		ob.driveShifter.set(DoubleSolenoid.Value.kReverse);
+	public void shiftHigh() {
+		ob.driveShifter.set(DoubleSolenoid.Value.kReverse);
 	}
 
 	/**
 	 * puts the drive train in low gear (strong)
 	 */
-	public void shiftLow() { // shifts into low gear ratio
-//		ob.driveShifter.set(DoubleSolenoid.Value.kForward);
+	public void shiftLow() {
+		ob.driveShifter.set(DoubleSolenoid.Value.kForward);
 	}
 }

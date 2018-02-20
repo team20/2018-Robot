@@ -1,4 +1,4 @@
-package org.usfirst.frc.team20.robot;
+ package org.usfirst.frc.team20.robot;
 
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.I2C;
@@ -7,34 +7,12 @@ import edu.wpi.first.wpilibj.I2C.Port;
 public class Arduino {
 	I2C Wire;									//initializes I2C communication on port 1
 	Zenith ob;
-	private final int numOfBytes = 1;					//number of bytes stored in sensorData
-	private byte[] sensorData = new byte[numOfBytes];	//all data from sensors is stored here
-	private byte IRSensor;	//data from IR sensor
 
 	Arduino(int port, Zenith o) {
 		Wire = new I2C(Port.kOnboard, port);
 		ob = o;
 	}
-	
-	/**
-	 * get array of data from Arduino and sets each variable to the correct value
-	 */
-	public void getSensorData() {
-		Wire.read(1, numOfBytes, sensorData);
-		IRSensor = sensorData[0];
-	}
-	
-	/**
-	 * checks for the presence of an object in front of the IR sensor
-	 * @return true if there is an object in front of the IR sensor
-	 */
-	public boolean getIRSensor() {
-		if (IRSensor == 1)
-			return true;
-		else
-			return false;
-	}
-	
+
 	/**
 	 * 
 	 * @param writeData: data that needs to be written to the Arduino

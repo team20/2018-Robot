@@ -35,45 +35,45 @@ public class Collector {
 	 * closes the manipulator
 	 */
 	public void close(){
-//		ob.grabber.set(Value.kForward);
+		ob.grabber.set(Value.kForward);
 	}
 
 	/**
 	 * opens the manipulator
 	 */
 	public void open(){
-//		ob.grabber.set(Value.kReverse);
+		ob.grabber.set(Value.kReverse);
 	}
 
 	/**
 	 * sets the manipulator to the horizontal position (to allow intaking)
 	 */
 	public void armIntakePosition(){
-//		ob.piston45.set(Value.kReverse);
-//		ob.piston180.set(Value.kReverse);
+		ob.singleUp.set(Value.kReverse);
+		ob.doubleUp.set(Value.kReverse);
 	}
 	
 	/**
 	 * sets the manipulator upwards at a 45 degree angle
 	 */
 	public void arm45(){
-//		ob.piston45.set(Value.kForward);
-//		ob.piston180.set(Value.kReverse);
+		ob.singleUp.set(Value.kForward);
+		ob.doubleUp.set(Value.kReverse);
 	}
 	
 	/**
 	 * sets the manipulator in the starting position - up 100 degrees
 	 */
 	public void arm100(){
-//		ob.piston45.set(Value.kReverse);
-//		ob.piston180.set(Value.kForward);
+		ob.singleUp.set(Value.kReverse);
+		ob.doubleUp.set(Value.kForward);
 	}
 
 	/**
 	 * flips the manipulator over the top of the elevator carriage
 	 */
 	public void arm180(){
-//		ob.piston45.set(Value.kForward);
-//		ob.piston180.set(Value.kForward);
+		ob.singleUp.set(Value.kForward);
+		ob.doubleUp.set(Value.kForward);
 	}
 }

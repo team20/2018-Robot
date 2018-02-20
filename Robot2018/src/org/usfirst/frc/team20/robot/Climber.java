@@ -21,8 +21,8 @@ public class Climber {
 	/**
 	 * runs the climber motors in order to climb
 	 */
-	public void climb(){
-		ob.climberMaster.set(ControlMode.PercentOutput, 1.0); 
+	public void climb(double speed){
+		ob.climberMaster.set(ControlMode.PercentOutput, speed); 
 	}
 	
 	/**
@@ -34,7 +34,7 @@ public class Climber {
 	/**
 	 * releases the pin of the climber, allowing it to pull the robot up
 	 */
-	public void releasePin(){
+	public void releasePin(){ //TODO
 //		ob.climberSpringPin.set(Value.kReverse);
 	}
 }
