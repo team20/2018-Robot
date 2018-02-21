@@ -16,7 +16,7 @@ public class RocketScript {
 	static public ArrayList<String> crossAutoLine(){
 		ArrayList<String> auto = new ArrayList<>();
 		auto.add(Integer.toString(RobotModes.WAIT_ENTERED));
-		auto.add(RobotModes.ENCODER_DRIVE + ";" + 1.0 + ";" + 120);
+		auto.add(RobotModes.ENCODER_DRIVE + ";" + 0.5 + ";" + 120 + ";" + 0.0);
 		return auto;
 	}	
 

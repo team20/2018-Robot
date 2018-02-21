@@ -20,6 +20,7 @@ public class Zenith implements Loggable{
 	RobotController controller;
 	double gyroSetpoint = 0, gyroAngle = 0, leftSide = 0, rightSide = 0, driveLeftSetpoint = 0, driveRightSetpoint = 0, elevatorSetpoint = 0;
 	boolean cube = false;
+
 	public Zenith(){
 		//DriveTrain - each group is all the information for a motor
 		driveMasterLeft = new TalonSRX(1);
@@ -41,15 +42,15 @@ public class Zenith implements Loggable{
 		driveFollowerRight = new VictorSPX(4);
 		driveFollowerRight.follow(driveMasterRight);
 		driveFollowerRight.setInverted(true);
-		
+
 		driveFollowerLeftTwo = new VictorSPX(5);
 		driveFollowerLeftTwo.follow(driveMasterLeft);
 		driveFollowerLeftTwo.setInverted(false);
-		
+
 		driveFollowerRightTwo = new VictorSPX(6);
 		driveFollowerRightTwo.follow(driveMasterRight);
 		driveFollowerRightTwo.setInverted(false);
-		
+
 		driveShifter = new DoubleSolenoid(14, 0, 1);
 
 		//Manipulator

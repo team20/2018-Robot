@@ -221,7 +221,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 //					script.addAll(RocketScript.crossAutoLine());
 //				}
 //				rocketScriptSize = script.size();
-				script.addAll(RocketScript.crossAutoLine());
+				script.addAll(RocketScript.splineCenterToRightSwitch());
 				rocketScriptSize = script.size();
 				autoSelected = true;
 //			}
@@ -370,7 +370,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			logger.startSocket(); socket = true;
 		}
 		beenEnabled = true;
-		elevator.setPID(0.05, 0.0, 1.0, 0.0); //TODO move to robotInit() //0.05, 0.00001, 0.0, 0.0
 	}
 
 	@Override
@@ -411,6 +410,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 //				ob.driveMasterRight.getSelectedSensorPosition(0)));
 //		System.out.println("Elevator: " + ob.elevatorMaster.getSelectedSensorPosition(Constants.PIDIDX));			
 //		System.out.println("Raw Angle:                       " + gyro.getYaw());
+		
 	}
 	
 	/**

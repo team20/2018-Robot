@@ -76,7 +76,7 @@ public class Grids {
 
 	private RobotGrid centerToRightSwitch(){
 		RobotGrid grid = new RobotGrid(0, 150+WIDTH, 0, 2);
-		grid.addPoint(50.75, 194.25, 90);
+		grid.addPoint(50.75, 194.25, 270);
 		grid.addPoint(140-LENGTH, 238.5-WIDTH, 0);
 		return grid;
 	}

@@ -33,19 +33,17 @@ public class Arduino {
 		if(off){
 			send[0] = 21;
 		}else if(current){
-			send[0] = 27;
+			send[0] = 28;
 		} else if (climbing){
-			send[0] = 26;
+			send[0] = 27;
 		} else if (cube) {
-			send[0] = 25;
+			send[0] = 26;
 		} else if (elevatorMoving){
-			send[0] = 29;
-			write(send);
 			send[0] = (byte)((ob.elevatorMaster.getSelectedSensorPosition(0)/Constants.ELEVATOR_MAX_POSITION)*20);
 		} else if (alliance == Alliance.Red){
-			send[0] = 23;
+			send[0] = 23; //TODO (22 low, 23)
 		} else if(alliance == Alliance.Blue){
-			send[0] = 24;
+			send[0] = 24; //TODO make high gear low gear (24 low, 25)
 		}
 		write(send);
 	}

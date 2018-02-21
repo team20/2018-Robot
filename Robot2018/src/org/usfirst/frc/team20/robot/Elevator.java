@@ -10,7 +10,7 @@ public class Elevator {
 	public Elevator(Zenith o){
 		ob = o;
 		setPosition = ob.elevatorMaster.getSelectedSensorPosition(0);
-		setPID(0.05, 0.0, 1.0, 0.0); //0.05, 0.00001, 0.0, 0.0
+		setPID(0.05, 0.00001, 0.0, 0.0); //0.05, 0.00001, 0.0, 0.0
 	}
 	
 	/**
@@ -117,10 +117,10 @@ public class Elevator {
 	}
 
 	/**
-	 * 
+	 * sets the elevator 15 inches lower
 	 */
 	public void flipPosition(){
-		setPosition -= 15*TICKS_PER_INCH;
+		setPosition += 15*TICKS_PER_INCH;
 		ob.updateElevatorSetpoint(setPosition);
 		ob.elevatorMaster.set(ControlMode.Position, setPosition);
 	}

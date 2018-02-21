@@ -16,7 +16,6 @@ public class DriverControls {
 		climb = cl;
 	}
 	
-
 	/**
 	 * contains all of the controls for the driver joystick
 	 */
@@ -26,10 +25,14 @@ public class DriverControls {
 		} else {
 			speedStraight = 0.0;
 		}
-		speedLeft = ob.driverJoy4.getLeftTriggerAxis();
-		speedRight = ob.driverJoy4.getRightTriggerAxis();
+		if(ob.elevatorMaster.getSelectedSensorPosition(0) > Constants.ELEVATOR_STAGE_THRESHOLD){
+			speedLeft = ob.driverJoy4.getLeftTriggerAxis()*0.5;
+			speedRight = ob.driverJoy4.getRightTriggerAxis()*0.5;			
+		} else {
+			speedLeft = ob.driverJoy4.getLeftTriggerAxis()*0.75;
+			speedRight = ob.driverJoy4.getRightTriggerAxis()*0.75;
+		}
 		drive.drive(speedStraight, speedRight, speedLeft);
-		
 		if(ob.driverJoy4.getTriButton()){
 			drive.shiftHigh();
 		}
