@@ -19,13 +19,20 @@ public class DriverControls {
 	/**
 	 * contains all of the controls for the driver joystick
 	 */
-	public void driverControlsPS4(){ //TODO Alex, make climber speed variable on joystick???
+	public void driverControlsPS4(){
 		if(Math.abs(ob.driverJoy4.getLeftYAxis()) > 0.1){
 			speedStraight = -ob.driverJoy4.getLeftYAxis();			
 		} else {
 			speedStraight = 0.0;
 		}
-		if(ob.elevatorMaster.getSelectedSensorPosition(0) > Constants.ELEVATOR_STAGE_THRESHOLD){
+		if(ob.elevatorMaster.getSelectedSensorPosition(0) < Constants.ELEVATOR_FAST_DRIVING_MAX){
+			ob.driveMasterLeft.configOpenloopRamp(0.2, 1000);
+			ob.driveMasterRight.configOpenloopRamp(0.2, 1000);
+		} else {
+			ob.driveMasterLeft.configOpenloopRamp(0.1, 1000);
+			ob.driveMasterRight.configOpenloopRamp(0.1, 1000);			
+		}
+		if(ob.elevatorMaster.getSelectedSensorPosition(0) < Constants.ELEVATOR_STAGE_THRESHOLD){
 			speedLeft = ob.driverJoy4.getLeftTriggerAxis()*0.5;
 			speedRight = ob.driverJoy4.getRightTriggerAxis()*0.5;			
 		} else {

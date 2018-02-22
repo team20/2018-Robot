@@ -374,7 +374,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 
 	@Override
 	public void teleopPeriodic() {
-		if(driverJoy.leds){			
+		if(driverJoy.leds){
 			arduino.lights(alliance, ob.cube, driverJoy.climbing, ob.currentLimit(), false, elevator.elevatorMoving());
 		} else {
 			arduino.lights(null, false, false, false, true, false);

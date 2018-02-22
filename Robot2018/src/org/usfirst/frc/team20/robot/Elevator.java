@@ -102,7 +102,7 @@ public class Elevator {
 	 * brings the elevator up six inches
 	 */
 	public void upIncrement(){
-		setPosition = ob.elevatorMaster.getSelectedSensorPosition(0) + (int)6*TICKS_PER_INCH;
+		setPosition = ob.elevatorMaster.getSelectedSensorPosition(0) - (int)6*TICKS_PER_INCH;
 		ob.updateElevatorSetpoint(setPosition);
 		ob.elevatorMaster.set(ControlMode.Position, setPosition);
 	}
@@ -111,7 +111,7 @@ public class Elevator {
 	 * brings the elevator down six inches
 	 */
 	public void downIncrement(){
-		setPosition = ob.elevatorMaster.getSelectedSensorPosition(0) - (int)6*TICKS_PER_INCH;
+		setPosition = ob.elevatorMaster.getSelectedSensorPosition(0) + (int)6*TICKS_PER_INCH;
 		ob.updateElevatorSetpoint(setPosition);
 		ob.elevatorMaster.set(ControlMode.Position, setPosition);
 	}
@@ -152,15 +152,21 @@ public class Elevator {
 	 * waits for the current to spike,
 	 * zeros the elevator encoder
 	 */
-//	public boolean reset(){
-//		ob.elevatorMaster.set(ControlMode.PercentOutput, -.1); // tune the value for going down
-//		if(ob.elevatorMaster.getOutputCurrent() > 10) { // tune the value for the current threshold
-//			ob.elevatorMaster.set(ControlMode.PercentOutput, 0);
-//			ob.elevatorMaster.setSelectedSensorPosition(0);
-//			return true;
-//		}else {
-//			return false;
-//		}
-//	}
-	 
+	public boolean reset(){
+		ob.elevatorMaster.set(ControlMode.PercentOutput, -0.1);
+		if(ob.elevatorMaster.getOutputCurrent() > 100) { //TODO tune the value for the current threshold
+			ob.elevatorMaster.set(ControlMode.PercentOutput, 0.0);
+			ob.elevatorMaster.setSelectedSensorPosition(0, 0, 1000);
+			return true;
+		} else {
+			return false;
+		}
+	}	 
+	
+	/**
+	 * @return true if the elevator is above the stationary stage
+	 */
+	public boolean aboveThreshold(){
+		return ob.elevatorMaster.getSelectedSensorPosition(0) < Constants.ELEVATOR_STAGE_THRESHOLD;
+	}
 }

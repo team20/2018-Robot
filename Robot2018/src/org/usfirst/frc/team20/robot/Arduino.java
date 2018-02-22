@@ -1,5 +1,6 @@
  package org.usfirst.frc.team20.robot;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.I2C.Port;
@@ -7,10 +8,11 @@ import edu.wpi.first.wpilibj.I2C.Port;
 public class Arduino {
 	I2C Wire;									//initializes I2C communication on port 1
 	Zenith ob;
-
+	private boolean prevCube;
 	Arduino(int port, Zenith o) {
 		Wire = new I2C(Port.kOnboard, port);
 		ob = o;
+		prevCube = false;
 	}
 
 	/**
@@ -29,6 +31,11 @@ public class Arduino {
 	 * sends the code for the needed light pattern to the Arduino
 	 */
 	public void lights(Alliance alliance, boolean cube, boolean climbing, boolean current, boolean off, boolean elevatorMoving){
+		if(cube == prevCube){
+			cube = false;
+		} else {
+			prevCube = cube;
+		}
 		byte[] send = new byte[1];
 		if(off){
 			send[0] = 21;
@@ -41,9 +48,15 @@ public class Arduino {
 		} else if (elevatorMoving){
 			send[0] = (byte)((ob.elevatorMaster.getSelectedSensorPosition(0)/Constants.ELEVATOR_MAX_POSITION)*20);
 		} else if (alliance == Alliance.Red){
-			send[0] = 23; //TODO (22 low, 23)
+			if(ob.driveShifter.get() == Value.kForward)
+				send[0] = 22;
+			else
+				send[0] = 23;
 		} else if(alliance == Alliance.Blue){
-			send[0] = 24; //TODO make high gear low gear (24 low, 25)
+			if(ob.driveShifter.get() == Value.kForward)
+				send[0] = 24;
+			else
+				send[0] = 25;
 		}
 		write(send);
 	}

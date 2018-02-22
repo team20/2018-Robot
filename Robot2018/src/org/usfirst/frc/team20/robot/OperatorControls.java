@@ -7,72 +7,36 @@ public class OperatorControls {
 	Collector collector;
 	Elevator elevator;
 	Zenith ob;
-	boolean override, flipOver, timeStarted, resetting, intakeMode, maxHeight, setIntake, downTimerStarted, flipPositionSet;
+	boolean override, flipOver, timeStarted, resetting, intakeMode, maxHeight, downTimerStarted, flipPositionSet, flipped, positionChange;
 	double startTime;
+	int toRun;
+	private final double FLIP_WAIT_TIME = 0.75;
 	
 	public OperatorControls(Collector c, Elevator e, Zenith o){
 		collector = c;
 		elevator = e;
 		ob = o;
-		override = false;
-		flipOver = false;
-		timeStarted = false;
-		resetting = false;
-		intakeMode = false;
-		maxHeight = false;
-		setIntake = false;
+		override = flipOver = timeStarted = resetting = intakeMode = maxHeight = downTimerStarted = flipPositionSet = flipped = positionChange = false;
 		startTime = 0;
+		toRun = 0;
 	}
 	
 	/**
 	 * runs all of the controls of the operator
 	 */
 	public void operatorControlsPS4(){
-		System.out.println("Elevator Position: " + ob.elevatorMaster.getSelectedSensorPosition(0)); 
-		System.out.println("Elevator Setpoint: " + elevator.getSetPosition());
+		//PRINT LINES
+//		System.out.println("Elevator Position: " + ob.elevatorMaster.getSelectedSensorPosition(0)); 
+//		System.out.println("Elevator Setpoint: " + elevator.getSetPosition());
 //		System.out.println("Elevator Master: " + ob.elevatorMaster.getMotorOutputVoltage()); 
 //		System.out.println("Elevator Follower: " + ob.elevatorFollower.getMotorOutputVoltage()); 
-		//automated
-		if(ob.elevatorMaster.getSelectedSensorPosition(0) < Constants.ELEVATOR_MAX_POSITION){
-			maxHeight = true;
-		} else {
-			maxHeight = false;
-		}
-		if(intakeMode){ //don't go down unless we do not have a cube
-			if(!ob.cubeSensor.get()){
-				if(!timeStarted){
-					startTime = Timer.getFPGATimestamp();
-					collector.intake(1.0);
-					timeStarted = true;
-				}
-				collector.close();
-				ob.updateCube(true);
-			} else {
-				ob.updateCube(false);
-			}
-			if((Timer.getFPGATimestamp() - startTime) > 0.5 && timeStarted){ //time to wait until closes
-				collector.intake(0.0);
-				intakeMode = false;
-				timeStarted = false;
-			}
-		}
-		//controlled
+		System.out.println("Elevator Current Draw: " + ob.elevatorMaster.getOutputCurrent());
+		//CONTROLLER
 		if(ob.operatorJoy4.getXButton()){
 			collector.intake(0.5);
 			collector.open();
 			intakeMode = true;
 			ob.operatorJoy4.setRumble(1.0, 1.0);
-		}
-		if(downTimerStarted){
-			System.out.println("&&&&&&&&&&&&&&&&&&&&WAITING&&&&&&&&&&&&&&&&&&&&&&&&");
-			if(Math.abs(Timer.getFPGATimestamp() - startTime) > 0.75){
-				elevator.setIntake();
-				collector.intake(0.5);
-				collector.open();
-				intakeMode = true;
-				setIntake = true;				
-				downTimerStarted = false;
-			}
 		}
 		if(ob.operatorJoy4.getCircleButton()){
 			collector.stopRollers();
@@ -84,20 +48,30 @@ public class OperatorControls {
 			ob.operatorJoy4.setRumble(100, 100);
 		}
 		if(ob.operatorJoy4.getButtonDUp()){
+			positionChange = true;
 			elevator.setScaleHigh();
 			collector.arm45();
 		}
-//		if(ob.operatorJoy4.getOptionsButton() && ob.operatorJoy4.getShareButton()) {
-//			resetting = true;
-//		}
+		if(ob.operatorJoy4.getOptionsButton() && ob.operatorJoy4.getShareButton()) {
+			resetting = true;
+		}
 		if(ob.operatorJoy4.getButtonDLeft()){
+			positionChange = true;
 			elevator.setScaleMid();
 		}
 		if(ob.operatorJoy4.getButtonDDown()) {
+			positionChange = true;
 			elevator.setScaleLow();
 		}
 		if(ob.operatorJoy4.getButtonDRight()) {
-			elevator.setSwitch();
+			toRun = 0;
+			if(elevator.aboveThreshold()){
+				collector.armIntakePosition();
+				startTime = Timer.getFPGATimestamp();
+				downTimerStarted = true;
+			} else {
+ 				runFunction();
+			}
 		}
 		if(ob.operatorJoy4.getRightYAxis() < -0.5) {
 			collector.arm45();
@@ -106,18 +80,14 @@ public class OperatorControls {
 			collector.armIntakePosition();
 		}
 		if(ob.operatorJoy4.getLeftBumperButton()) {
-			if(ob.doubleUp.get() == Value.kForward || ob.singleUp.get() == Value.kForward){
-				System.out.println("**********************************FORWARD HIT***********************************");
+			toRun = 2;
+			if(flipped){
 				collector.armIntakePosition();
 				startTime = Timer.getFPGATimestamp();
 				downTimerStarted = true;
 			}
 			if(!downTimerStarted){
-				elevator.setIntake();
-				collector.intake(0.5);
-				collector.open();
-				intakeMode = true;
-				setIntake = true;				
+				runFunction();
 			}
 		}
 		if(Math.abs(ob.operatorJoy4.getLeftYAxis()) > 0.1 && ob.operatorJoy4.getTrackpadButton()){
@@ -141,10 +111,10 @@ public class OperatorControls {
 				override = false;
 			}
 		}
-		if(ob.operatorJoy4.getLeftYAxis() > 0.5 && !ob.operatorJoy4.getLeftStickButton() && !override){
+		if(ob.operatorJoy4.getLeftYAxis() < -0.5 && !ob.operatorJoy4.getLeftStickButton() && !override){
 			elevator.upIncrement();
 		}
-		if(ob.operatorJoy4.getLeftYAxis() < -0.5 && !ob.operatorJoy4.getLeftStickButton() && !override){
+		if(ob.operatorJoy4.getLeftYAxis() > 0.5 && !ob.operatorJoy4.getLeftStickButton() && !override){
 			elevator.downIncrement();
 		}
 		if(ob.operatorJoy4.getLeftTriggerAxis() > 0.1){
@@ -158,10 +128,6 @@ public class OperatorControls {
 		if(ob.operatorJoy4.getLeftTriggerAxis() == 0){
 			flipPositionSet = false;
 		}
-		if(flipOver && ob.elevatorMaster.getSelectedSensorPosition(0) < Constants.ELEVATOR_STAGE_THRESHOLD){
-			collector.arm180();
-			flipOver = false;
-		}
 		if(ob.operatorJoy4.getRightBumperButton()){
 			collector.open();
 		}
@@ -169,13 +135,100 @@ public class OperatorControls {
 			collector.close();
 		}
 		if(ob.operatorJoy4.getSquareButton()){
-			elevator.setIntake();
-			setIntake = true;
-			collector.arm100();
+			toRun = 1;
+			if(flipped){
+				collector.arm100();
+				startTime = Timer.getFPGATimestamp();
+				downTimerStarted = true;
+			} else {
+				runFunction();
+			}
 		}
 		if(ob.operatorJoy4.getOptionsButton()){
 			elevator.stop();
 			collector.stopRollers();
 		}
+		//SAFETY INFORMATION
+		if(ob.elevatorMaster.getSelectedSensorPosition(0) < Constants.ELEVATOR_MAX_POSITION){
+			maxHeight = true;
+		} else {
+			maxHeight = false;
+		}
+		if(ob.doubleUp.get() == Value.kForward && ob.singleUp.get() == Value.kForward){
+			flipped = true;
+		} else {
+			flipped = false;
+		}
+		//BOOLEANS
+		if(intakeMode){ //don't go down unless we do not have a cube
+			if(!ob.cubeSensor.get()){
+				if(!timeStarted){
+					startTime = Timer.getFPGATimestamp();
+					collector.intake(1.0);
+					timeStarted = true;
+				}
+				collector.close();
+				ob.updateCube(true);
+			} else {
+				ob.updateCube(false);
+			}
+			if((Timer.getFPGATimestamp() - startTime) > 0.5 && timeStarted){ //time to wait until closes
+				collector.intake(0.0);
+				intakeMode = false;
+				timeStarted = false;
+			}
+		}
+		if(downTimerStarted){
+			if(flipWaitTime()){
+				runFunction();
+				downTimerStarted = false;
+			}
+		}
+		if(resetting){
+			if(elevator.reset()){
+				resetting = false;
+			}
+		}
+		if(flipOver && elevator.aboveThreshold()){
+			collector.arm180();
+			flipOver = false;
+		}
+		if(flipped && positionChange){
+			elevator.flipPosition();
+			positionChange = false;
+		}
 	}	
+	/**
+	 * @return true if the elevator has waiting long enough to flip the manipulator
+	 */
+	private boolean flipWaitTime(){
+		if(Math.abs(startTime - Timer.getFPGATimestamp()) > FLIP_WAIT_TIME){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * runs the function designated by the integer toRun
+	 * toRun = 0; sets the elevator to switch height
+	 * toRun = 1; sets the elevator to intake position with the arm at the 100 degree position
+	 * toRun = 2; sets the elevator and arm to intake position and into intake mode
+	 */
+	private void runFunction(){
+		switch(toRun){
+		case 0: 
+			elevator.setSwitch();
+			break;
+		case 1:
+			elevator.setIntake();
+			break;
+		case 2: 
+			elevator.setIntake();
+			collector.armIntakePosition();
+			collector.intake(0.5);
+			intakeMode = true;
+			break;
+		}
+	}
 }

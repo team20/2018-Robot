@@ -19,6 +19,7 @@ public class Constants {
 	public static final int SCALE_HIGH_POSITION = -44010;
 	public static final int ELEVATOR_MAX_POSITION = -49570;
 	public static final int ELEVATOR_STAGE_THRESHOLD = -24000;
+	public static final int ELEVATOR_FAST_DRIVING_MAX = -49570;
 	public static final double CURRENT_LIMIT = 500000;
 
 	public static final int PIDIDX = 0;
