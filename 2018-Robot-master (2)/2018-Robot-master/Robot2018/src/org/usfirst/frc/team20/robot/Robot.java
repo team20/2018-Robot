@@ -49,7 +49,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	
 	//Autonomous Variables
 	PIDController headingPID;
-	AHRS gyro = new AHRS(SerialPort.Port.kMXP); // DO NOT PUT IN ROBOT INIT
+	AHRS gyro; // DO NOT PUT IN ROBOT INIT
+//	EncoderGyro gyro;
 	ArrayList<String> script = new ArrayList<>();
 	Grids grid;
 	DriverVision elevCam, cam1;
@@ -71,6 +72,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	
 	@Override
 	public void robotInit() {
+		gyro = new AHRS(SerialPort.Port.kMXP);
 		ob = new Zenith();
 		drive = new DriveTrain(ob);
 		collector = new Collector(ob);
@@ -83,15 +85,16 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		headingPID.setInputRange(-180, 180);
 		headingPID.setContinuous();
 		headingPID.setOutputRange(-1.0, 1.0);
+//		gyro = new EncoderGyro(ob, 32.5); //TODO get measurement
 		grid = new Grids();
 		arduino = new Arduino(1, ob);
 		ob.elevatorMaster.setSelectedSensorPosition(0, 0, 1000);
 
 		try{
-			elevCam = new DriverVision("Elevator Cam", 0); //TODO uncomment camera code
+			elevCam = new DriverVision("Elevator Cam", 0);
 			elevCam.startUSBCamera();
-			cam1 = new DriverVision("cam1", 1);
-			cam1.startUSBCamera();
+//			cam1 = new DriverVision("cam1", 1);
+//			cam1.startUSBCamera();
 		} catch(Exception e){
 			
 		} finally {
@@ -163,71 +166,112 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			gyroReset = true;
 		}
 		if(!autoSelected){
-			//Switch and Scale are on the left or right?	//TODO uncomment auto selection
-//			String field = DriverStation.getInstance().getGameSpecificMessage();
-//			if(field.length() > 0){
-//				boolean switchLeft = false, scaleLeft = false;
-//				if(field.charAt(0) == 'L'){
-//					switchLeft = true;
-//				}
-//				if(field.charAt(1) == 'L'){
-//					scaleLeft = true;
-//				}
-//				//Picking Which Auto Mode
-//				boolean scalePriority = SmartDashboard.getBoolean("DB/Button 0", false);
-//				boolean highOnly = SmartDashboard.getBoolean("DB/Button 1", false);
-//				double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
-//				waitTime = 2*SmartDashboard.getNumber("DB/Slider 1", 0.0);
-//				if(position == 0){
-//					if(switchLeft){
-//						script.addAll(RocketScript.splineLeftToLeftSwitch());
+			//Switch and Scale are on the left or right?
+			String field = DriverStation.getInstance().getGameSpecificMessage();
+			if(field == null){
+				field = "";
+			}
+			int retries = 100;
+			while(field.length() < 2 && retries > 0){
+				try{
+//					Thread.sleep(5);
+					field = DriverStation.getInstance().getGameSpecificMessage();
+					if(field == null){
+						field = "";
+					}
+				} catch (Exception e){
+					
+				}
+				retries --;
+			}
+			if(field.length() > 2){
+				System.out.println("**********************GOT FIELD MESSAGE: " + field);
+				SmartDashboard.putString("DB/String 0", field);
+				boolean switchLeft = false, scaleLeft = false;
+				if(field.charAt(0) == 'L'){
+					switchLeft = true;
+				}
+				if(field.charAt(1) == 'L'){
+					scaleLeft = true;
+				}
+				//Middle Scale or Switch Decision Tree
+//				boolean partnerLeft = SmartDashboard.getBoolean("DB/Button 0", false);
+//				if(partnerLeft){
+//					if(!scaleLeft){
+//						script.addAll(RocketScript.splineCenterToRightScale());
+//					} else if (switchLeft){
+//						script.addAll(RocketScript.splineCenterToLeftSwitch());
 //					} else {
-//						script.addAll(RocketScript.splineLeftToRightSwitch());
+//						script.addAll(RocketScript.splineCenterToRightSwitch());
 //					}
-//				} else if (position == 2.5){
-//					if(!highOnly){
-//						if(scaleLeft && switchLeft){
-//							script.addAll(RocketScript.splineCenterToLeftSwitchToLeftScale());
-//						} else if (!scaleLeft && !switchLeft){
-//							script.addAll(RocketScript.splineCenterToRightSwitchToRightScale());
-//						} else {
-//							if(!scalePriority){
-//								if(switchLeft){
-//									script.addAll(RocketScript.splineCenterToLeftSwitch());
-//								} else {
-//									script.addAll(RocketScript.splineCenterToRightSwitch());
-//								}
-//							} else {
-//								if(scaleLeft){
-//									script.addAll(RocketScript.splineCenterToLeftScale());
-//								} else {
-//									script.addAll(RocketScript.splineCenterToRightScale());
-//								}
-//							}
-//						}
+//				} else {
+//					if(scaleLeft){
+//						script.addAll(RocketScript.splineCenterToLeftScale());
+//					} else if (switchLeft){
+//						script.addAll(RocketScript.splineCenterToLeftSwitch());
 //					} else {
-//						if(!scalePriority){
-//							if(switchLeft){
-//								script.addAll(RocketScript.splineCenterToLeftSwitch());
-//							} else {
-//								script.addAll(RocketScript.splineCenterToRightSwitch());
-//							}
-//						} else {
-//							if(scaleLeft){
-//								script.addAll(RocketScript.splineCenterToLeftScale());
-//							} else {
-//								script.addAll(RocketScript.splineCenterToRightScale());
-//							}
-//						}				
-//					}
-//				} else if (position == 5){
-//					script.addAll(RocketScript.crossAutoLine());
+//						script.addAll(RocketScript.splineCenterToRightSwitch());
+//					}					
 //				}
-//				rocketScriptSize = script.size();
-				script.addAll(RocketScript.splineCenterToLeftScale());
+				//Normal Decision Tree
+				String auto = "";
+				boolean scalePriority = SmartDashboard.getBoolean("DB/Button 0", false);
+				boolean highOnly = SmartDashboard.getBoolean("DB/Button 1", false);
+				double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
+				waitTime = 2*SmartDashboard.getNumber("DB/Slider 1", 0.0);
+				if(position == 0){
+					if(switchLeft){
+						script.addAll(RocketScript.splineLeftToLeftSwitch());
+					} else {
+						script.addAll(RocketScript.splineLeftToRightSwitch());
+					}
+				} else if (position == 2.5){
+					if(!highOnly){
+						if(scaleLeft && switchLeft){
+							script.addAll(RocketScript.splineCenterTwoCubeLeftV2());
+						} else if (!scaleLeft && !switchLeft){
+							script.addAll(RocketScript.splineCenterTwoCubeRightV2());
+						} else {
+							if(!scalePriority){
+								if(switchLeft){
+									script.addAll(RocketScript.splineCenterToLeftSwitch());
+								} else {
+									script.addAll(RocketScript.splineCenterToRightSwitch());
+								}
+							} else {
+								if(scaleLeft){
+									script.addAll(RocketScript.splineCenterToLeftScale());
+								} else {
+									script.addAll(RocketScript.splineCenterToRightScale());
+								}
+							}
+						}
+					} else {
+						if(!scalePriority){
+							if(switchLeft){
+								auto = "centerToLeftSwitch Ran";
+								script.addAll(RocketScript.splineCenterToLeftSwitch());
+							} else {
+								script.addAll(RocketScript.splineCenterToRightSwitch());
+								auto = "centerToRightSwitch Ran";
+							}
+						} else {
+							if(scaleLeft){
+								script.addAll(RocketScript.splineCenterToLeftScale());
+								auto = "splineCenterToLeftScale Ran";
+							} else {
+								script.addAll(RocketScript.splineCenterToRightScale());
+								auto = "splineCenterToRightScale Ran";
+							}
+						}				
+					}
+				} else if (position == 5){
+					script.addAll(RocketScript.cross());
+				}
+				SmartDashboard.putString("DB/String 1", auto);
 				rocketScriptSize = script.size();
 				autoSelected = true;
-//			}
+			}
 		}
 		//Scripting
 		if (rocketScriptCurrentCount < rocketScriptSize) {
@@ -259,6 +303,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.ARM_INTAKE_POSITION){
 				collector.armIntakePosition();
+				rocketScriptCurrentCount++;
+			}
+			if(Integer.parseInt(values[0]) == RobotModes.ARM_100){
+				collector.arm100();
 				rocketScriptCurrentCount++;
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.SLOW_SPIT){
@@ -339,7 +387,12 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				}
 			}
 			if (Integer.parseInt(values[0]) == RobotModes.TIME_DRIVE) {
-				if (timeDrive(Double.parseDouble(values[1]), Double.parseDouble(values[2]), true)) {
+				if (timeDrive(Double.parseDouble(values[1]), Double.parseDouble(values[2]), false)) {
+					rocketScriptCurrentCount++;
+				}
+			}
+			if (Integer.parseInt(values[0]) == RobotModes.TIME_TURN){
+				if (timeTurn(Double.parseDouble(values[1]), Double.parseDouble(values[2]), Boolean.parseBoolean(values[3]))){
 					rocketScriptCurrentCount++;
 				}
 			}
@@ -356,6 +409,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				if (!waitStartTime) {
 					startTime = Timer.getFPGATimestamp();
 					waitStartTime = true;
+					collector.armIntakePosition();
 					collector.outtake();
 				}
 				if (Timer.getFPGATimestamp() - startTime > 0.25) {
@@ -392,7 +446,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	@Override
 	public void teleopInit(){
 		path = new RobotGrid(0,0,0,0);
-		startingDistance = (((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2;
+		startingDistance = (((-ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2;
 		drive.shiftHigh();
 		if(!socket){
 			logger.startSocket(); socket = true;
@@ -402,8 +456,13 @@ public class Robot extends IterativeRobot implements PIDOutput{
 
 	@Override
 	public void teleopPeriodic() {
+		System.out.println("Elevator Position: " + ob.elevatorMaster.getSelectedSensorPosition(0));
 		if(driverJoy.leds){
-			arduino.lights(alliance, ob.cube, driverJoy.climbing, ob.currentLimit(), false, elevator.elevatorMoving());
+			if(Timer.getMatchTime() < 40.0 && Timer.getMatchTime() > 0){
+				arduino.lights(alliance, ob.cube, true, false, false, false);
+			} else {
+				arduino.lights(alliance, ob.cube, driverJoy.climbing, ob.currentLimit(), false, elevator.elevatorMoving());
+			}
 		} else {
 			arduino.lights(null, false, false, false, true, false);
 		}
@@ -431,14 +490,27 @@ public class Robot extends IterativeRobot implements PIDOutput{
 
 	@Override
 	public void testPeriodic() {
-//		System.out.println("NavX Yaw: " + gyro.getYaw());
+		boolean blue = false;
+		if(ob.driverJoy4.getLeftBumperButton()) {
+			blue = true;
+		}
+		if(blue){
+			arduino.lights(Alliance.Blue, ob.driverJoy4.getXButton(), ob.driverJoy4.getSquareButton(), ob.driverJoy4.getTriButton(), false, ob.driverJoy4.getRightYAxis() > .1);
+			
+		}
+		
+		
+		
+		
+		
+		
+		//System.out.println("NavX Yaw: " + gyro.getYaw());
 //		System.out.println("Left: " + ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX));	
 //		System.out.println("		Right: " + ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX));	
 //		System.out.println("Encoder Gyro Angle: " + gy.updateAngle(ob.driveMasterLeft.getSelectedSensorPosition(0), ob.driveMasterRight.getSelectedSensorPosition(0)));
 //				ob.driveMasterRight.getSelectedSensorPosition(0)));
-//		System.out.println("Elevator: " + ob.elevatorMaster.getSelectedSensorPosition(Constants.PIDIDX));			
+//		System.out.println("                     Elevator: " + ob.elevatorMaster.getSelectedSensorPosition(Constants.PIDIDX));			
 //		System.out.println("Raw Angle:                       " + gyro.getYaw());		
-		System.out.println("CUBE: ");
 	}
 	
 	/**
@@ -546,6 +618,28 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		}
 		return false;
 	}
+	
+	/**
+	 * turns the robot for a specific number of seconds
+	 * @param speed: speed of the moving wheel
+	 * @param time: amount of time to turn for
+	 * @param left: is the robot turning left?
+	 * @return: true when the robot is done turning
+	 */
+	public boolean timeTurn(double speed, double time, boolean left){
+		if(!setStartTime){
+			startTime = Timer.getFPGATimestamp();
+			setStartTime = true;
+		}
+		if (Timer.getFPGATimestamp() - startTime < time) {
+			drive.turn(speed, left);
+		} else {
+			arcadeDrive(0.0, 0);
+			setStartTime = false;
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * drive a certain number of inches using encoders
@@ -631,7 +725,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					} else if (angleToDrive > 90 && gyro.getYaw() < -90){
 						double temp = 180 - angleToDrive;
 						temp += (180 + gyro.getYaw());
-						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);					
+						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);
 					} else {
 						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
 					}

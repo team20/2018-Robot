@@ -45,7 +45,7 @@ public class DriverControls {
 		} else {
 			if (ob.driverJoy4.getSquareButton()) {
 				speedLeft = ob.driverJoy4.getLeftTriggerAxis()*0.33;
-				speedRight = ob.driverJoy4.getRightTriggerAxis()*0.33;	
+				speedRight = ob.driverJoy4.getRightTriggerAxis()*0.33;
 			} else {
 				speedLeft = ob.driverJoy4.getLeftTriggerAxis()*0.65;
 				speedRight = ob.driverJoy4.getRightTriggerAxis()*0.65;

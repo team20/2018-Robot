@@ -5,7 +5,8 @@ public class Grids {
 	static RobotGrid centerToLeftSwitch, centerToRightSwitch, centerToLeftSwitchSide, centerToRightSwitchSide,
 	centerToRightScale, centerToLeftScale, backupFromRightSwitch, rightSwitchToCube, rightSwitchBackup2, rightSwitchToScale,
 	backupFromLeftSwitch, leftSwitchToCube, leftSwitchBackup2, leftSwitchToScale, leftToLeftSwitch, leftToRightSwitch,
-	fullTurnRight;
+	fullTurnRight, centerToLeftScaleBackwards, centerToRightScaleBackwards, leftScaleToCube, rightScaleToCube, testLeftSwitchBackwards,
+	rightScaleDeceleration, leftScaleDeceleration;
 
 	public Grids(){
 		centerToLeftSwitch = centerToLeftSwitch();
@@ -25,8 +26,45 @@ public class Grids {
 		leftToLeftSwitch = leftToLeftSwitch();
 		leftToRightSwitch = leftToRightSwitch();
 		fullTurnRight = fullTurnRight();
+		centerToLeftScaleBackwards = centerToLeftScaleBackwards();
+		centerToRightScaleBackwards = centerToRightScaleBackwards();
+		leftScaleToCube = leftScaleToCube();
+		rightScaleToCube = rightScaleToCube();
+		testLeftSwitchBackwards = testLeftSwitchBackwards();
+		rightScaleDeceleration = rightScaleDeceleration();
+		leftScaleDeceleration = leftScaleDeceleration();
 	}
 	
+	public RobotGrid testLeftSwitchBackwards(){
+		RobotGrid grid = new RobotGrid(0, 150+WIDTH, 180, 2);
+		grid.addPoint(-50.75, 134.5, 90, 50.75, 166.75);
+		grid.addPoint(-140+LENGTH, 85.5+WIDTH, 0, 50.75, 102.25);
+		return grid;
+	}
+	public RobotGrid centerToLeftScaleBackwards(){
+		RobotGrid grid = new RobotGrid(-LENGTH, 150+WIDTH, 180, 2);
+		grid.addPoint(-60, 105, 90);
+		grid.addPoint(-120, 40, 0);
+		grid.addPoint(-280-WIDTH, 67, 90);
+		return grid;
+	}
+	public RobotGrid leftScaleToCube(){
+		RobotGrid grid = new RobotGrid(-280-WIDTH, 67, 90, 2);
+		grid.addPoint(-208.75, 83.75, 135.0);
+		return grid;
+	}
+	public RobotGrid centerToRightScaleBackwards(){
+		RobotGrid grid = new RobotGrid(-LENGTH, 150+WIDTH, 180, 2);
+		grid.addPoint(-60,  220, 90);
+		grid.addPoint(-120,  290,  0);
+		grid.addPoint(-300-WIDTH, 254, 90);
+		return grid;
+	}
+	public RobotGrid rightScaleToCube(){
+		RobotGrid grid = new RobotGrid(-300-WIDTH, 254, 90, 2);
+		grid.addPoint(-218, 240, 0.0);
+		return grid;
+	}
 	/**
 	 * @param gridPath: integer corresponding to the desired path
 	 * @return corresponding RobotGrid
@@ -67,6 +105,20 @@ public class Grids {
 				return leftToRightSwitch;
 			case RobotModes.SPLINE_TURN_AROUND_RIGHT:
 				return fullTurnRight;
+			case RobotModes.SPLINE_CENTER_TO_LEFT_SCALE_BACKWARDS:
+				return centerToLeftScaleBackwards;
+			case RobotModes.SPLINE_CENTER_TO_RIGHT_SCALE_BACKWARDS:
+				return centerToRightScaleBackwards;
+			case RobotModes.SPLINE_LEFT_SCALE_TO_CUBE:
+				return leftScaleToCube;
+			case RobotModes.SPLINE_RIGHT_SCALE_TO_CUBE:
+				return rightScaleToCube;
+			case RobotModes.SPLINE_TEST_BACKWARDS:
+				return testLeftSwitchBackwards;
+			case RobotModes.SPLINE_RIGHT_SCALE_DECELERATION:
+				return rightScaleDeceleration;
+			case RobotModes.SPLINE_LEFT_SCALE_DECELERATION:
+				return leftScaleDeceleration;
 		}
 		return null;
 	}
@@ -89,14 +141,37 @@ public class Grids {
 		RobotGrid grid = new RobotGrid(LENGTH, 150+WIDTH, 0, 2);
 		grid.addPoint(60, 105, 90);
 		grid.addPoint(120, 40, 0);
-		grid.addPoint(280+WIDTH, 67, 90, 280+WIDTH, 35);
 		return grid;
 	}
 	
+	private RobotGrid leftScaleDeceleration(){
+		RobotGrid grid = new RobotGrid(120, 40, 0, 2);
+		grid.addPoint(295+WIDTH, 67, 90, 295+WIDTH, 35);
+		return grid;
+	}
+
 	private RobotGrid centerToRightScale(){
 		RobotGrid grid = new RobotGrid(LENGTH, 150+WIDTH, 0, 2);
 		grid.addPoint(60,  220, 90);
 		grid.addPoint(120,  290,  0);
+		return grid;
+	}
+	
+	private RobotGrid rightScaleDeceleration(){
+		RobotGrid grid = new RobotGrid(120, 290, 0, 2);
+		grid.addPoint(295+WIDTH, 254, 90);
+		return grid;
+	}
+	
+	private RobotGrid leftToLeftScale(){
+		RobotGrid grid = new RobotGrid(28.813+WIDTH, LENGTH, 0, 2);
+		grid.addPoint(280+WIDTH, 67, 90);
+		return grid;
+	}
+	
+	private RobotGrid leftToRightScale(){
+		RobotGrid grid = new RobotGrid(28.813+WIDTH, LENGTH, 0, 2);
+		grid.addPoint(228, 250, 90);
 		grid.addPoint(300+WIDTH, 254, 90);
 		return grid;
 	}
@@ -127,7 +202,7 @@ public class Grids {
 	}
 	private RobotGrid rightSwitchToCube(){
 		RobotGrid grid = new RobotGrid(255, 280, -90, 2); //angle = 180
-		grid.addPoint(218, 240, 0.0); //208.75, 240, angle = -135 //TODO change x back to origional???
+		grid.addPoint(218, 240, 0.0); //208.75, 240, angle = -135
 		return grid;
 	}
 	private RobotGrid rightSwitchBackup2(){

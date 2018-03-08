@@ -23,6 +23,15 @@ public class DriveTrain {
         ob.updateRightSide(-speed + leftTurn - rightTurn);
 	}
 	
+	public void turn(double speed, boolean left){
+		if(left){
+			ob.driveMasterLeft.set(ControlMode.PercentOutput, 0.0);
+			ob.driveMasterRight.set(ControlMode.PercentOutput, speed);
+		} else {
+			ob.driveMasterLeft.set(ControlMode.PercentOutput, -speed);
+			ob.driveMasterRight.set(ControlMode.PercentOutput, 0.0);			
+		}
+	}
 	/**
 	 * stops the drive train's movement
 	 */

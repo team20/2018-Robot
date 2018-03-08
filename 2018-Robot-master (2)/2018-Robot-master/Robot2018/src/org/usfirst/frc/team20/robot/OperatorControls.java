@@ -2,13 +2,12 @@ package org.usfirst.frc.team20.robot;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 public class OperatorControls {
 	Collector collector;
 	Elevator elevator;
 	Zenith ob;
-	boolean override, flipOver, timeStarted, resetting, intakeMode, maxHeight, downTimerStarted, flipPositionSet, flipped, positionChange;
+	boolean override, flipOver, timeStarted, intakeMode, maxHeight, downTimerStarted, flipPositionSet, flipped, positionChange;
 	double startTime;
 	double rumble;
 	int toRun;
@@ -18,7 +17,7 @@ public class OperatorControls {
 		collector = c;
 		elevator = e;
 		ob = o;
-		override = flipOver = timeStarted = resetting = intakeMode = maxHeight = downTimerStarted = flipPositionSet = flipped = positionChange = false;
+		override = flipOver = timeStarted = intakeMode = maxHeight = downTimerStarted = flipPositionSet = flipped = positionChange = false;
 		startTime = 0;
 		rumble = 0;
 		toRun = 0;
@@ -50,7 +49,7 @@ public class OperatorControls {
 			// collector.arm45();
 		}
 		if(ob.operatorJoy4.getOptionsButton() && ob.operatorJoy4.getShareButton()) {
-			resetting = true;
+			elevator.reset();
 		}
 		if(ob.operatorJoy4.getButtonDLeft()){
 			positionChange = true;
@@ -170,11 +169,18 @@ public class OperatorControls {
 			} else {
 				ob.updateCube(false);
 			}
-			if((Timer.getFPGATimestamp() - startTime) > 0.5 && timeStarted){ //time to wait until closes
+			if(timeStarted && (Timer.getFPGATimestamp() - startTime) > 0.5){ //time to wait until closes
 				collector.stopRollers();
+				elevator.upIncrement(); //TODO do we want this??? (keep cube from scraping on floor)
 				rumble = 0;
 				intakeMode = false;
 				timeStarted = false;
+				if(!ob.cubeSensor.get()){
+					ob.updateCube(true);
+					collector.arm100();
+				} else {
+					intakeMode = true;
+				}
 			}
 		}
 		if(collector.intakeOn){
@@ -186,11 +192,6 @@ public class OperatorControls {
 			if(flipWaitTime()){
 				runFunction();
 				downTimerStarted = false;
-			}
-		}
-		if(resetting){
-			if(elevator.reset()){
-				resetting = false;
 			}
 		}
 		if(flipOver && elevator.aboveThreshold()){

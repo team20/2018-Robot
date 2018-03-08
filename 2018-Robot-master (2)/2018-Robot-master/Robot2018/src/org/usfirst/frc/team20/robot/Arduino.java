@@ -41,12 +41,13 @@ public class Arduino {
 			send[0] = 21;
 		}else if(current){
 			send[0] = 28;
-		} else if (climbing){
-			send[0] = 27;
-		} else if (cube) {
+		} else if (cube){
 			send[0] = 26;
+		} else if (climbing) {
+			send[0] = 27;
 		} else if (elevatorMoving){
 			send[0] = (byte)((ob.elevatorMaster.getSelectedSensorPosition(0)/Constants.ELEVATOR_MAX_POSITION_DOUBLE)*20.0);
+			//send[0] = (byte) ((ob.driverJoy4.getRightXAxis() / 1)*20);
 			System.out.println("ELevator Position: " + ob.elevatorMaster.getSelectedSensorPosition(0));
 			System.out.println("Math: " + ob.elevatorMaster.getSelectedSensorPosition(0)/Constants.ELEVATOR_MAX_POSITION_DOUBLE*20);
 		} else if (alliance == Alliance.Red){

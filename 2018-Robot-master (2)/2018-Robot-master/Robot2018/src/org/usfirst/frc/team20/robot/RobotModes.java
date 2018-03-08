@@ -17,6 +17,8 @@ public class RobotModes {
 	public static final int OVER_BACK = 12;
 	public static final int ARM_INTAKE_POSITION = 13;
 	public static final int SLOW_SPIT = 14;
+	public static final int TIME_TURN = 15;
+	public static final int ARM_100 = 16;
 	
 	//Elevator Positions - encoder ticks
 	public static final int POSITION_SWITCH = 0;
@@ -24,7 +26,6 @@ public class RobotModes {
 	public static final int POSITION_INTAKE = 2;
 	
 	//Splines
-	public static final int SPLINE_TEST = 0;
 	public static final int SPLINE_CENTER_TO_LEFT_SWITCH = 1;
 	public static final int SPLINE_CENTER_TO_RIGHT_SWITCH = 2;
 	public static final int SPLINE_CENTER_TO_LEFT_SWITCH_SIDE = 3;
@@ -44,4 +45,11 @@ public class RobotModes {
 	public static final int SPLINE_LEFT_TO_LEFT_SWITCH = 17;
 	public static final int SPLINE_LEFT_TO_RIGHT_SWITCH = 18;
 	public static final int SPLINE_TURN_AROUND_RIGHT = 19;
+	public static final int SPLINE_CENTER_TO_LEFT_SCALE_BACKWARDS = 20;
+	public static final int SPLINE_CENTER_TO_RIGHT_SCALE_BACKWARDS = 21;
+	public static final int SPLINE_LEFT_SCALE_TO_CUBE = 22;
+	public static final int SPLINE_RIGHT_SCALE_TO_CUBE = 23;
+	public static final int SPLINE_TEST_BACKWARDS = 24;
+	public static final int SPLINE_RIGHT_SCALE_DECELERATION = 25;
+	public static final int SPLINE_LEFT_SCALE_DECELERATION = 26;
 }

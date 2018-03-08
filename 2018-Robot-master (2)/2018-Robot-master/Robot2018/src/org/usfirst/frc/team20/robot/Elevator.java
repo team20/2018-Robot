@@ -10,7 +10,7 @@ public class Elevator {
 	public Elevator(Zenith o){
 		ob = o;
 		setPosition = ob.elevatorMaster.getSelectedSensorPosition(0);
-		setPID(0.075, 0.000015, 1.1, 0.0); //dual 775 tune = p 0.05, 0.00001, 0.0, 0.0
+		setPID(0.075, 0.000015, 1.1, 0.0); //dual 775 tune = p 0.05, 0.00001, 0.0, 0.0 - mini tune 0.075, 0.000015, 1.1, 0.0
 	}
 	
 	/**
@@ -138,7 +138,7 @@ public class Elevator {
 	 * @return true if the elevator is within deadband of its set position
 	 */
 	public boolean elevatorMoving(){
-		if(Math.abs(ob.elevatorMaster.getSelectedSensorPosition(0) - prevPosition) > 10){
+		if(Math.abs(ob.elevatorMaster.getSelectedSensorPosition(0) - prevPosition) > 50){
 			prevPosition = ob.elevatorMaster.getSelectedSensorPosition(0);
 			return true;
 		} else {
@@ -159,16 +159,8 @@ public class Elevator {
 	 * waits for the current to spike,
 	 * zeros the elevator encoder
 	 */
-	public boolean reset(){
-		ob.elevatorMaster.set(ControlMode.PercentOutput, -0.1);
-		System.out.println(ob.elevatorMaster.getOutputCurrent());
-		if(ob.elevatorMaster.getOutputCurrent() > 100) { //TODO tune the value for the current threshold
-			ob.elevatorMaster.set(ControlMode.PercentOutput, 0.0);
-			ob.elevatorMaster.setSelectedSensorPosition(0, 0, 1000);
-			return true;
-		} else {
-			return false;
-		}
+	public void reset(){
+		ob.elevatorMaster.setSelectedSensorPosition(0, 0, 1000);
 	}	 
 	
 	/**

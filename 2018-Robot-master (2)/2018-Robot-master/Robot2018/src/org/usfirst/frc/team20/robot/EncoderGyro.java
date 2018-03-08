@@ -46,6 +46,7 @@ public class EncoderGyro {
 	 * @return angle of the robot
 	 */
 	public double getAngle(){
+		updateAngle(ob.driveMasterLeft.getSelectedSensorPosition(0), ob.driveMasterRight.getSelectedSensorPosition(0));
 		return angle;
 	}
 	

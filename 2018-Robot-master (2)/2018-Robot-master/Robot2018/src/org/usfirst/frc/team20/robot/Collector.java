@@ -38,7 +38,7 @@ public class Collector {
 	 * stops the rollers from moving
 	 */
 	public void stopRollers(){
-		ob.collectorMaster.set(ControlMode.PercentOutput, 0.0);
+		ob.collectorMaster.set(ControlMode.PercentOutput, 0.1);
 		intakeOn = false;
 	}
 	
