@@ -74,9 +74,6 @@ public class Zenith implements Loggable{
 		elevatorMaster.configClosedloopRamp(0.2, 1000);
 		elevatorMaster.configOpenloopRamp(0.2, 1000);
 		elevatorMaster.enableVoltageCompensation(true);
-//		elevatorFollower = new TalonSRX(10);
-//		elevatorFollower.setInverted(false);
-//		elevatorFollower.follow(elevatorMaster);
 		
 		//Climber
 		climberMaster = new TalonSRX(11);
@@ -166,7 +163,6 @@ public class Zenith implements Loggable{
 		current += driveMasterLeft.getOutputCurrent() + driveFollowerLeft.getOutputCurrent() + driveFollowerLeftTwo.getOutputCurrent();
 		current += driveMasterRight.getOutputCurrent() + driveFollowerRight.getOutputCurrent() + driveFollowerRightTwo.getOutputCurrent();
 		current += collectorMaster.getOutputCurrent() + collectorFollower.getOutputCurrent();
-//		current += elevatorMaster.getOutputCurrent() + elevatorFollower.getOutputCurrent();
 		current += climberMaster.getOutputCurrent();
 //		current += climberFollower.getOutputCurrent();
 		return current;

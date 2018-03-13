@@ -8,7 +8,7 @@ public class DriverControls {
 	Zenith ob;
 	Climber climb;
 	double speedStraight = 0, speedLeft = 0, speedRight = 0, climbSpeed = 0, speedRightSlow = 0, speedLeftSlow = 0, startTime = 0;
-	boolean climbing = false, leds = true, prevCube = false, timerStarted = false;
+	boolean climbing = false, leds = true, prevCube = false, timerStarted = false, collectorBeenRun = false;
 	
 	public DriverControls(DriveTrain d, Collector c, Zenith o, Climber cl){
 		drive = d;
@@ -63,9 +63,13 @@ public class DriverControls {
 		} // This will allow slow spit with square and right bump, and normal with just right bump
 		if(ob.driverJoy4.getRightBumperButton() && ob.driverJoy4.getSquareButton()){
 			collector.outtakeSlow();
-		} else{
-			if(ob.driverJoy4.getRightBumperButton())
+			collectorBeenRun = true;
+		} else if (ob.driverJoy4.getRightBumperButton()){
 			collector.outtake();
+			collectorBeenRun = true;
+		} else if (collectorBeenRun){
+			collector.stopRollers();
+			collectorBeenRun = false;
 		}
 		if(ob.driverJoy4.getXButton()){
 			climb.stop();

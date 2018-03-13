@@ -49,7 +49,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	
 	//Autonomous Variables
 	PIDController headingPID;
-	AHRS gyro; // DO NOT PUT IN ROBOT INIT
+	AHRS gyro = new AHRS(SerialPort.Port.kMXP);
+
 //	EncoderGyro gyro;
 	ArrayList<String> script = new ArrayList<>();
 	Grids grid;
@@ -60,7 +61,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	double kP = 0.0, kI = 0.0, kD = 0.0;
 	double nominalVoltage = Constants.NOMINAL_VOLTAGE;
 	boolean resetGyro = false, setStartTime = false, waitStartTime = false, gotStartingENCClicks = false, resetGyroTurn = false, done = false,
-			gyroReset = false, elevatorDone = false, driveDone = false, splineDone = false, elevatorSet = false, autoSelected = false, collectorSet = false;
+			gyroReset = false, elevatorDone = false, driveDone = false, splineDone = false, elevatorSet = false, autoSelected = false,
+			collectorSet = false, intakeMode = false;
 
 	//Spline
 	RobotGrid path;
@@ -72,7 +74,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	
 	@Override
 	public void robotInit() {
-		gyro = new AHRS(SerialPort.Port.kMXP);
 		ob = new Zenith();
 		drive = new DriveTrain(ob);
 		collector = new Collector(ob);
@@ -116,6 +117,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 
 	public void disabledInit(){
 		if(beenEnabled){
+			arduino.lights(alliance, false, false, false, true, false);
 			try {
 //				logger.sendLog(path.toCode());
 				logger.closeSocket(); socket = false;
@@ -150,9 +152,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		elevator.limitPosition();
 		System.out.println("Angle: " + gyro.getYaw());
 		//Diagnostic LEDs
-		if(driverJoy.leds){			
+		if(driverJoy.leds){
 			arduino.lights(alliance, ob.cube, driverJoy.climbing, ob.currentLimit(), false, elevator.elevatorMoving());
 		} else {
 			arduino.lights(null, false, false, false, true, false);
@@ -185,93 +188,139 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				retries --;
 			}
 			if(field.length() > 2){
-				System.out.println("**********************GOT FIELD MESSAGE: " + field);
 				SmartDashboard.putString("DB/String 0", field);
-				boolean switchLeft = false, scaleLeft = false;
-				if(field.charAt(0) == 'L'){
-					switchLeft = true;
-				}
-				if(field.charAt(1) == 'L'){
-					scaleLeft = true;
-				}
-				//Middle Scale or Switch Decision Tree
-//				boolean partnerLeft = SmartDashboard.getBoolean("DB/Button 0", false);
-//				if(partnerLeft){
-//					if(!scaleLeft){
-//						script.addAll(RocketScript.splineCenterToRightScale());
-//					} else if (switchLeft){
-//						script.addAll(RocketScript.splineCenterToLeftSwitch());
-//					} else {
-//						script.addAll(RocketScript.splineCenterToRightSwitch());
-//					}
-//				} else {
-//					if(scaleLeft){
-//						script.addAll(RocketScript.splineCenterToLeftScale());
-//					} else if (switchLeft){
-//						script.addAll(RocketScript.splineCenterToLeftSwitch());
-//					} else {
-//						script.addAll(RocketScript.splineCenterToRightSwitch());
-//					}					
-//				}
-				//Normal Decision Tree
-				String auto = "";
 				boolean scalePriority = SmartDashboard.getBoolean("DB/Button 0", false);
 				boolean highOnly = SmartDashboard.getBoolean("DB/Button 1", false);
 				double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
 				waitTime = 2*SmartDashboard.getNumber("DB/Slider 1", 0.0);
-				if(position == 0){
-					if(switchLeft){
-						script.addAll(RocketScript.splineLeftToLeftSwitch());
-					} else {
-						script.addAll(RocketScript.splineLeftToRightSwitch());
-					}
-				} else if (position == 2.5){
-					if(!highOnly){
-						if(scaleLeft && switchLeft){
-							script.addAll(RocketScript.splineCenterTwoCubeLeftV2());
-						} else if (!scaleLeft && !switchLeft){
-							script.addAll(RocketScript.splineCenterTwoCubeRightV2());
+//				//TVR Decision Tree
+				switch(field.substring(0, 2)){
+				case "LL":
+					if(position == 2.5){
+						if(scalePriority){
+							script.addAll(RocketScript.splineCenterToLeftScale());
 						} else {
-							if(!scalePriority){
-								if(switchLeft){
-									script.addAll(RocketScript.splineCenterToLeftSwitch());
-								} else {
-									script.addAll(RocketScript.splineCenterToRightSwitch());
-								}
-							} else {
-								if(scaleLeft){
-									script.addAll(RocketScript.splineCenterToLeftScale());
-								} else {
-									script.addAll(RocketScript.splineCenterToRightScale());
-								}
-							}
+							script.addAll(RocketScript.splineCenterToLeftSwitch());
 						}
+					} else if (position == 0){
+//						if(highOnly){
+							script.addAll(RocketScript.splineLeftToLeftScale());
+//						} else {
+//							script.addAll(RocketScript.splineLeftTwoCube());
+//						}
+					} else if (position == 5){
+						script.addAll(RocketScript.splineRightToLeftScale());
 					} else {
-						if(!scalePriority){
-							if(switchLeft){
-								auto = "centerToLeftSwitch Ran";
-								script.addAll(RocketScript.splineCenterToLeftSwitch());
-							} else {
-								script.addAll(RocketScript.splineCenterToRightSwitch());
-								auto = "centerToRightSwitch Ran";
-							}
-						} else {
-							if(scaleLeft){
-								script.addAll(RocketScript.splineCenterToLeftScale());
-								auto = "splineCenterToLeftScale Ran";
-							} else {
-								script.addAll(RocketScript.splineCenterToRightScale());
-								auto = "splineCenterToRightScale Ran";
-							}
-						}				
+						script.addAll(RocketScript.cross());
 					}
-				} else if (position == 5){
-					script.addAll(RocketScript.cross());
+					break;
+				case "RR":
+					if(position == 2.5){
+						if(scalePriority){
+							script.addAll(RocketScript.splineCenterToRightScale());
+						} else {
+							script.addAll(RocketScript.splineCenterToRightSwitch());
+						}
+					} else if (position == 5){
+//						if(highOnly){
+							script.addAll(RocketScript.splineRightToRightScale());
+//						} else {
+//							script.addAll(RocketScript.splineRightTwoCube());
+//						}
+					} else if (position == 0){
+						script.addAll(RocketScript.splineLeftToRightScale());
+					} else {
+						script.addAll(RocketScript.cross());
+					}
+					break;					
+				case "LR":
+					if(position == 2.5){
+						if(scalePriority){
+							script.addAll(RocketScript.splineCenterToRightScale());
+						} else {
+							script.addAll(RocketScript.splineCenterToLeftSwitch());
+						}
+					} else if (position == 0){
+						script.addAll(RocketScript.splineLeftToRightScale());
+					} else if (position == 5){
+						script.addAll(RocketScript.splineRightToRightScale());
+					} else {
+						script.addAll(RocketScript.cross());
+					}
+					break;
+				case "RL":
+					if(position == 2.5){
+						if(scalePriority){
+							script.addAll(RocketScript.splineCenterToLeftScale());
+						} else {
+							script.addAll(RocketScript.splineCenterToRightSwitch());
+						}
+					} else if (position == 0){
+						script.addAll(RocketScript.splineLeftToLeftScale());
+					} else if (position == 5){
+						script.addAll(RocketScript.splineRightToLeftScale());
+					} else {
+						script.addAll(RocketScript.cross());
+					}
+					break;
 				}
-				SmartDashboard.putString("DB/String 1", auto);
+				//Origional Decision Tree
+//				boolean switchLeft = false, scaleLeft = false;
+//				if(field.charAt(0) == 'L'){
+//					switchLeft = true;
+//				}
+//				if(field.charAt(1) == 'L'){
+//					scaleLeft = true;
+//				}
+//				if(position == 0){
+////					if(switchLeft){
+////						script.addAll(RocketScript.splineLeftToLeftSwitch());
+////					} else {
+////						script.addAll(RocketScript.splineLeftToRightSwitch());
+////					}
+//				} else if (position == 2.5){
+//					if(!highOnly){
+//						if(scaleLeft && switchLeft){
+////							script.addAll(RocketScript.splineCenterTwoCubeLeftV2());
+////						} else if (!scaleLeft && !switchLeft){
+////							script.addAll(RocketScript.splineCenterTwoCubeRightV2());
+//						} else {
+//							if(!scalePriority){
+//								if(switchLeft){
+//									script.addAll(RocketScript.splineCenterToLeftSwitch());
+//								} else {
+//									script.addAll(RocketScript.splineCenterToRightSwitch());
+//								}
+//							} else {
+//								if(scaleLeft){
+//									script.addAll(RocketScript.splineCenterToLeftScale());
+//								} else {
+//									script.addAll(RocketScript.splineCenterToRightScale());
+//								}
+//							}
+//						}
+//					} else {
+//						if(!scalePriority){
+//							if(switchLeft){
+//								script.addAll(RocketScript.splineCenterToLeftSwitch());
+//							} else {
+//								script.addAll(RocketScript.splineCenterToRightSwitch());
+//							}
+//						} else {
+//							if(scaleLeft){
+//								script.addAll(RocketScript.splineCenterToLeftScale());
+//							} else {
+//								script.addAll(RocketScript.splineCenterToRightScale());
+//							}
+//						}				
+//					}
+//				} else if (position == 5){
+//					script.addAll(RocketScript.cross());
+//				}
+
 				rocketScriptSize = script.size();
 				autoSelected = true;
-			}
+//			}
 		}
 		//Scripting
 		if (rocketScriptCurrentCount < rocketScriptSize) {
@@ -305,6 +354,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				collector.armIntakePosition();
 				rocketScriptCurrentCount++;
 			}
+			if(Integer.parseInt(values[0]) == RobotModes.DROP){
+				collector.open();
+				rocketScriptCurrentCount++;
+			}
 			if(Integer.parseInt(values[0]) == RobotModes.ARM_100){
 				collector.arm100();
 				rocketScriptCurrentCount++;
@@ -331,12 +384,44 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					rocketScriptCurrentCount++;
 				}
 			}
+			if(Integer.parseInt(values[0]) == RobotModes.SPLINE_AND_INTAKE){
+				if(!splineDone){
+					if(spline(Double.parseDouble(values[1]), grid.getGrid(Integer.parseInt(values[2])))){
+						System.out.println("*******SPLINE IS DONE************" + Timer.getMatchTime());
+						rocketScriptCurrentCount++;
+					}					
+				}
+				if(!collectorSet){
+					collector.intake(0.5);
+					collectorSet = true;
+				}
+				if (!ob.cubeSensor.get() && !waitStartTime) {
+					startTime = Timer.getFPGATimestamp();
+					waitStartTime = true;
+					collector.intake(1.0);
+					collector.close();
+					splineDone = true;
+				}
+				if (waitStartTime && Timer.getFPGATimestamp() - startTime > 0.3) {
+					collector.stopRollers();
+					waitStartTime = false;
+					collectorSet = false;
+					splineDone = false;
+					rocketScriptCurrentCount++;
+				}
+			}
 			if (Integer.parseInt(values[0]) == RobotModes.ENCODER_DRIVE) {
 				if (encoderDrive(Double.parseDouble(values[1]),
 						Double.parseDouble(values[2]) - Constants.STOPPING_INCHES, Double.parseDouble(values[3]))) {
 					gotStartingENCClicks = false;
 					gyro.reset();
-					rocketScriptCurrentCount++;
+					if(Boolean.parseBoolean(values[4]) == false){
+						rocketScriptCurrentCount++;						
+					} else {
+						if(!ob.cubeSensor.get()){
+							rocketScriptCurrentCount++;
+						}
+					}
 				}
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.MOVE_ELEVATOR){
@@ -419,6 +504,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					rocketScriptCurrentCount++;
 				}
 			}
+			if(Integer.parseInt(values[0]) == RobotModes.OPEN){
+				collector.open();
+				rocketScriptCurrentCount++;
+			}
   			if(Integer.parseInt(values[0]) == RobotModes.INTAKE){
   				if(!collectorSet){
   	  				collector.intake(0.5);
@@ -490,27 +579,22 @@ public class Robot extends IterativeRobot implements PIDOutput{
 
 	@Override
 	public void testPeriodic() {
-		boolean blue = false;
-		if(ob.driverJoy4.getLeftBumperButton()) {
-			blue = true;
-		}
-		if(blue){
-			arduino.lights(Alliance.Blue, ob.driverJoy4.getXButton(), ob.driverJoy4.getSquareButton(), ob.driverJoy4.getTriButton(), false, ob.driverJoy4.getRightYAxis() > .1);
-			
-		}
-		
-		
-		
-		
-		
-		
-		//System.out.println("NavX Yaw: " + gyro.getYaw());
+		//Light Testing
+//		boolean blue = false;
+//		if(ob.driverJoy4.getLeftBumperButton()) {
+//			blue = true;
+//		}
+//		if(blue){
+//			arduino.lights(Alliance.Blue, ob.driverJoy4.getXButton(), ob.driverJoy4.getSquareButton(), ob.driverJoy4.getTriButton(), false, ob.driverJoy4.getRightYAxis() > .1);			
+//		}
+		//Encoder/Sensor Testing
+//		System.out.println("NavX Yaw: " + gyro.getYaw());
 //		System.out.println("Left: " + ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX));	
 //		System.out.println("		Right: " + ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX));	
 //		System.out.println("Encoder Gyro Angle: " + gy.updateAngle(ob.driveMasterLeft.getSelectedSensorPosition(0), ob.driveMasterRight.getSelectedSensorPosition(0)));
 //				ob.driveMasterRight.getSelectedSensorPosition(0)));
 //		System.out.println("                     Elevator: " + ob.elevatorMaster.getSelectedSensorPosition(Constants.PIDIDX));			
-//		System.out.println("Raw Angle:                       " + gyro.getYaw());		
+		System.out.println("Raw Angle:                       " + gyro.getYaw());		
 	}
 	
 	/**
@@ -684,18 +768,18 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	 * @param spline: the path to be followed
 	 * @return true if the spline is completed
 	 */
-	public boolean spline(double speed, RobotGrid spline) {
+	public boolean spline(double speed, RobotGrid spline) { //TODO negate left encoder comp bot!!!!!
 		if (gotStartingENCClicks == false) {
 			gotStartingENCClicks = true;
-			startingENCClicksLeft = -ob.driveMasterLeft.getSelectedSensorPosition(0);
-			startingENCClicksRight = ob.driveMasterRight.getSelectedSensorPosition(0);
+			startingENCClicksLeft = ob.driveMasterLeft.getSelectedSensorPosition(0);
+			startingENCClicksRight = -ob.driveMasterRight.getSelectedSensorPosition(0);
 		}
-		System.out.println("****************Left: " + -ob.driveMasterLeft.getSelectedSensorPosition(0));
-		System.out.println("****************Right: " + ob.driveMasterRight.getSelectedSensorPosition(0));
-		double robotDistance = Math.abs((((-ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
-		System.out.println("****************RobotDistance: " + robotDistance);
-		System.out.println("****************Travel Distance: " + spline.getDistance());
-		speed = Math.abs(spline.speedMultiplier(robotDistance, gyro.getYaw(), speed));			
+//		System.out.println("****************Left: " + -ob.driveMasterLeft.getSelectedSensorPosition(0));
+//		System.out.println("****************Right: " + ob.driveMasterRight.getSelectedSensorPosition(0));
+		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (-ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
+//		System.out.println("****************RobotDistance: " + robotDistance);
+//		System.out.println("****************Travel Distance: " + spline.getDistance());
+		speed = spline.speedMultiplier(robotDistance, gyro.getYaw(), speed);			
 		if (spline.getDistance() <= robotDistance) {
 			ob.driveMasterLeft.set(ControlMode.PercentOutput, 0.00);
 			ob.driveMasterRight.set(ControlMode.PercentOutput, 0.00);
@@ -715,26 +799,42 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			if (spline.getDistance() > 0) {
 				if (spline.getDistance() > robotDistance);
 				{
-				System.out.println("speed = " + speed);
+//				System.out.println("speed = " + speed);
 				System.out.println("angle = " + gyro.getYaw());
-				System.out.println("Target Angle = " + spline.getAngle(robotDistance));				
-					if(angleToDrive < -90 && gyro.getYaw() > 90){
-						double temp = -180 - angleToDrive;
-						temp += -(180 - gyro.getYaw());
-						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);
-					} else if (angleToDrive > 90 && gyro.getYaw() < -90){
-						double temp = 180 - angleToDrive;
-						temp += (180 + gyro.getYaw());
-						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);
+				System.out.println("Target Angle = " + spline.getReverseAngle(robotDistance));				
+				if(angleToDrive < -90 && gyro.getYaw() > 90){
+					double temp = -180 - angleToDrive;
+					temp += -(180 - gyro.getYaw());
+					if(speed >= 0){
+						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);						
 					} else {
+						System.out.println("1");
+						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR);
+					}
+				} else if (angleToDrive > 90 && gyro.getYaw() < -90){
+					double temp = 180 - angleToDrive;
+					temp += (180 + gyro.getYaw());
+					if(speed >= 0){
+						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);						
+					} else {
+						System.out.println("2");
+						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR);
+					}
+				} else {
+					if(speed >= 0){
+						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
+					} else {
+						System.out.println("3");
 						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
 					}
 				}
-			} else {
-				arcadeDrive(-speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
 			}
+		} else {
+			System.out.println("4");
+			arcadeDrive(-speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
 		}
-		return false;
+	}
+	return false;
 	}
 
 	/**

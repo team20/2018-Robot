@@ -19,6 +19,9 @@ public class RobotModes {
 	public static final int SLOW_SPIT = 14;
 	public static final int TIME_TURN = 15;
 	public static final int ARM_100 = 16;
+	public static final int DROP = 17;
+	public static final int OPEN = 18;
+	public static final int SPLINE_AND_INTAKE = 19;
 	
 	//Elevator Positions - encoder ticks
 	public static final int POSITION_SWITCH = 0;
@@ -28,28 +31,16 @@ public class RobotModes {
 	//Splines
 	public static final int SPLINE_CENTER_TO_LEFT_SWITCH = 1;
 	public static final int SPLINE_CENTER_TO_RIGHT_SWITCH = 2;
-	public static final int SPLINE_CENTER_TO_LEFT_SWITCH_SIDE = 3;
-	public static final int SPLINE_CENTER_TO_RIGHT_SWITCH_SIDE = 4;
-	public static final int SPLINE_LEFT_SWITCH_SIDE_TO_LEFT_SCALE = 5;
-	public static final int SPLINE_RIGHT_SWITCH_SIDE_TO_RIGHT_SCALE = 6;
-	public static final int SPLINE_CENTER_TO_RIGHT_SCALE = 7;
-	public static final int SPLINE_CENTER_TO_LEFT_SCALE = 8;
-	public static final int SPLINE_BACKUP_FROM_RIGHT_SWITCH = 9;
-	public static final int SPLINE_RIGHT_SWITCH_TO_CUBE = 10;
-	public static final int SPLINE_RIGHT_SWITCH_BACKUP_2 = 11;
-	public static final int SPLINE_RIGHT_SWITCH_TO_SCALE = 12;
-	public static final int SPLINE_BACKUP_FROM_LEFT_SWITCH = 13;
-	public static final int SPLINE_LEFT_SWITCH_TO_CUBE = 14;
-	public static final int SPLINE_LEFT_SWITCH_BACKUP_2 = 15;
-	public static final int SPLINE_LEFT_SWITCH_TO_SCALE = 16;
-	public static final int SPLINE_LEFT_TO_LEFT_SWITCH = 17;
-	public static final int SPLINE_LEFT_TO_RIGHT_SWITCH = 18;
-	public static final int SPLINE_TURN_AROUND_RIGHT = 19;
-	public static final int SPLINE_CENTER_TO_LEFT_SCALE_BACKWARDS = 20;
-	public static final int SPLINE_CENTER_TO_RIGHT_SCALE_BACKWARDS = 21;
-	public static final int SPLINE_LEFT_SCALE_TO_CUBE = 22;
-	public static final int SPLINE_RIGHT_SCALE_TO_CUBE = 23;
-	public static final int SPLINE_TEST_BACKWARDS = 24;
-	public static final int SPLINE_RIGHT_SCALE_DECELERATION = 25;
-	public static final int SPLINE_LEFT_SCALE_DECELERATION = 26;
+	public static final int SPLINE_CENTER_TO_RIGHT_SCALE = 3;
+	public static final int SPLINE_CENTER_TO_LEFT_SCALE = 4;
+	public static final int SPLINE_RIGHT_SCALE_DECELERATION = 5;
+	public static final int SPLINE_LEFT_SCALE_DECELERATION = 6;
+	public static final int SPLINE_LEFT_TO_LEFT_SCALE = 7;
+	public static final int SPLINE_RIGHT_TO_RIGHT_SCALE = 8;
+	public static final int SPLINE_LEFT_TO_RIGHT_SCALE = 9;
+	public static final int SPLINE_RIGHT_TO_LEFT_SCALE = 10;
+	public static final int SPLINE_LEFT_SCALE_TO_CUBE = 11;
+	public static final int SPLINE_RIGHT_SCALE_TO_CUBE = 12;
+	public static final int SPLINE_RIGHT_SCALE_TO_SCALE = 13;
+	public static final int SPLINE_LEFT_SCALE_TO_SCALE = 14;
 }

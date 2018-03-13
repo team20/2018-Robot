@@ -30,6 +30,18 @@ public class Elevator {
 		}
 	}
 
+	public void limitCurrent(){
+		if(ob.elevatorMaster.getOutputCurrent() > Constants.ELEVATOR_CURRENT_LIMIT){
+			stop();
+		}
+	}
+	public void limitPosition(){
+		if(setPosition < Constants.ELEVATOR_MAX_POSITION){
+			setPosition = Constants.ELEVATOR_MAX_POSITION;
+			ob.updateElevatorSetpoint(setPosition);
+			ob.elevatorMaster.set(ControlMode.Position, setPosition);
+		}
+	}
 	/**
 	 * inserts the p i d f values into the Talon SRX
 	 * @param p: proportional value

@@ -7,7 +7,8 @@ public class OperatorControls {
 	Collector collector;
 	Elevator elevator;
 	Zenith ob;
-	boolean override, flipOver, timeStarted, intakeMode, maxHeight, downTimerStarted, flipPositionSet, flipped, positionChange;
+	boolean override, flipOver, timeStarted, intakeMode, maxHeight, downTimerStarted, flipPositionSet,
+	flipped, positionChange, stayDown;
 	double startTime;
 	double rumble;
 	int toRun;
@@ -18,6 +19,7 @@ public class OperatorControls {
 		elevator = e;
 		ob = o;
 		override = flipOver = timeStarted = intakeMode = maxHeight = downTimerStarted = flipPositionSet = flipped = positionChange = false;
+		stayDown = false;
 		startTime = 0;
 		rumble = 0;
 		toRun = 0;
@@ -113,6 +115,9 @@ public class OperatorControls {
 		if(ob.operatorJoy4.getLeftYAxis() > 0.5 && !ob.operatorJoy4.getLeftStickButton() && !override){
 			elevator.downIncrement();
 		}
+		if(ob.operatorJoy4.getTrackpadButton() && Math.abs(ob.operatorJoy4.getLeftYAxis()) < 0.1){
+			stayDown = true;
+		}
 		if(ob.operatorJoy4.getLeftTriggerAxis() > 0.1){
 //			if(!flipPositionSet){
 //				elevator.flipPosition();	
@@ -146,6 +151,9 @@ public class OperatorControls {
 			rumble = 0;
 		}
 		//SAFETY INFORMATION
+		System.out.println("CURRENT: " + ob.elevatorMaster.getOutputCurrent());
+//		elevator.limitCurrent();
+		elevator.limitPosition();
 		if(ob.elevatorMaster.getSelectedSensorPosition(0) < Constants.ELEVATOR_MAX_POSITION){
 			maxHeight = true;
 		} else {
@@ -171,13 +179,16 @@ public class OperatorControls {
 			}
 			if(timeStarted && (Timer.getFPGATimestamp() - startTime) > 0.5){ //time to wait until closes
 				collector.stopRollers();
-				elevator.upIncrement(); //TODO do we want this??? (keep cube from scraping on floor)
 				rumble = 0;
 				intakeMode = false;
 				timeStarted = false;
 				if(!ob.cubeSensor.get()){
 					ob.updateCube(true);
-					collector.arm100();
+//					if(stayDown){
+//						stayDown = false;
+//					} else {
+//						collector.arm100();						
+//					}
 				} else {
 					intakeMode = true;
 				}
@@ -204,6 +215,7 @@ public class OperatorControls {
 		}
 		ob.operatorJoy4.setRumble(rumble);
 	}	
+
 	/**
 	 * @return true if the elevator has waiting long enough to flip the manipulator
 	 */
