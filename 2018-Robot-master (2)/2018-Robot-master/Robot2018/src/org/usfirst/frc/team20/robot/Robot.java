@@ -86,7 +86,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		headingPID.setInputRange(-180, 180);
 		headingPID.setContinuous();
 		headingPID.setOutputRange(-1.0, 1.0);
-//		gyro = new EncoderGyro(ob, 32.5); //TODO get measurement
+//		gyro = new EncoderGyro(ob, 32.5);
 		grid = new Grids();
 		arduino = new Arduino(1, ob);
 		ob.elevatorMaster.setSelectedSensorPosition(0, 0, 1000);
@@ -177,7 +177,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			int retries = 100;
 			while(field.length() < 2 && retries > 0){
 				try{
-//					Thread.sleep(5);
 					field = DriverStation.getInstance().getGameSpecificMessage();
 					if(field == null){
 						field = "";
@@ -189,81 +188,105 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			}
 			if(field.length() > 2){
 				SmartDashboard.putString("DB/String 0", field);
+				String auto = "";
 				boolean scalePriority = SmartDashboard.getBoolean("DB/Button 0", false);
 				boolean highOnly = SmartDashboard.getBoolean("DB/Button 1", false);
 				double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
 				waitTime = 2*SmartDashboard.getNumber("DB/Slider 1", 0.0);
-//				//TVR Decision Tree
+				//TVR Decision Tree
 				switch(field.substring(0, 2)){
 				case "LL":
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToLeftScale());
+							auto = "centerToLeftScale";
 						} else {
 							script.addAll(RocketScript.splineCenterToLeftSwitch());
+							auto = "centerToLeftSwitch";
 						}
 					} else if (position == 0){
-//						if(highOnly){
+						if(highOnly){
 							script.addAll(RocketScript.splineLeftToLeftScale());
-//						} else {
-//							script.addAll(RocketScript.splineLeftTwoCube());
-//						}
+							auto = "leftToLeftScale";
+						} else {
+							script.addAll(RocketScript.splineLeftTwoScale());
+							auto = "leftTwoScale";
+						}
 					} else if (position == 5){
 						script.addAll(RocketScript.splineRightToLeftScale());
+						auto = "rightToLeftScale";
 					} else {
 						script.addAll(RocketScript.cross());
+						auto = "cross";
 					}
 					break;
 				case "RR":
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToRightScale());
+							auto = "centerToRightScale";
 						} else {
 							script.addAll(RocketScript.splineCenterToRightSwitch());
+							auto = "centerToRightScale";
 						}
 					} else if (position == 5){
-//						if(highOnly){
+						if(highOnly){
 							script.addAll(RocketScript.splineRightToRightScale());
-//						} else {
-//							script.addAll(RocketScript.splineRightTwoCube());
-//						}
+							auto = "rightToRightScale";
+						} else {
+							script.addAll(RocketScript.splineRightTwoCube());
+							auto = "rightSwitchAndScale";
+						}
 					} else if (position == 0){
 						script.addAll(RocketScript.splineLeftToRightScale());
+						auto = "leftToRightScale";
 					} else {
 						script.addAll(RocketScript.cross());
+						auto = "cross";
 					}
 					break;					
 				case "LR":
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToRightScale());
+							auto = "centerToRightScale";
 						} else {
 							script.addAll(RocketScript.splineCenterToLeftSwitch());
+							auto = "centerToLeftSwitch";
 						}
 					} else if (position == 0){
 						script.addAll(RocketScript.splineLeftToRightScale());
+						auto = "leftToRightScale";
 					} else if (position == 5){
 						script.addAll(RocketScript.splineRightToRightScale());
+						auto = "rightToRightScale";
 					} else {
 						script.addAll(RocketScript.cross());
+						auto = "cross";
 					}
 					break;
 				case "RL":
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToLeftScale());
+							auto = "centerToLeftScale";
 						} else {
 							script.addAll(RocketScript.splineCenterToRightSwitch());
+							auto = "centerToRightSwitch";
 						}
 					} else if (position == 0){
 						script.addAll(RocketScript.splineLeftToLeftScale());
+						auto = "leftToLeftScale";
 					} else if (position == 5){
 						script.addAll(RocketScript.splineRightToLeftScale());
+						auto = "rightToLeftScale";
 					} else {
 						script.addAll(RocketScript.cross());
+						auto = "cross";
 					}
 					break;
 				}
+				SmartDashboard.putString("DB/String 1", auto);
 				//Origional Decision Tree
 //				boolean switchLeft = false, scaleLeft = false;
 //				if(field.charAt(0) == 'L'){
@@ -320,8 +343,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 
 				rocketScriptSize = script.size();
 				autoSelected = true;
-//			}
-		}
+			}
+	}
 		//Scripting
 		if (rocketScriptCurrentCount < rocketScriptSize) {
 			String[] values = script.get(rocketScriptCurrentCount).split(";");
@@ -332,22 +355,20 @@ public class Robot extends IterativeRobot implements PIDOutput{
 						splineDone = true;
 					}
 				}
-				if(!elevatorDone){
-					if(!elevatorSet){
-						elevator.getAutoPosition(Integer.parseInt(values[3]));
-						elevatorSet = true;
-					}
-					if(!elevator.elevatorMoving()){
-						elevatorSet = false;
-						elevatorDone = true;
-						System.out.println("ELEVATOR IS DONE &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-					}
+				if(!elevatorSet){
+					elevator.getAutoPosition(Integer.parseInt(values[1]));
+					elevatorSet = true;
+					startTime = Timer.getFPGATimestamp();
+				}
+				if(Timer.getFPGATimestamp() - startTime > 0.5){
+					elevatorDone = true;
 				}
 				if(splineDone && elevatorDone){
 					ob.elevatorMaster.set(ControlMode.PercentOutput, 0.0);
-					rocketScriptCurrentCount++;
 					splineDone = false;
 					elevatorDone = false;
+					elevatorSet = false;
+					rocketScriptCurrentCount++;
 				}
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.ARM_INTAKE_POSITION){
@@ -771,12 +792,12 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	public boolean spline(double speed, RobotGrid spline) { //TODO negate left encoder comp bot!!!!!
 		if (gotStartingENCClicks == false) {
 			gotStartingENCClicks = true;
-			startingENCClicksLeft = ob.driveMasterLeft.getSelectedSensorPosition(0);
-			startingENCClicksRight = -ob.driveMasterRight.getSelectedSensorPosition(0);
+			startingENCClicksLeft = -ob.driveMasterLeft.getSelectedSensorPosition(0);
+			startingENCClicksRight = ob.driveMasterRight.getSelectedSensorPosition(0);
 		}
 //		System.out.println("****************Left: " + -ob.driveMasterLeft.getSelectedSensorPosition(0));
 //		System.out.println("****************Right: " + ob.driveMasterRight.getSelectedSensorPosition(0));
-		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (-ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
+		double robotDistance = Math.abs((((-ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
 //		System.out.println("****************RobotDistance: " + robotDistance);
 //		System.out.println("****************Travel Distance: " + spline.getDistance());
 		speed = spline.speedMultiplier(robotDistance, gyro.getYaw(), speed);			

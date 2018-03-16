@@ -100,11 +100,11 @@ public class Grids {
 	private RobotGrid leftToLeftScale(){
 		RobotGrid grid = new RobotGrid(-LENGTH, -28.813-WIDTH, 180, 2);
 		grid.addPoint(-250, -64, 90);
-		grid.addPoint(-280, -105, 180);
+		grid.addPoint(-273, -115, 180);
 		return grid;
 	}
 	private RobotGrid leftScaleToCube(){
-		RobotGrid grid = new RobotGrid(-280, -105, -5, 2);
+		RobotGrid grid = new RobotGrid(-273, -115, -5, 2);
 		grid.addPoint(-240, -150, 5);
 		return grid;
 	}
@@ -112,7 +112,7 @@ public class Grids {
 		RobotGrid grid = new RobotGrid(-240, -150, 0, 2);
 //		grid.addPoint(-228, -110, 90);
 //		grid.addPoint(-233, -120, 5);
-		grid.addLinearPoint(-233, -120, 0);
+		grid.addLinearPoint(-250, -115, 0);
 		return grid;
 	}
 
@@ -137,16 +137,16 @@ public class Grids {
 	
 	private RobotGrid leftToRightScale(){
 		RobotGrid grid = new RobotGrid(-LENGTH, -28.813-WIDTH, 180, 2);
-		grid.addPoint(-260, -64, 90);
-		grid.addLinearPoint(-260, -220, 90);
-		grid.addPoint(-310, -265, 180);
+		grid.addPoint(-255, -64, 90);
+		grid.addLinearPoint(-255, -220, 90);
+		grid.addPoint(-290, -265, 180);
 		return grid;
 	}
 	private RobotGrid rightToLeftScale(){
 		RobotGrid grid = new RobotGrid(-LENGTH, -296+WIDTH, 180, 2);
-		grid.addPoint(-260, -273, 90);
-		grid.addLinearPoint(-260, -64, 90);
-		grid.addPoint(-295, -90, 180);
+		grid.addPoint(-255, -273, 90);
+		grid.addLinearPoint(-255, -64, 90);
+		grid.addPoint(-290, -90, 180);
 		return grid;
 	}
 }

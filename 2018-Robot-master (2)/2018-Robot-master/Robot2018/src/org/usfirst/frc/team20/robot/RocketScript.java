@@ -184,10 +184,10 @@ public class RocketScript {
 		auto.add(RobotModes.SPLINE_AND_INTAKE + ";" + 0.85 + ";" + RobotModes.SPLINE_LEFT_SCALE_TO_CUBE);
 		auto.add(Integer.toString(RobotModes.ARM_100));
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + -0.75 + ";" + RobotModes.SPLINE_LEFT_SCALE_TO_SCALE + ";" + RobotModes.POSITION_SCALE);
-		auto.add(RobotModes.WAIT + ";" + 0.5);
-		auto.add(Integer.toString(RobotModes.OVER_BACK)); //TODO and elevator above
-		auto.add(RobotModes.WAIT + ";" + 0.5);
-		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
+		auto.add(RobotModes.WAIT + ";" + 0.75);
+		auto.add(Integer.toString(RobotModes.OVER_BACK));
+		auto.add(RobotModes.WAIT + ";" + 0.25);
+		auto.add(Integer.toString(RobotModes.DROP));
 		return auto;
 	}
 }
