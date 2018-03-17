@@ -100,19 +100,19 @@ public class Grids {
 	private RobotGrid leftToLeftScale(){
 		RobotGrid grid = new RobotGrid(-LENGTH, -28.813-WIDTH, 180, 2);
 		grid.addPoint(-250, -64, 90);
-		grid.addPoint(-273, -115, 180);
+		grid.addPoint(-273, -110, 180);
 		return grid;
 	}
 	private RobotGrid leftScaleToCube(){
-		RobotGrid grid = new RobotGrid(-273, -115, -5, 2);
-		grid.addPoint(-240, -150, 5);
+		RobotGrid grid = new RobotGrid(-273, -110, -5, 2);
+		grid.addPoint(-240+LENGTH, -160, 5);
 		return grid;
 	}
 	private RobotGrid leftScaleToScale(){
-		RobotGrid grid = new RobotGrid(-240, -150, 0, 2);
+		RobotGrid grid = new RobotGrid(-240, -160, 0, 2);
 //		grid.addPoint(-228, -110, 90);
 //		grid.addPoint(-233, -120, 5);
-		grid.addLinearPoint(-250, -115, 0);
+		grid.addLinearPoint(-273, -110, 0);
 		return grid;
 	}
 

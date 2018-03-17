@@ -10,7 +10,7 @@ public class Constants {
 	public static final double TICKS_PER_INCH = 620;
 	public static final double STOPPING_INCHES = 0.0;
 	public static final int ELEVATOR_DEADBAND = 5000;
-	public static final double SPLINE_FACTOR = 8;
+	public static final double SPLINE_FACTOR = 7; //PRACTICE = 8
 	
 	public static final int INTAKE_POSITION = 0;
 	public static final int SWITCH_POSITION = -17910;

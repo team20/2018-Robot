@@ -68,6 +68,8 @@ public class RocketScript {
 		auto.add(Integer.toString(RobotModes.OVER_BACK));
 		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
+//		auto.add(RobotModes.WAIT + ";" + 0.75);
+//		auto.add(RobotModes.TIME_DRIVE + ";" + 0.75 + ";" + 3.0);
 		return auto;
 	}
 	
@@ -78,7 +80,7 @@ public class RocketScript {
 		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SCALE);
 		auto.add(Integer.toString(RobotModes.OVER_BACK));
 		auto.add(RobotModes.WAIT + ";" + 0.5);
-		auto.add(Integer.toString(RobotModes.DROP));
+		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
 		return auto;
 	}
 
@@ -90,6 +92,8 @@ public class RocketScript {
 		auto.add(Integer.toString(RobotModes.OVER_BACK));
 		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
+//		auto.add(RobotModes.WAIT + ";" + 0.75);
+//		auto.add(RobotModes.TIME_DRIVE + ";" + 0.75 + ";" + 3.0);
 		return auto;
 	}
 
@@ -122,7 +126,7 @@ public class RocketScript {
 		auto.add(Integer.toString(RobotModes.INTAKE));
 		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SWITCH);
 		auto.add(RobotModes.TIME_DRIVE + ";" + 0.5 + ";" + 1.0);
-		auto.add(Integer.toString(RobotModes.PLACE));
+		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
 		return auto;
 	}
 	
@@ -187,7 +191,7 @@ public class RocketScript {
 		auto.add(RobotModes.WAIT + ";" + 0.75);
 		auto.add(Integer.toString(RobotModes.OVER_BACK));
 		auto.add(RobotModes.WAIT + ";" + 0.25);
-		auto.add(Integer.toString(RobotModes.DROP));
+		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
 		return auto;
 	}
 }

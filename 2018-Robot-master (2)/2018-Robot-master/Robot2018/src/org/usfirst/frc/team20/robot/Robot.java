@@ -69,7 +69,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	double startingDistance;
 	
 	//Blackbox
-	Logger logger;
+//	Logger logger;
 	boolean socket = false, beenEnabled = false;
 	
 	@Override
@@ -105,9 +105,9 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		Compressor c = new Compressor(14);
 		c.setClosedLoopControl(true);
 
-		logger = new Logger();
-		logger.register(ob);
-		logger.startSocket();
+//		logger = new Logger();
+//		logger.register(ob);
+//		logger.startSocket();
 		socket = true;
 		alliance = DriverStation.getInstance().getAlliance();
 		byte[] send = new byte[1];
@@ -120,7 +120,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			arduino.lights(alliance, false, false, false, true, false);
 			try {
 //				logger.sendLog(path.toCode());
-				logger.closeSocket(); socket = false;
+//				logger.closeSocket(); socket = false;
 				System.out.println(" socket did the thingy -----------------------------------------------------");
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -134,9 +134,9 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		ob.elevatorMaster.setSelectedSensorPosition(0, 0, 1000);
 		//logger stuff!
 		
-		if(!socket){
-			logger.startSocket(); socket = true;
-		}
+//		if(!socket){
+//			logger.startSocket(); socket = true;
+//		}
 		beenEnabled = true;		
 
 		//Reset all variables for the start of auto
@@ -161,7 +161,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			arduino.lights(null, false, false, false, true, false);
 		}
 		//Black Box
-		logger.log();
+//		logger.log();
 		ob.updateGyroAngle(gyro.getYaw());
 		//Auto Selection
 		if(!gyroReset){
@@ -275,8 +275,13 @@ public class Robot extends IterativeRobot implements PIDOutput{
 							auto = "centerToRightSwitch";
 						}
 					} else if (position == 0){
-						script.addAll(RocketScript.splineLeftToLeftScale());
-						auto = "leftToLeftScale";
+						if(highOnly){
+							script.addAll(RocketScript.splineLeftToLeftScale());
+							auto = "leftToLeftScale";							
+						} else {
+							script.addAll(RocketScript.splineLeftTwoScale());
+							auto = "leftTwoScale";
+						}
 					} else if (position == 5){
 						script.addAll(RocketScript.splineRightToLeftScale());
 						auto = "rightToLeftScale";
@@ -340,7 +345,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 //				} else if (position == 5){
 //					script.addAll(RocketScript.cross());
 //				}
-
 				rocketScriptSize = script.size();
 				autoSelected = true;
 			}
@@ -356,7 +360,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					}
 				}
 				if(!elevatorSet){
-					elevator.getAutoPosition(Integer.parseInt(values[1]));
+					elevator.getAutoPosition(Integer.parseInt(values[3]));
 					elevatorSet = true;
 					startTime = Timer.getFPGATimestamp();
 				}
@@ -558,9 +562,9 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		path = new RobotGrid(0,0,0,0);
 		startingDistance = (((-ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2;
 		drive.shiftHigh();
-		if(!socket){
-			logger.startSocket(); socket = true;
-		}
+//		if(!socket){
+//			logger.startSocket(); socket = true;
+//		}
 		beenEnabled = true;
 	}
 
@@ -576,7 +580,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		} else {
 			arduino.lights(null, false, false, false, true, false);
 		}
-		logger.log();
+//		logger.log();
 		try{
 			ob.updateGyroAngle(gyro.getYaw());
 		} catch (Exception e){
