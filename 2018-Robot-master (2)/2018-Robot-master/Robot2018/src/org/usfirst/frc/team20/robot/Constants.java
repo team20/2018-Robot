@@ -10,12 +10,12 @@ public class Constants {
 	public static final double TICKS_PER_INCH = 620;
 	public static final double STOPPING_INCHES = 0.0;
 	public static final int ELEVATOR_DEADBAND = 5000;
-	public static final double SPLINE_FACTOR = 7; //PRACTICE = 8
+	public static final double SPLINE_FACTOR = 6.5; //PRACTICE = 8
 	
 	public static final int INTAKE_POSITION = 0;
 	public static final int SWITCH_POSITION = -17910;
 	public static final int SCALE_LOW_POSITION = -37375;
-	public static final int SCALE_MID_POSITION = -45075;
+	public static final int SCALE_MID_POSITION = -44000;//45075, halfway = 42700
 	public static final int SCALE_HIGH_POSITION = -48000;
 	public static final int ELEVATOR_MAX_POSITION = -49000;
 	public static final int ELEVATOR_STAGE_THRESHOLD = -24000;

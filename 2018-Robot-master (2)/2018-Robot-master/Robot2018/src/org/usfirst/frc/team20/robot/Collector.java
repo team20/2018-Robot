@@ -30,7 +30,7 @@ public class Collector {
 	 * runs the rollers in order to release a cube (slowly)
 	 */
 	public void outtakeSlow(){
-		ob.collectorMaster.set(ControlMode.PercentOutput, -0.25);
+		ob.collectorMaster.set(ControlMode.PercentOutput, -0.35); //TODO -0.25 comp bot, -0.35 practice
 		intakeOn = true;
 	}
 	

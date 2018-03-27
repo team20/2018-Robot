@@ -22,6 +22,7 @@ public class RobotModes {
 	public static final int DROP = 17;
 	public static final int OPEN = 18;
 	public static final int SPLINE_AND_INTAKE = 19;
+	public static final int TIME_DRIVE_TO_SENSOR = 20;
 	
 	//Elevator Positions - encoder ticks
 	public static final int POSITION_SWITCH = 0;
@@ -43,4 +44,6 @@ public class RobotModes {
 	public static final int SPLINE_RIGHT_SCALE_TO_CUBE = 12;
 	public static final int SPLINE_RIGHT_SCALE_TO_SCALE = 13;
 	public static final int SPLINE_LEFT_SCALE_TO_SCALE = 14;
+	public static final int SPLINE_LEFT_TO_LEFT_SCALE_SIDE = 15;
+	public static final int SPLINE_LEFT_SCALE_DECELERATION_BACKWARDS = 16;
 }
