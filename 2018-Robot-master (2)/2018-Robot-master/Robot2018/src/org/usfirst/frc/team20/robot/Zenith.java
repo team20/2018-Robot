@@ -15,7 +15,7 @@ public class Zenith implements Loggable{
 	VictorSPX collectorFollower;//, climberFollower;
 	DoubleSolenoid driveShifter, grabber, singleUp, doubleUp, climberSpringPin;
 	PS4Controller driverJoy4, operatorJoy4;
-	DigitalInput flipSwitch, cubeSensor;
+	DigitalInput nullZone, cubeSensor;
 	DriverStation driverStation;
 	RobotController controller;
 	double gyroSetpoint = 0, gyroAngle = 0, leftSide = 0, rightSide = 0, driveLeftSetpoint = 0, driveRightSetpoint = 0, elevatorSetpoint = 0;
@@ -52,7 +52,7 @@ public class Zenith implements Loggable{
 		driveFollowerRightTwo = new VictorSPX(6);
 		driveFollowerRightTwo.follow(driveMasterRight);
 		driveFollowerRightTwo.setInverted(false);
-
+		//TODO go back to other PCM
 		driveShifter = new DoubleSolenoid(14, 0, 1);
 
 		//Manipulator
@@ -64,8 +64,8 @@ public class Zenith implements Loggable{
 		singleUp = new DoubleSolenoid(14, 2, 3);
 		grabber = new DoubleSolenoid(14, 4, 5);
 		doubleUp = new DoubleSolenoid(14, 6, 7);
-		flipSwitch = new DigitalInput(1);
 		cubeSensor = new DigitalInput(0);
+		nullZone = new DigitalInput(1);
 		
 		//Elevator
 		elevatorMaster = new TalonSRX(9);
@@ -81,7 +81,7 @@ public class Zenith implements Loggable{
 //		climberFollower = new VictorSPX(12);
 //		climberFollower.setInverted(true);
 //		climberFollower.follow(climberMaster);
-//		climberSpringPin = new DoubleSolenoid(15, 0, 1);
+//		climberSpringPin = new DoubleSolenoid(14, 0, 1);
 		
 		//Joysticks
 		driverJoy4 = new PS4Controller(0, 2);
@@ -196,7 +196,7 @@ public class Zenith implements Loggable{
 		output += driveShifter.get() + ",";
 		output += elevatorMaster.getOutputCurrent() + "," + elevatorSetpoint + "," + elevatorMaster.getSelectedSensorPosition(0);
 		output += collectorMaster.getOutputCurrent() + "," + grabber.get() + "," + cube + "," + singleUp.get() + "," + doubleUp.get() + ",";
-		output += flipSwitch.get() + "\n";
+		output += nullZone.get() + "\n";
 		return output;
 	}
 }

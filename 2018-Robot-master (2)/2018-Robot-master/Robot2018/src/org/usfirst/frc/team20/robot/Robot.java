@@ -62,7 +62,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	double nominalVoltage = Constants.NOMINAL_VOLTAGE;
 	boolean resetGyro = false, setStartTime = false, waitStartTime = false, gotStartingENCClicks = false, resetGyroTurn = false, done = false,
 			gyroReset = false, elevatorDone = false, driveDone = false, splineDone = false, elevatorSet = false, autoSelected = false,
-			collectorSet = false, intakeMode = false;
+			collectorSet = false, intakeMode = false, inNullZone = false, prevValue = true;
 
 	//Spline
 	RobotGrid path;
@@ -152,6 +152,14 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		if(!ob.nullZone.get() && ob.nullZone.get() != prevValue){
+			if(inNullZone){
+				inNullZone = false;
+			} else {
+				inNullZone = true;
+			}
+			prevValue = ob.nullZone.get();
+		}
 		elevator.limitPosition();
 		System.out.println("Angle: " + gyro.getYaw());
 		//Diagnostic LEDs
@@ -206,8 +214,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 						}
 					} else if (position == 0){
 						if(highOnly){
-							script.addAll(RocketScript.splineLeftToLeftScale());
-							auto = "leftToLeftScale";
+							script.addAll(RocketScript.splineLeftToLeftScaleSide()); //TODO ...side or not???
+							auto = "leftToLeftScaleSide";
 						} else {
 							script.addAll(RocketScript.splineLeftTwoScale());
 							auto = "leftTwoScale";
@@ -276,8 +284,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 						}
 					} else if (position == 0){
 						if(highOnly){
-							script.addAll(RocketScript.splineLeftToLeftScale());
-							auto = "leftToLeftScale";							
+							script.addAll(RocketScript.splineLeftToLeftScaleSide());//TODO side or not?
+							auto = "leftToLeftScaleSide";
 						} else {
 							script.addAll(RocketScript.splineLeftTwoScale());
 							auto = "leftTwoScale";
@@ -292,59 +300,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					break;
 				}
 				SmartDashboard.putString("DB/String 1", auto);
-				//Origional Decision Tree
-//				boolean switchLeft = false, scaleLeft = false;
-//				if(field.charAt(0) == 'L'){
-//					switchLeft = true;
-//				}
-//				if(field.charAt(1) == 'L'){
-//					scaleLeft = true;
-//				}
-//				if(position == 0){
-////					if(switchLeft){
-////						script.addAll(RocketScript.splineLeftToLeftSwitch());
-////					} else {
-////						script.addAll(RocketScript.splineLeftToRightSwitch());
-////					}
-//				} else if (position == 2.5){
-//					if(!highOnly){
-//						if(scaleLeft && switchLeft){
-////							script.addAll(RocketScript.splineCenterTwoCubeLeftV2());
-////						} else if (!scaleLeft && !switchLeft){
-////							script.addAll(RocketScript.splineCenterTwoCubeRightV2());
-//						} else {
-//							if(!scalePriority){
-//								if(switchLeft){
-//									script.addAll(RocketScript.splineCenterToLeftSwitch());
-//								} else {
-//									script.addAll(RocketScript.splineCenterToRightSwitch());
-//								}
-//							} else {
-//								if(scaleLeft){
-//									script.addAll(RocketScript.splineCenterToLeftScale());
-//								} else {
-//									script.addAll(RocketScript.splineCenterToRightScale());
-//								}
-//							}
-//						}
-//					} else {
-//						if(!scalePriority){
-//							if(switchLeft){
-//								script.addAll(RocketScript.splineCenterToLeftSwitch());
-//							} else {
-//								script.addAll(RocketScript.splineCenterToRightSwitch());
-//							}
-//						} else {
-//							if(scaleLeft){
-//								script.addAll(RocketScript.splineCenterToLeftScale());
-//							} else {
-//								script.addAll(RocketScript.splineCenterToRightScale());
-//							}
-//						}				
-//					}
-//				} else if (position == 5){
-//					script.addAll(RocketScript.cross());
-//				}
 				rocketScriptSize = script.size();
 				autoSelected = true;
 			}
@@ -388,8 +343,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				rocketScriptCurrentCount++;
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.SLOW_SPIT){
-				collector.outtakeSlow();
-				rocketScriptCurrentCount++;
+				if(inNullZone){
+					collector.outtakeSlow();
+					rocketScriptCurrentCount++;
+				}
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.OVER_BACK){
 				System.out.println("GOING OVER THE BACK YAYYYYYYYYY**************************************************");
@@ -415,6 +372,16 @@ public class Robot extends IterativeRobot implements PIDOutput{
 						System.out.println("*******SPLINE IS DONE************" + Timer.getMatchTime());
 						rocketScriptCurrentCount++;
 					}					
+				}
+				if(!setStartTime){
+					startTime = Timer.getFPGATimestamp();
+					setStartTime = true;
+				}
+				if(Timer.getFPGATimestamp() - startTime > 1.5){
+					collector.close();
+					collector.stopRollers();
+					setStartTime = false;
+					rocketScriptCurrentCount++;
 				}
 				if(!collectorSet){
 					collector.intake(0.5);
@@ -501,6 +468,15 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					rocketScriptCurrentCount++;
 				}
 			}
+			if(Integer.parseInt(values[0]) == RobotModes.TIME_DRIVE_TO_SENSOR){
+				if (timeDrive(Double.parseDouble(values[1]), Double.parseDouble(values[2]), true)) {
+					rocketScriptCurrentCount++;
+				}
+				if(!ob.nullZone.get()){
+					drive.stopDrive();
+					rocketScriptCurrentCount++;
+				}
+			}
 			if (Integer.parseInt(values[0]) == RobotModes.TIME_TURN){
 				if (timeTurn(Double.parseDouble(values[1]), Double.parseDouble(values[2]), Boolean.parseBoolean(values[3]))){
 					rocketScriptCurrentCount++;
@@ -516,7 +492,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.PLACE){
 				System.out.println("************Placing****************");
-				if (!waitStartTime) {
+				if (!waitStartTime && inNullZone) {
 					startTime = Timer.getFPGATimestamp();
 					waitStartTime = true;
 					collector.armIntakePosition();
@@ -619,7 +595,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 //		System.out.println("Encoder Gyro Angle: " + gy.updateAngle(ob.driveMasterLeft.getSelectedSensorPosition(0), ob.driveMasterRight.getSelectedSensorPosition(0)));
 //				ob.driveMasterRight.getSelectedSensorPosition(0)));
 //		System.out.println("                     Elevator: " + ob.elevatorMaster.getSelectedSensorPosition(Constants.PIDIDX));			
-		System.out.println("Raw Angle:                       " + gyro.getYaw());		
+//		System.out.println("Raw Angle:                       " + gyro.getYaw());		
+		System.out.println("LINE SENSOR: " + ob.nullZone.get());
 	}
 	
 	/**
@@ -714,10 +691,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				if (withGyro){
 					arcadeDrive(speed, -(gyro.getYaw() * Constants.DRIVING_P));
 					ob.updateGyroSetpoint(gyro.getYaw());
-					System.out.println("------------------------Arcade Drive is Over");
 				} else {
 					arcadeDrive(speed, 0);
-					System.out.println("------------------------Arcade Drive is Over");
 				}
 			}
 		} else {
@@ -799,12 +774,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			startingENCClicksLeft = ob.driveMasterLeft.getSelectedSensorPosition(0);
 			startingENCClicksRight = -ob.driveMasterRight.getSelectedSensorPosition(0);
 		}
-//		System.out.println("****************Left: " + -ob.driveMasterLeft.getSelectedSensorPosition(0));
-//		System.out.println("****************Right: " + ob.driveMasterRight.getSelectedSensorPosition(0));
-		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (-ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
-//		System.out.println("****************RobotDistance: " + robotDistance);
-//		System.out.println("****************Travel Distance: " + spline.getDistance());
+		double robotDistance = Math.abs((((-ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
 		speed = spline.speedMultiplier(robotDistance, gyro.getYaw(), speed);			
+		System.out.println("Speed: " + speed);
+		System.out.println("**************************************************RobotDistance: " + robotDistance);		
 		if (spline.getDistance() <= robotDistance) {
 			ob.driveMasterLeft.set(ControlMode.PercentOutput, 0.00);
 			ob.driveMasterRight.set(ControlMode.PercentOutput, 0.00);
@@ -832,8 +805,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					if(speed >= 0){
 						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR, true);	//TODO do we need the boolean?			
 					} else {
-						System.out.println("1");
-						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR, true);
+						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR);
 					}
 				} else if (angleToDrive > 90 && gyro.getYaw() < -90){
 					double temp = 180 - angleToDrive;
@@ -841,21 +813,18 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					if(speed >= 0){
 						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR, true);						
 					} else {
-						System.out.println("2");
-						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR, true);
+						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR);
 					}
 				} else {
 					if(speed >= 0){
 						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR),true);
 					} else {
-						System.out.println("3");
-						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR),true);
+						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
 					}
 				}
 			}
 		} else {
-			System.out.println("4");
-			arcadeDrive(-speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR),true);
+			arcadeDrive(-speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
 		}
 	}
 	return false;
@@ -907,42 +876,36 @@ public class Robot extends IterativeRobot implements PIDOutput{
         ob.updateLeftSide(-leftMotorSpeed);
         ob.updateRightSide(rightMotorSpeed);
 	}
-	/**
-	 * sets the robot to move
-	 * @param move: move value (amount forward)
-	 * @param turn: rotate value (amount to turn)
-	 * @param flag: if there's a boolean it uses this method
-	 */
- 	private void arcadeDrive(double move, double turn, boolean flag){
-		double left = 0;
-		double right = 0;
-		if (move>0){
-			left = move -turn;
-			right = move + turn;
-		}else{
-			left = move + turn;
-			right = move-turn;
-		}
-		if (right > 1){
-			left -= right - 1;
-			right = 1;
-		}else if (left > 1){
-			right -= left -1;
-			left = 1;
-		}else if (right < -1){
-			left -= right + 1;
-			right = -1;
-		}else if(left< -1){
-			right -= left +1;
-			left = -1;
-		}
-		ob.driveMasterLeft.set(ControlMode.PercentOutput, -left);
-        ob.driveMasterRight.set(ControlMode.PercentOutput, right);
+	private void arcadeDrive(double move, double turn, boolean flag) {
+		 // local variables to hold the computed PWM values for the motors
+       double left = 0;
+       double right = 0;
+           // square the inputs (while preserving the sign) to increase fine control while permitting full power
+       if (move > 0.0) {
+           left = move - turn;
+           right = move + turn;
+       } else {
+    	   left = move + turn;
+    	   right = move - turn;
+       }
+       if(right > 1){
+    	   left -= right - 1;
+    	   right = 1;
+       } else if(left > 1){
+    	   right -= left - 1;
+    	   left = 1;
+       } else if (right < -1){
+    	   left -= right + 1;
+    	   right = -1;
+       } else if (left < -1){
+    	   right -= left + 1;
+    	   left = -1;
+       }
+       ob.driveMasterLeft.set(ControlMode.PercentOutput, -left);
+       ob.driveMasterRight.set(ControlMode.PercentOutput, right);
+       ob.updateLeftSide(-left);
+       ob.updateRightSide(right);
 	}
-	//can we just go to work an not try to get recognition for people
-	//or a recap of unfortunite events
-	//Josh Jolly challenged you to program a swerve drive let me know if i am needed for that because i know i will be
-	
 	/**
 	 * makes sure the speed is within range (-1.0 to 1.0)
 	 * @param num: speed to be checked
