@@ -771,8 +771,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	public boolean spline(double speed, RobotGrid spline) { //TODO negate left encoder comp bot!!!!!
 		if (gotStartingENCClicks == false) {
 			gotStartingENCClicks = true;
-			startingENCClicksLeft = -ob.driveMasterLeft.getSelectedSensorPosition(0);
-			startingENCClicksRight = ob.driveMasterRight.getSelectedSensorPosition(0);
+			startingENCClicksLeft = ob.driveMasterLeft.getSelectedSensorPosition(0);
+			startingENCClicksRight = -ob.driveMasterRight.getSelectedSensorPosition(0);
 		}
 		double robotDistance = Math.abs((((-ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
 		speed = spline.speedMultiplier(robotDistance, gyro.getYaw(), speed);			
@@ -797,14 +797,13 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			if (spline.getDistance() > 0) {
 				if (spline.getDistance() > robotDistance);
 				{
-//				System.out.println("speed = " + speed);
 				System.out.println("angle = " + gyro.getYaw());
 				System.out.println("Target Angle = " + spline.getReverseAngle(robotDistance));				
 				if(angleToDrive < -90 && gyro.getYaw() > 90){
 					double temp = -180 - angleToDrive;
 					temp += -(180 - gyro.getYaw());
 					if(speed >= 0){
-						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);						
+						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR, true);	//TODO do we need the boolean?			
 					} else {
 						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR);
 					}
@@ -812,13 +811,13 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					double temp = 180 - angleToDrive;
 					temp += (180 + gyro.getYaw());
 					if(speed >= 0){
-						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);						
+						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR, true);						
 					} else {
 						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR);
 					}
 				} else {
 					if(speed >= 0){
-						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
+						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR),true);
 					} else {
 						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
 					}
@@ -907,7 +906,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
        ob.updateLeftSide(-left);
        ob.updateRightSide(right);
 	}
-
 	/**
 	 * makes sure the speed is within range (-1.0 to 1.0)
 	 * @param num: speed to be checked
