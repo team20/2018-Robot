@@ -110,8 +110,6 @@ public class Grids {
 	}
 	private RobotGrid leftScaleToScale(){
 		RobotGrid grid = new RobotGrid(-240, -160, 0, 2);
-//		grid.addPoint(-228, -110, 90);
-//		grid.addPoint(-233, -120, 5);
 		grid.addLinearPoint(-273, -110, 0);
 		return grid;
 	}

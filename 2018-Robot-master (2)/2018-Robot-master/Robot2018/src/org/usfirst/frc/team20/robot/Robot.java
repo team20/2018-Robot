@@ -796,12 +796,12 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	public boolean spline(double speed, RobotGrid spline) { //TODO negate left encoder comp bot!!!!!
 		if (gotStartingENCClicks == false) {
 			gotStartingENCClicks = true;
-			startingENCClicksLeft = -ob.driveMasterLeft.getSelectedSensorPosition(0);
-			startingENCClicksRight = ob.driveMasterRight.getSelectedSensorPosition(0);
+			startingENCClicksLeft = ob.driveMasterLeft.getSelectedSensorPosition(0);
+			startingENCClicksRight = -ob.driveMasterRight.getSelectedSensorPosition(0);
 		}
 //		System.out.println("****************Left: " + -ob.driveMasterLeft.getSelectedSensorPosition(0));
 //		System.out.println("****************Right: " + ob.driveMasterRight.getSelectedSensorPosition(0));
-		double robotDistance = Math.abs((((-ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
+		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (-ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
 //		System.out.println("****************RobotDistance: " + robotDistance);
 //		System.out.println("****************Travel Distance: " + spline.getDistance());
 		speed = spline.speedMultiplier(robotDistance, gyro.getYaw(), speed);			
@@ -824,39 +824,38 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			if (spline.getDistance() > 0) {
 				if (spline.getDistance() > robotDistance);
 				{
-//				System.out.println("speed = " + speed);
 				System.out.println("angle = " + gyro.getYaw());
 				System.out.println("Target Angle = " + spline.getReverseAngle(robotDistance));				
 				if(angleToDrive < -90 && gyro.getYaw() > 90){
 					double temp = -180 - angleToDrive;
 					temp += -(180 - gyro.getYaw());
 					if(speed >= 0){
-						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);						
+						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR, true);	//TODO do we need the boolean?			
 					} else {
 						System.out.println("1");
-						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR);
+						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR, true);
 					}
 				} else if (angleToDrive > 90 && gyro.getYaw() < -90){
 					double temp = 180 - angleToDrive;
 					temp += (180 + gyro.getYaw());
 					if(speed >= 0){
-						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);						
+						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR, true);						
 					} else {
 						System.out.println("2");
-						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR);
+						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR, true);
 					}
 				} else {
 					if(speed >= 0){
-						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
+						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR),true);
 					} else {
 						System.out.println("3");
-						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
+						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR),true);
 					}
 				}
 			}
 		} else {
 			System.out.println("4");
-			arcadeDrive(-speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
+			arcadeDrive(-speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR),true);
 		}
 	}
 	return false;
@@ -908,7 +907,42 @@ public class Robot extends IterativeRobot implements PIDOutput{
         ob.updateLeftSide(-leftMotorSpeed);
         ob.updateRightSide(rightMotorSpeed);
 	}
-
+	/**
+	 * sets the robot to move
+	 * @param move: move value (amount forward)
+	 * @param turn: rotate value (amount to turn)
+	 * @param flag: if there's a boolean it uses this method
+	 */
+ 	private void arcadeDrive(double move, double turn, boolean flag){
+		double left = 0;
+		double right = 0;
+		if (move>0){
+			left = move -turn;
+			right = move + turn;
+		}else{
+			left = move + turn;
+			right = move-turn;
+		}
+		if (right > 1){
+			left -= right - 1;
+			right = 1;
+		}else if (left > 1){
+			right -= left -1;
+			left = 1;
+		}else if (right < -1){
+			left -= right + 1;
+			right = -1;
+		}else if(left< -1){
+			right -= left +1;
+			left = -1;
+		}
+		ob.driveMasterLeft.set(ControlMode.PercentOutput, -left);
+        ob.driveMasterRight.set(ControlMode.PercentOutput, right);
+	}
+	//can we just go to work an not try to get recognition for people
+	//or a recap of unfortunite events
+	//Josh Jolly challenged you to program a swerve drive let me know if i am needed for that because i know i will be
+	
 	/**
 	 * makes sure the speed is within range (-1.0 to 1.0)
 	 * @param num: speed to be checked

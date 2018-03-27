@@ -166,7 +166,7 @@ public class RocketScript {
 		auto.add(RobotModes.WAIT + ";" + 0.75); //1.5
 		auto.add(Integer.toString(RobotModes.DROP));
 		auto.add(RobotModes.SPLINE_AND_INTAKE + ";" + 0.5 + ";" + RobotModes.SPLINE_RIGHT_SCALE_TO_CUBE);
-		auto.add(Integer.toString(RobotModes.INTAKE));
+		auto.add(Integer.toString(RobotModes.INTAKE)); //elevator
 		auto.add(RobotModes.SPLINE + ";" + -0.75 + ";" + RobotModes.SPLINE_RIGHT_SCALE_TO_SCALE);
 		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
 		return auto;
