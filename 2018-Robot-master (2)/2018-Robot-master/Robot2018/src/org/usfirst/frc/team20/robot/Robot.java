@@ -562,8 +562,13 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		} catch (Exception e){
 		} finally {
 		}
+		System.out.println(elevator);
 		driverJoy.driverControlsPS4();
 		operatorJoy.operatorControlsPS4();
+		if(!operatorJoy.override){
+			elevator.incrementElevator();			
+		}
+		//elevator.adaptiveTune();
 // 		double robotDistance = Math.abs(((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2)-startingDistance);
 // 		path.addRelativePoint(robotDistance, gyro.getYaw());
 	}

@@ -6,11 +6,12 @@ public class Elevator {
 	Zenith ob;
 	private int setPosition = 0, prevPosition = 0;
 	private static final int TICKS_PER_INCH = 695;
-
+	
 	public Elevator(Zenith o){
 		ob = o;
 		setPosition = ob.elevatorMaster.getSelectedSensorPosition(0);
-		setPID(0.075, 0.000015, 1.1, 0.0); //dual 775 tune = p 0.05, 0.00001, 0.0, 0.0 - mini tune 0.075, 0.000015, 1.1, 0.0
+		setPID(.075, 0.000015, 1.1, 0.0); //dual 775 tune = p 0.05, 0.00001, 0.0, 0.0 - mini tune 0.075, 0.000015, 1.1, 0.0
+//		setPID(0.2/*.075*/, /*0.000015*/.00025, 03 /*1.1*/, 0/*0.0*/); //dual 775 tune = p 0.05, 0.00001, 0.0, 0.0 - mini tune 0.075, 0.000015, 1.1, 0.0
 	}
 	
 	/**
@@ -180,5 +181,23 @@ public class Elevator {
 	 */
 	public boolean aboveThreshold(){
 		return ob.elevatorMaster.getSelectedSensorPosition(0) < Constants.ELEVATOR_STAGE_THRESHOLD;
+	}
+
+	public void incrementElevator(){
+//		int currentPos = ob.elevatorMaster.getSelectedSensorPosition(0);
+//		int increment = (int)8*TICKS_PER_INCH;
+//		int nextSP = setPosition;
+//		if(Math.abs(setPosition - currentPos) < increment)
+//			increment  = Math.abs(setPosition - currentPos);
+//	    if(setPosition > currentPos)
+//			nextSP = currentPos + increment;
+//	    else nextSP = currentPos - increment;
+//
+//		ob.updateElevatorSetpoint(nextSP);
+//		ob.elevatorMaster.set(ControlMode.Position, nextSP);
+	}
+
+	public String toString(){
+		return "target " + ob.elevatorMaster.getClosedLoopTarget(0)+"/n Actual " + ob.elevatorMaster.getSelectedSensorPosition(0) + "/n Difference " + ob.elevatorMaster.getClosedLoopError(0);
 	}
 }

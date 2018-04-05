@@ -22,7 +22,7 @@ public class Collector {
 	 * runs the rollers in order to release a cube (with force)
 	 */
 	public void outtake(){
-		ob.collectorMaster.set(ControlMode.PercentOutput, -1.0);
+		ob.collectorMaster.set(ControlMode.PercentOutput, -0.8);
 		intakeOn = true;
 	}
 	
