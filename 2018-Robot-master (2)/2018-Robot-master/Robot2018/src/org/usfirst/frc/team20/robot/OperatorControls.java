@@ -134,6 +134,7 @@ public class OperatorControls {
 		}
 		if(ob.operatorJoy4.getRightTriggerAxis() > 0.1){
 			collector.close();
+			intakeMode = false;
 		}
 		if(ob.operatorJoy4.getSquareButton()){
 			toRun = 1;

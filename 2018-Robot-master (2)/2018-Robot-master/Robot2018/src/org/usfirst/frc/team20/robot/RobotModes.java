@@ -46,4 +46,7 @@ public class RobotModes {
 	public static final int SPLINE_LEFT_SCALE_TO_SCALE = 14;
 	public static final int SPLINE_LEFT_TO_LEFT_SCALE_SIDE = 15;
 	public static final int SPLINE_LEFT_SCALE_DECELERATION_BACKWARDS = 16;
+	public static final int SPLINE_RIGHT_SWITCH_BACK_UP = 17;
+	public static final int SPLINE_LEFT_SWITCH_BACK_UP = 18;
+	public static final int SPLINE_SWITCH_TO_CUBE = 19;
 }

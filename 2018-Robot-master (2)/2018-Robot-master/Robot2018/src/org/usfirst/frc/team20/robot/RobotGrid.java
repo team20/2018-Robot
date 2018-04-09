@@ -132,6 +132,11 @@ public class RobotGrid {
     		angleTarget = getAngle(distance + 25);
     	else 
     		angleTarget = getReverseAngle(distance + 25);
+//    	if(speed < 0){
+//        	return -(Math.abs(1-Math.abs((angleTarget-angle)/115/1.66))*speed)*(Math.abs(1-Math.abs((angleTarget-angle)/115/1.66))*speed);
+//    	} else {
+//        	return (Math.abs(1-Math.abs((angleTarget-angle)/115/1.66))*speed)*(Math.abs(1-Math.abs((angleTarget-angle)/115/1.66))*speed);
+//    	}
     	return Math.abs(1-Math.abs((angleTarget-angle)/115/1.66))*speed;
     }
     public double getLeftIPS(double distance,double angle,double baseIPS, EncoderGyro change){//inches per second

@@ -127,6 +127,8 @@ public class Elevator {
 	 */
 	public void downIncrement(){
 		setPosition = ob.elevatorMaster.getSelectedSensorPosition(0) + (int)6*TICKS_PER_INCH;
+		if (setPosition > 0)
+			setPosition = 0;
 		ob.updateElevatorSetpoint(setPosition);
 		ob.elevatorMaster.set(ControlMode.Position, setPosition);
 	}

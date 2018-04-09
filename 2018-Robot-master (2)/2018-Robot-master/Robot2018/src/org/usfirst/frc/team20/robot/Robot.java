@@ -154,14 +154,15 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	public void autonomousPeriodic() {
 		if(!ob.nullZone.get() && ob.nullZone.get() != prevValue){
 			if(inNullZone){
+				System.out.println("NOOOOOOPPPPPPEEEEEEEE");
 				inNullZone = false;
 			} else {
+				System.out.println("WE'RE IN THE NULL ZONE FOLKS");
 				inNullZone = true;
 			}
 			prevValue = ob.nullZone.get();
 		}
 		elevator.limitPosition();
-		System.out.println("Angle: " + gyro.getYaw());
 		//Diagnostic LEDs
 		if(driverJoy.leds){
 			arduino.lights(alliance, ob.cube, driverJoy.climbing, ob.currentLimit(), false, elevator.elevatorMoving());
@@ -235,7 +236,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 							auto = "centerToRightScale";
 						} else {
 							script.addAll(RocketScript.splineCenterToRightSwitch());
-							auto = "centerToRightScale";
+							auto = "centerToRightSwitch";
 						}
 					} else if (position == 5){
 						if(highOnly){
@@ -345,7 +346,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			if(Integer.parseInt(values[0]) == RobotModes.SLOW_SPIT){
 				if(inNullZone){
 					collector.outtakeSlow();
+					drive.stopDrive();
 					rocketScriptCurrentCount++;
+				} else {
+					drive.drive(-0.3, 0.0, 0.0);
 				}
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.OVER_BACK){
@@ -367,19 +371,12 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				}
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.SPLINE_AND_INTAKE){
-				if(!splineDone){
-					if(spline(Double.parseDouble(values[1]), grid.getGrid(Integer.parseInt(values[2])))){
-						System.out.println("*******SPLINE IS DONE************" + Timer.getMatchTime());
-						rocketScriptCurrentCount++;
-					}					
-				}
-				if(!setStartTime){
-					startTime = Timer.getFPGATimestamp();
-					setStartTime = true;
-				}
-				if(Timer.getFPGATimestamp() - startTime > 1.5){
-					collector.close();
+				if(spline(Double.parseDouble(values[1]), grid.getGrid(Integer.parseInt(values[2])))){
+					System.out.println("*******SPLINE IS DONE************" + Timer.getMatchTime());
 					collector.stopRollers();
+					collector.close();
+					System.out.println("Rollers Stopped");
+					collectorSet = false;
 					setStartTime = false;
 					rocketScriptCurrentCount++;
 				}
@@ -389,16 +386,16 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				}
 				if (!ob.cubeSensor.get() && !waitStartTime) {
 					startTime = Timer.getFPGATimestamp();
-					waitStartTime = true;
 					collector.intake(1.0);
 					collector.close();
-					splineDone = true;
+					waitStartTime = true;
 				}
 				if (waitStartTime && Timer.getFPGATimestamp() - startTime > 0.3) {
 					collector.stopRollers();
-					waitStartTime = false;
+					drive.stopDrive();
 					collectorSet = false;
-					splineDone = false;
+					setStartTime = false;
+					System.out.println("Rollers Stopped");
 					rocketScriptCurrentCount++;
 				}
 			}
@@ -422,8 +419,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					elevatorSet = true;
 					startTime = Timer.getFPGATimestamp();
 				}
-				System.out.println("Encoder Position: " + ob.driveMasterLeft.getSelectedSensorPosition(0));
-				System.out.println("                                 Output Voltage: " + ob.driveMasterLeft.getOutputCurrent());
 //				if(!elevator.elevatorMoving()){
 				if(Timer.getFPGATimestamp() - startTime > 0.5){
 					System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^WOW ITS INCREMENTING^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
@@ -492,13 +487,18 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.PLACE){
 				System.out.println("************Placing****************");
+				if(!inNullZone){
+					System.out.println("************CREEPING");
+					arcadeDrive(0.3, 0.0);
+				}
 				if (!waitStartTime && inNullZone) {
 					startTime = Timer.getFPGATimestamp();
 					waitStartTime = true;
+					drive.stopDrive();
 					collector.armIntakePosition();
 					collector.outtake();
 				}
-				if (Timer.getFPGATimestamp() - startTime > 0.25) {
+				if (inNullZone && waitStartTime && Timer.getFPGATimestamp() - startTime > 0.3) {
 					collector.open();
 					collector.stopRollers();
 					waitStartTime = false;
@@ -546,7 +546,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 
 	@Override
 	public void teleopPeriodic() {
-		System.out.println("Elevator Position: " + ob.elevatorMaster.getSelectedSensorPosition(0));
+		System.out.println("Drivetrain Current: " + ob.driveMasterRight.getOutputCurrent());
 		if(driverJoy.leds){
 			if(Timer.getMatchTime() < 40.0 && Timer.getMatchTime() > 0){
 				arduino.lights(alliance, ob.cube, true, false, false, false);
@@ -595,13 +595,13 @@ public class Robot extends IterativeRobot implements PIDOutput{
 //		}
 		//Encoder/Sensor Testing
 //		System.out.println("NavX Yaw: " + gyro.getYaw());
-//		System.out.println("Left: " + ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX));	
-//		System.out.println("		Right: " + ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX));	
+		System.out.println("Left: " + ob.driveMasterLeft.getSelectedSensorPosition(Constants.PIDIDX));	
+		System.out.println("		Right: " + ob.driveMasterRight.getSelectedSensorPosition(Constants.PIDIDX));	
 //		System.out.println("Encoder Gyro Angle: " + gy.updateAngle(ob.driveMasterLeft.getSelectedSensorPosition(0), ob.driveMasterRight.getSelectedSensorPosition(0)));
 //				ob.driveMasterRight.getSelectedSensorPosition(0)));
 //		System.out.println("                     Elevator: " + ob.elevatorMaster.getSelectedSensorPosition(Constants.PIDIDX));			
 //		System.out.println("Raw Angle:                       " + gyro.getYaw());		
-		System.out.println("LINE SENSOR: " + ob.nullZone.get());
+//		System.out.println("LINE SENSOR: " + ob.nullZone.get());
 	}
 	
 	/**
@@ -779,7 +779,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			startingENCClicksLeft = ob.driveMasterLeft.getSelectedSensorPosition(0);
 			startingENCClicksRight = -ob.driveMasterRight.getSelectedSensorPosition(0);
 		}
-		double robotDistance = Math.abs((((-ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
+		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (-ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
 		speed = spline.speedMultiplier(robotDistance, gyro.getYaw(), speed);			
 		System.out.println("Speed: " + speed);
 		System.out.println("**************************************************RobotDistance: " + robotDistance);		
@@ -808,7 +808,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					double temp = -180 - angleToDrive;
 					temp += -(180 - gyro.getYaw());
 					if(speed >= 0){
-						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR, true);	//TODO do we need the boolean?			
+						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);	//TODO do we need the boolean?			
 					} else {
 						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR);
 					}
@@ -816,13 +816,13 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					double temp = 180 - angleToDrive;
 					temp += (180 + gyro.getYaw());
 					if(speed >= 0){
-						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR, true);						
+						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);						
 					} else {
 						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR);
 					}
 				} else {
 					if(speed >= 0){
-						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR),true);
+						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
 					} else {
 						arcadeDrive(speed, ((gyro.getYaw() - angleToDrive) /360*Constants.SPLINE_FACTOR));
 					}
