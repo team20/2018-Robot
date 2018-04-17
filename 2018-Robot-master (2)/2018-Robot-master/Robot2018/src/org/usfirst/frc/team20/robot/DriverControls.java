@@ -71,8 +71,8 @@ public class DriverControls {
 			collector.stopRollers();
 			collectorBeenRun = false;
 		}
-		if(Math.abs(ob.driverJoy4.getRightYAxis()) > 0.1){
-			climbSpeed = -ob.driverJoy4.getRightYAxis();
+		if(ob.driverJoy4.getRightYAxis() > 0.1){
+			climbSpeed = ob.driverJoy4.getRightYAxis();
 		} else {
 			climbSpeed = 0.0;
 		}

@@ -200,6 +200,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				String auto = "";
 				boolean scalePriority = SmartDashboard.getBoolean("DB/Button 0", false);
 				boolean highOnly = SmartDashboard.getBoolean("DB/Button 1", false);
+				boolean test = SmartDashboard.getBoolean("DB/Button 3", false);
 				double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
 				waitTime = 2*SmartDashboard.getNumber("DB/Slider 1", 0.0);
 				//TVR Decision Tree
@@ -214,8 +215,12 @@ public class Robot extends IterativeRobot implements PIDOutput{
 							auto = "centerToLeftSwitch";
 						}
 					} else if (position == 0){
+						if(test){
+							script.addAll(RocketScript.austinsBullshit());
+							auto = "austin";
+						}else
 						if(highOnly){
-							script.addAll(RocketScript.splineLeftToLeftScaleSide()); //TODO ...side or not???
+							script.addAll(RocketScript.splineLeftToLeftScaleSide());
 							auto = "leftToLeftScaleSide";
 						} else {
 							script.addAll(RocketScript.splineLeftTwoScale());
@@ -285,7 +290,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 						}
 					} else if (position == 0){
 						if(highOnly){
-							script.addAll(RocketScript.splineLeftToLeftScaleSide());//TODO side or not?
+							script.addAll(RocketScript.splineLeftToLeftScaleSide());
 							auto = "leftToLeftScaleSide";
 						} else {
 							script.addAll(RocketScript.splineLeftTwoScale());
@@ -485,7 +490,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				drive.shiftHigh();
 				rocketScriptCurrentCount++;
 			}
-			if(Integer.parseInt(values[0]) == RobotModes.PLACE){
+			if(Integer.parseInt(values[0]) == RobotModes.PLACE_SCALE){
 				System.out.println("************Placing****************");
 				if(!inNullZone){
 					System.out.println("************CREEPING");
@@ -504,6 +509,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					waitStartTime = false;
 					rocketScriptCurrentCount++;
 				}
+			}
+			if(Integer.parseInt(values[0]) == RobotModes.PLACE){
+				collector.outtake();
+				rocketScriptCurrentCount++;
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.OPEN){
 				collector.open();
@@ -808,7 +817,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					double temp = -180 - angleToDrive;
 					temp += -(180 - gyro.getYaw());
 					if(speed >= 0){
-						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);	//TODO do we need the boolean?			
+						arcadeDrive(speed, temp /360*Constants.SPLINE_FACTOR);			
 					} else {
 						arcadeDrive(speed, -temp /360*Constants.SPLINE_FACTOR);
 					}

@@ -13,7 +13,7 @@ public class Constants {
 	public static final double SPLINE_FACTOR = 8; //PRACTICE = 8, 6.5
 	
 	public static final int INTAKE_POSITION = 0;
-	public static final int SWITCH_POSITION = -23010;
+	public static final int SWITCH_POSITION = -16000;
 	public static final int SCALE_LOW_POSITION = -37375;
 	public static final int SCALE_MID_POSITION = -44000;//45075, halfway = 42700
 	public static final int SCALE_HIGH_POSITION = -48000;
