@@ -200,7 +200,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				String auto = "";
 				boolean scalePriority = SmartDashboard.getBoolean("DB/Button 0", false);
 				boolean highOnly = SmartDashboard.getBoolean("DB/Button 1", false);
-				boolean test = SmartDashboard.getBoolean("DB/Button 3", false);
 				double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
 				waitTime = 2*SmartDashboard.getNumber("DB/Slider 1", 0.0);
 				//TVR Decision Tree
@@ -215,10 +214,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 							auto = "centerToLeftSwitch";
 						}
 					} else if (position == 0){
-						if(test){
-							script.addAll(RocketScript.austinsBullshit());
-							auto = "austin";
-						}else
 						if(highOnly){
 							script.addAll(RocketScript.splineLeftToLeftScaleSide());
 							auto = "leftToLeftScaleSide";
@@ -244,13 +239,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 							auto = "centerToRightSwitch";
 						}
 					} else if (position == 5){
-						if(highOnly){
-							script.addAll(RocketScript.splineRightToRightScale());
-							auto = "rightToRightScale";
-						} else {
-							script.addAll(RocketScript.splineRightTwoCube());
-							auto = "rightSwitchAndScale";
-						}
+						script.addAll(RocketScript.splineRightToRightScale());
+						auto = "rightToRightScale";
 					} else if (position == 0){
 						script.addAll(RocketScript.splineLeftToRightScale());
 						auto = "leftToRightScale";
@@ -340,10 +330,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				collector.armIntakePosition();
 				rocketScriptCurrentCount++;
 			}
-			if(Integer.parseInt(values[0]) == RobotModes.DROP){
-				collector.open();
-				rocketScriptCurrentCount++;
-			}
 			if(Integer.parseInt(values[0]) == RobotModes.ARM_100){
 				collector.arm100();
 				rocketScriptCurrentCount++;
@@ -375,7 +361,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					rocketScriptCurrentCount++;
 				}
 			}
-			if(Integer.parseInt(values[0]) == RobotModes.SPLINE_AND_INTAKE){
+			if(Integer.parseInt(values[0]) == RobotModes.SPLINE_AND_INTAKE_STOP){
 				if(spline(Double.parseDouble(values[1]), grid.getGrid(Integer.parseInt(values[2])))){
 					System.out.println("*******SPLINE IS DONE************" + Timer.getMatchTime());
 					collector.stopRollers();
@@ -402,6 +388,28 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					setStartTime = false;
 					System.out.println("Rollers Stopped");
 					rocketScriptCurrentCount++;
+				}
+			}
+			if(Integer.parseInt(values[0]) == RobotModes.SPLINE_AND_INTAKE){
+				if(spline(Double.parseDouble(values[1]), grid.getGrid(Integer.parseInt(values[2])))){
+					collector.stopRollers();
+					collector.close();
+					collectorSet = false;
+					setStartTime = false;
+					rocketScriptCurrentCount++;
+				}
+				if(!collectorSet){
+					collector.intake(0.5);
+					collectorSet = true;
+				}
+				if (!ob.cubeSensor.get() && !waitStartTime) {
+					startTime = Timer.getFPGATimestamp();
+					collector.intake(1.0);
+					collector.close();
+					waitStartTime = true;
+				}
+				if (waitStartTime && Timer.getFPGATimestamp() - startTime > 0.3) {
+					collector.stopRollers();
 				}
 			}
 			if (Integer.parseInt(values[0]) == RobotModes.ENCODER_DRIVE) {
@@ -889,36 +897,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
         ob.driveMasterRight.set(ControlMode.PercentOutput, rightMotorSpeed);
         ob.updateLeftSide(-leftMotorSpeed);
         ob.updateRightSide(rightMotorSpeed);
-	}
-	private void arcadeDrive(double move, double turn, boolean flag) {
-		 // local variables to hold the computed PWM values for the motors
-       double left = 0;
-       double right = 0;
-           // square the inputs (while preserving the sign) to increase fine control while permitting full power
-       if (move > 0.0) {
-           left = move - turn;
-           right = move + turn;
-       } else {
-    	   left = move + turn;
-    	   right = move - turn;
-       }
-       if(right > 1){
-    	   left -= right - 1;
-    	   right = 1;
-       } else if(left > 1){
-    	   right -= left - 1;
-    	   left = 1;
-       } else if (right < -1){
-    	   left -= right + 1;
-    	   right = -1;
-       } else if (left < -1){
-    	   right -= left + 1;
-    	   left = -1;
-       }
-       ob.driveMasterLeft.set(ControlMode.PercentOutput, -left);
-       ob.driveMasterRight.set(ControlMode.PercentOutput, right);
-       ob.updateLeftSide(-left);
-       ob.updateRightSide(right);
 	}
 	/**
 	 * makes sure the speed is within range (-1.0 to 1.0)

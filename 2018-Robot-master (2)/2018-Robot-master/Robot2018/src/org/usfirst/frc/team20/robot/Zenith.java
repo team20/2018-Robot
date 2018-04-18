@@ -162,7 +162,7 @@ public class Zenith implements Loggable{
 		double current = 0;
 		current += driveMasterLeft.getOutputCurrent() + driveFollowerLeft.getOutputCurrent() + driveFollowerLeftTwo.getOutputCurrent();
 		current += driveMasterRight.getOutputCurrent() + driveFollowerRight.getOutputCurrent() + driveFollowerRightTwo.getOutputCurrent();
-		current += collectorMaster.getOutputCurrent() + collectorFollower.getOutputCurrent();
+		current += collectorMaster.getOutputCurrent();// + collectorFollower.getOutputCurrent();
 		current += climberMaster.getOutputCurrent();
 //		current += climberFollower.getOutputCurrent();
 		return current;
