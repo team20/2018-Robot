@@ -78,7 +78,17 @@ public class RobotGrid {
     		path.add(new Position(distance,angle,true));    		
     	}
     }
-//NO ARCS OVER 90 DEGREES
+    public void sCurve(double targetX ,double targetY, double x1, double y1,double x2,double y2){
+    	Position p0 = path.get(path.size()-1);
+    	double pointAngle = p0.getAngle();
+    	for (double t = 1/180.0 ; t<=1;t+=1/180.0){
+    		double pointX = Math.pow(1-t,3)*p0.getX()+3*Math.pow(1-t,2)*t*x1+3*(1-t)*Math.pow(t, 2)*x2+Math.pow(t, 3)*targetX;
+    		double pointY = Math.pow(1-t,3)*p0.getY()+3*Math.pow(1-t,2)*t*y1+3*(1-t)*Math.pow(t, 2)*y2+Math.pow(t, 3)*targetY;
+    		pointAngle = Math.toDegrees(Math.atan2(pointY-path.get(path.size()-1).getY(),pointX-path.get(path.size()-1).getX()));
+            path.add(new Position(pointX,pointY,pointAngle, Math.sqrt(Math.pow(pointX-path.get(path.size()-1).getX(),2) + Math.pow(pointY-path.get(path.size()-1).getY(),2))+path.get(path.size()-1).getDistance()));
+    	}
+    }
+    //NO ARCS OVER 90 DEGREES
     public String toString() {
         String temp = "";
         for (Position pos : path) {

@@ -8,7 +8,8 @@ public class DriverControls {
 	Zenith ob;
 	Climber climb;
 	double speedStraight = 0, speedLeft = 0, speedRight = 0, climbSpeed = 0, speedRightSlow = 0, speedLeftSlow = 0, startTime = 0;
-	boolean climbing = false, leds = true, prevCube = false, timerStarted = false, collectorBeenRun = false;
+	boolean climbing = false, leds = true, prevCube = false, timerStarted = false;
+	static boolean collectorBeenRun = false;
 	
 	public DriverControls(DriveTrain d, Collector c, Zenith o, Climber cl){
 		drive = d;

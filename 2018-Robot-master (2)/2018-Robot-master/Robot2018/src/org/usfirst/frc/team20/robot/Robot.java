@@ -152,6 +152,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		System.out.println("Right: " + ob.driveMasterRight.getSelectedSensorPosition(0));
 		if(!ob.nullZone.get() && ob.nullZone.get() != prevValue){
 			if(inNullZone){
 				System.out.println("NOOOOOOPPPPPPEEEEEEEE");
@@ -200,11 +201,15 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				String auto = "";
 				boolean scalePriority = SmartDashboard.getBoolean("DB/Button 0", false);
 				boolean highOnly = SmartDashboard.getBoolean("DB/Button 1", false);
+				boolean test = SmartDashboard.getBoolean("DB/Button 3",false);
 				double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
+				System.out.println("Position: " + position);
 				waitTime = 2*SmartDashboard.getNumber("DB/Slider 1", 0.0);
-				//TVR Decision Tree
 				switch(field.substring(0, 2)){
 				case "LL":
+					if (test){
+						script.addAll(RocketScript.splineLeftThreeScale());
+					}else
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToLeftScale());
@@ -230,6 +235,9 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					}
 					break;
 				case "RR":
+					if (test){
+						script.addAll(RocketScript.splineLeftThreeScale());
+					}else
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToRightScale());
@@ -242,14 +250,22 @@ public class Robot extends IterativeRobot implements PIDOutput{
 						script.addAll(RocketScript.splineRightToRightScale());
 						auto = "rightToRightScale";
 					} else if (position == 0){
-						script.addAll(RocketScript.splineLeftToRightScale());
-						auto = "leftToRightScale";
+						if(highOnly){
+							script.addAll(RocketScript.splineLeftToRightScale());
+							auto = "leftToRightScale";							
+						} else {
+							script.addAll(RocketScript.splineLeftToRightScaleTwoCube());
+							auto = "leftToRightScaleTwoCube";
+						}
 					} else {
 						script.addAll(RocketScript.cross());
 						auto = "cross";
 					}
 					break;					
 				case "LR":
+					if (test){
+						script.addAll(RocketScript.splineLeftThreeScale());
+					}else
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToRightScale());
@@ -259,8 +275,13 @@ public class Robot extends IterativeRobot implements PIDOutput{
 							auto = "centerToLeftSwitch";
 						}
 					} else if (position == 0){
-						script.addAll(RocketScript.splineLeftToRightScale());
-						auto = "leftToRightScale";
+						if(highOnly){
+							script.addAll(RocketScript.splineLeftToRightScale());
+							auto = "leftToRightScale";							
+						} else {
+							script.addAll(RocketScript.splineLeftToRightScaleTwoCube());
+							auto = "leftToRightScaleTwoCube";
+						}
 					} else if (position == 5){
 						script.addAll(RocketScript.splineRightToRightScale());
 						auto = "rightToRightScale";
@@ -270,6 +291,9 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					}
 					break;
 				case "RL":
+					if (test){
+						script.addAll(RocketScript.splineLeftThreeScale());
+					}else
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToLeftScale());
@@ -297,7 +321,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				}
 				SmartDashboard.putString("DB/String 1", auto);
 				rocketScriptSize = script.size();
-				autoSelected = true;
+					autoSelected = true;
+//				script.addAll(RocketScript.testS());
+//				rocketScriptSize = script.size();
+				
 			}
 	}
 		//Scripting
@@ -334,6 +361,11 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				collector.arm100();
 				rocketScriptCurrentCount++;
 			}
+			if(Integer.parseInt(values[0]) == RobotModes.PRINT_TIME){
+				for(int i = 0; i < 20; i++){
+					System.out.println("I FINISHED THE AUTO");
+				}
+			}
 			if(Integer.parseInt(values[0]) == RobotModes.SLOW_SPIT){
 				if(inNullZone){
 					collector.outtakeSlow();
@@ -348,6 +380,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				if (!waitStartTime) {
 					startTime = Timer.getFPGATimestamp();
 					waitStartTime = true;
+					elevator.setScaleMid();
 					collector.arm180();
 				}
 				if (Timer.getFPGATimestamp() - startTime > 0.25) {
@@ -366,10 +399,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					System.out.println("*******SPLINE IS DONE************" + Timer.getMatchTime());
 					collector.stopRollers();
 					collector.close();
-					System.out.println("Rollers Stopped");
-					collectorSet = false;
-					setStartTime = false;
-					rocketScriptCurrentCount++;
+					startTime = Timer.getFPGATimestamp();
+					waitStartTime = true;
 				}
 				if(!collectorSet){
 					collector.intake(0.5);
@@ -385,7 +416,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					collector.stopRollers();
 					drive.stopDrive();
 					collectorSet = false;
-					setStartTime = false;
+					waitStartTime = false;
+					gotStartingENCClicks = false;
 					System.out.println("Rollers Stopped");
 					rocketScriptCurrentCount++;
 				}
@@ -459,6 +491,9 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					rocketScriptCurrentCount++;
 				}
 			}
+			if(Integer.parseInt(values[0]) == RobotModes.INCREMENT){
+				rocketScriptCurrentCount++;
+			}
 			if (Integer.parseInt(values[0]) == RobotModes.WAIT) {
 				System.out.println("WAITING");
 				if (!waitStartTime) {
@@ -502,7 +537,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				System.out.println("************Placing****************");
 				if(!inNullZone){
 					System.out.println("************CREEPING");
-					arcadeDrive(0.3, 0.0);
+					arcadeDrive(-0.3, 0.0);
 				}
 				if (!waitStartTime && inNullZone) {
 					startTime = Timer.getFPGATimestamp();
@@ -563,7 +598,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 
 	@Override
 	public void teleopPeriodic() {
-		System.out.println("Drivetrain Current: " + ob.driveMasterRight.getOutputCurrent());
+//		System.out.println("Drivetrain Current: " + ob.driveMasterRight.getOutputCurrent());
 		if(driverJoy.leds){
 			if(Timer.getMatchTime() < 40.0 && Timer.getMatchTime() > 0){
 				arduino.lights(alliance, ob.cube, true, false, false, false);
@@ -579,7 +614,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		} catch (Exception e){
 		} finally {
 		}
-		System.out.println(elevator);
+//		System.out.println(elevator);
 		driverJoy.driverControlsPS4();
 		operatorJoy.operatorControlsPS4();
 		if(!operatorJoy.override){
@@ -797,9 +832,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			startingENCClicksRight = -ob.driveMasterRight.getSelectedSensorPosition(0);
 		}
 		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (-ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
-		speed = spline.speedMultiplier(robotDistance, gyro.getYaw(), speed);			
-		System.out.println("Speed: " + speed);
-		System.out.println("**************************************************RobotDistance: " + robotDistance);		
+		speed = spline.speedMultiplier(robotDistance, gyro.getYaw(), speed);
 		if (spline.getDistance() <= robotDistance) {
 			ob.driveMasterLeft.set(ControlMode.PercentOutput, 0.00);
 			ob.driveMasterRight.set(ControlMode.PercentOutput, 0.00);
@@ -819,8 +852,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			if (spline.getDistance() > 0) {
 				if (spline.getDistance() > robotDistance);
 				{
-				System.out.println("angle = " + gyro.getYaw());
-				System.out.println("Target Angle = " + spline.getReverseAngle(robotDistance));				
 				if(angleToDrive < -90 && gyro.getYaw() > 90){
 					double temp = -180 - angleToDrive;
 					temp += -(180 - gyro.getYaw());

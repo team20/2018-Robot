@@ -42,8 +42,10 @@ public class OperatorControls {
 			intakeMode = false;
 		}
 		if(ob.operatorJoy4.getTriButton()){
-			collector.outtake();
+			collector.intake(.65);
 			rumble = 1;
+		}else if (!DriverControls.collectorBeenRun&&!intakeMode){
+			collector.stopRollers();
 		}
 		if(ob.operatorJoy4.getButtonDUp()){
 			positionChange = false;
@@ -134,6 +136,7 @@ public class OperatorControls {
 		}
 		if(ob.operatorJoy4.getRightTriggerAxis() > 0.1){
 			collector.close();
+			collector.stopRollers();
 			intakeMode = false;
 		}
 		if(ob.operatorJoy4.getSquareButton()){

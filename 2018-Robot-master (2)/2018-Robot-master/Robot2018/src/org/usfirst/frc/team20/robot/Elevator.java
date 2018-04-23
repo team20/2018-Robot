@@ -200,6 +200,6 @@ public class Elevator {
 	}
 
 	public String toString(){
-		return "target " + ob.elevatorMaster.getClosedLoopTarget(0)+"/n Actual " + ob.elevatorMaster.getSelectedSensorPosition(0) + "/n Difference " + ob.elevatorMaster.getClosedLoopError(0);
+		return "target " + ob.elevatorMaster.getClosedLoopTarget(0)+"\n Actual " + ob.elevatorMaster.getSelectedSensorPosition(0) + "\n Difference " + ob.elevatorMaster.getClosedLoopError(0);
 	}
 }
