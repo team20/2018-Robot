@@ -7,8 +7,9 @@ public class Grids {
 	leftScaleToCube, rightScaleToCube, rightScaleDeceleration, leftScaleDeceleration, rightToRightScale,
 	leftToRightScale, rightToLeftScale, rightScaleToScale, leftScaleToScale, leftScaleSide, leftScaleDecelerationBackwards,
 	rightSwitchBackUp, leftSwitchBackUp, switchToCube, leftToLeftCorner,leftToLeftCornerSlow,leftCornerCube,
-	leftCubePickup,leftCubeToScale, leftNullToScale, switchBackupCube, testS,leftScaleToCube2,leftCubeToCornerScale,leftCornerToCubeFast,
-	leftCubePickupFast,leftCubeToScaleFast;
+	leftCubePickup,leftCubeToScale, leftNullToScale, switchBackupCube, testS, leftCubeToCornerScale,leftCornerToCubeFast,
+	leftCubePickupFast,leftCubeToScaleFast, leftScaleToThirdCube, leftScaleThirdCubePickup, leftThirdCubeToScale,
+	frontOfSwitch, frontOfSwitchSlow;
 	
 	public Grids(){
 		centerToLeftSwitch = centerToLeftSwitch();
@@ -38,11 +39,15 @@ public class Grids {
 		leftCubeToScale = leftCubeToScale();
 		leftNullToScale = leftNullToScale();
 		testS = testS();
-		leftScaleToCube2 = leftScaleToCube2();
 		leftCubeToCornerScale = leftCubeToCornerScale();
 		leftCornerToCubeFast = leftCornerToCubeFast();
 		leftCubePickupFast = leftCubePickupFast();
 		leftCubeToScaleFast = leftCubeToScaleFast();
+		leftScaleToThirdCube = leftScaleToThirdCube();
+		leftScaleThirdCubePickup = leftScaleThirdCubePickup();
+		leftThirdCubeToScale = leftThirdCubeToScale();
+		frontOfSwitch = frontOfSwitch();
+		frontOfSwitchSlow = frontOfSwitchSlow();
 	}
 	
 	/**
@@ -105,8 +110,6 @@ public class Grids {
 				return switchBackupCube;
 			case RobotModes.TEST_S:
 				return testS;
-			case RobotModes.SPLINE_LEFT_SCALE_TO_CUBE_2:
-				return leftScaleToCube2;
 			case RobotModes.SPLINE_LEFT_CUBE_TO_CORNER_SCALE:
 				return leftCubeToCornerScale;
 			case RobotModes.SPLINE_LEFT_CORNER_TO_CUBE_FAST:
@@ -115,6 +118,16 @@ public class Grids {
 				return leftCubePickupFast;
 			case RobotModes.SPLINE_LEFT_CUBE_TO_SCALE_FAST:
 				return leftCubeToScaleFast;
+			case RobotModes.SPLINE_LEFT_TO_THIRD_CUBE:
+				return leftScaleToThirdCube;
+			case RobotModes.SPLINE_LEFT_THIRD_CUBE_PICKUP:
+				return leftScaleThirdCubePickup;
+			case RobotModes.SPLINE_LEFT_THIRD_CUBE_TO_SCALE:
+				return leftThirdCubeToScale;
+			case RobotModes.SPLINE_FRONT_OF_SWITCH:
+				return frontOfSwitch;
+			case RobotModes.SPLINE_FRONT_OF_SWITCH_SLOW:
+				return frontOfSwitchSlow;
 		}
 		return null;
 	}
@@ -237,7 +250,6 @@ public class Grids {
 	private RobotGrid leftToLeftCorner(){
 		RobotGrid grid = new RobotGrid(-LENGTH,-(30+WIDTH),180,2);
 		grid.addLinearPoint(-200, -(30+WIDTH), 180);
-		//grid.addPoint(-270, -80, 30);
 		return grid;
 	}
 	private RobotGrid  leftCornerDecelerate(){
@@ -247,7 +259,6 @@ public class Grids {
 	}
 	private RobotGrid leftCornerToCube(){
 		RobotGrid grid = new RobotGrid(-275,-60.5, 30, 2);
-		//grid.addPoint(-(190 + WIDTH), -60, -90, -207.75, -23);//w195, 60, -90, 211.75, 23 (and all after)
 		grid.sCurve(-(185 + WIDTH), -60,-239.493 , -40, -(185+WIDTH), -40);
 		return grid;
 	}
@@ -273,21 +284,12 @@ public class Grids {
    	 //1, 2 = x, y ending point   3,4  = 1st reference point   5, 6 = 2nd reference point
 		return grid;
 	}
-	private RobotGrid leftScaleToCube2(){
-		RobotGrid grid = new RobotGrid(-324,-80,90,2);
-		grid.sCurve(-(190+WIDTH), -115,-324, -50, -(190+WIDTH), -90);
-		return grid;
-	}
 	private RobotGrid leftCubeToCornerScale(){
 		RobotGrid grid =new RobotGrid(-(196+WIDTH),-100,90,2);
 		grid.sCurve(-300,-85,-(195+WIDTH),-60,-256.699,-60);
 		return grid;
-	}
-	private RobotGrid leftCornerScaletoCube2(){
-		RobotGrid grid = new RobotGrid(-300,-85,30,2);
-		grid.sCurve(-(196+WIDTH), -115, -256, -60, -(196+WIDTH), -80);
-		return grid;
-	}private RobotGrid leftCornerToCubeFast(){
+	}	
+	private RobotGrid leftCornerToCubeFast(){
 		RobotGrid grid = new RobotGrid(-275,-60.5,30,2);
 		grid.addPoint(-212.464, -90, -30, -269.78, -57.486);
 		return grid;
@@ -300,6 +302,31 @@ public class Grids {
 	private RobotGrid leftCubeToScaleFast(){
 		RobotGrid grid = new RobotGrid (-218,-61,150,2);
 		grid.addPoint(-270, -75, -150,-231.876,-52.989);
+		return grid;
+	}
+	private RobotGrid leftScaleToThirdCube(){
+		RobotGrid grid = new RobotGrid(-275, -60.5, 0, 2);
+		grid.addPoint(-(196+WIDTH), -110, -90);
+		return grid;
+	}
+	private RobotGrid leftScaleThirdCubePickup(){
+		RobotGrid grid = new RobotGrid(-(196+WIDTH), -110, -90, 2);
+		grid.addLinearPoint(-(196+WIDTH), -115, -90);
+		return grid;
+	}
+	private RobotGrid leftThirdCubeToScale(){
+		RobotGrid grid = new RobotGrid(-(196+WIDTH), -115, -90, 2);
+		grid.addPoint(-270, -85, 0);
+		return grid;
+	}
+	private RobotGrid frontOfSwitch(){
+		RobotGrid grid = new RobotGrid(-LENGTH,-(30+WIDTH),180,2);
+		grid.sCurve(-140, -280, -45, -(30+WIDTH), -45, -280);
+		return grid;
+	}
+	private RobotGrid frontOfSwitchSlow(){
+		RobotGrid grid = new RobotGrid(-140, -280, 180, 2);
+		grid.addPoint(-(300+WIDTH), -254, -90);
 		return grid;
 	}
 }

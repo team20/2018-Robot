@@ -26,6 +26,7 @@ public class RobotModes {
 	public static final int SPLINE_AND_INTAKE_STOP = 21;
 	public static final int INCREMENT = 22;
 	public static final int PRINT_TIME = 23;
+	public static final int SLOW_SPIT_SCALE = 24;
 	
 	//Elevator Positions - encoder ticks
 	public static final int POSITION_SWITCH = 0;
@@ -60,10 +61,13 @@ public class RobotModes {
 	public static final int SPLINE_LEFT_NULL_TO_SCALE = 26;
 	public static final int SPLINE_SWITCH_CUBE_BACKUP = 27;
 	public static final int TEST_S = 28;
-	public static final int SPLINE_LEFT_SCALE_TO_CUBE_2 = 29;
 	public static final int SPLINE_LEFT_CUBE_TO_CORNER_SCALE = 30;
 	public static final int SPLINE_LEFT_CORNER_TO_CUBE_FAST = 31;
 	public static final int SPLINE_LEFT_CUBE_PICKUP_FAST = 32;
 	public static final int SPLINE_LEFT_CUBE_TO_SCALE_FAST = 33;
-	
+	public static final int SPLINE_LEFT_TO_THIRD_CUBE = 34;
+	public static final int SPLINE_LEFT_THIRD_CUBE_PICKUP = 35;
+	public static final int SPLINE_LEFT_THIRD_CUBE_TO_SCALE = 36;
+	public static final int SPLINE_FRONT_OF_SWITCH = 37;
+	public static final int SPLINE_FRONT_OF_SWITCH_SLOW = 38;
 }

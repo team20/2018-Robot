@@ -94,8 +94,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		try{
 			elevCam = new DriverVision("Elevator Cam", 0);
 			elevCam.startUSBCamera();
-//			cam1 = new DriverVision("cam1", 1);
-//			cam1.startUSBCamera();
 		} catch(Exception e){
 			
 		} finally {
@@ -200,28 +198,37 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				SmartDashboard.putString("DB/String 0", field);
 				String auto = "";
 				boolean scalePriority = SmartDashboard.getBoolean("DB/Button 0", false);
-				boolean highOnly = SmartDashboard.getBoolean("DB/Button 1", false);
-				boolean test = SmartDashboard.getBoolean("DB/Button 3",false);
+				boolean oneCube = SmartDashboard.getBoolean("DB/Button 1", false);
+				boolean threeCube = SmartDashboard.getBoolean("DB/Button 2", false);
+//				boolean test = SmartDashboard.getBoolean("DB/Button 3",false);
 				double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
 				System.out.println("Position: " + position);
 				waitTime = 2*SmartDashboard.getNumber("DB/Slider 1", 0.0);
 				switch(field.substring(0, 2)){
 				case "LL":
-					if (test){
-						script.addAll(RocketScript.splineLeftThreeScale());
-					}else
+//					if (test){
+//						script.addAll(RocketScript.splineLeftThreeScale());
+//					}else
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToLeftScale());
 							auto = "centerToLeftScale";
 						} else {
-							script.addAll(RocketScript.splineCenterToLeftSwitch());
-							auto = "centerToLeftSwitch";
+							if(oneCube){
+								script.addAll(RocketScript.splineCenterToLeftSwitch());
+								auto = "centerToLeftSwitch";								
+							} else {
+								script.addAll(RocketScript.splineCenterToLeftSwitchTwo());
+								auto = "centerToLeftSwitchTwo";
+							}
 						}
 					} else if (position == 0){
-						if(highOnly){
+						if(oneCube){
 							script.addAll(RocketScript.splineLeftToLeftScaleSide());
 							auto = "leftToLeftScaleSide";
+						} else if(threeCube){
+							script.addAll(RocketScript.splineLeftThreeScale());
+							auto = "leftThreeScale";
 						} else {
 							script.addAll(RocketScript.splineLeftTwoScale());
 							auto = "leftTwoScale";
@@ -235,22 +242,27 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					}
 					break;
 				case "RR":
-					if (test){
-						script.addAll(RocketScript.splineLeftThreeScale());
-					}else
+//					if (test){
+//						script.addAll(RocketScript.splineLeftThreeScale());
+//					}else
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToRightScale());
 							auto = "centerToRightScale";
 						} else {
-							script.addAll(RocketScript.splineCenterToRightSwitch());
-							auto = "centerToRightSwitch";
+							if(oneCube){
+								script.addAll(RocketScript.splineCenterToRightSwitch());
+								auto = "centerToRightSwitch";
+							} else {
+								script.addAll(RocketScript.splineCenterToRightSwitchTwo());
+								auto = "centerToRightSwitchTwo";
+							}
 						}
 					} else if (position == 5){
 						script.addAll(RocketScript.splineRightToRightScale());
 						auto = "rightToRightScale";
 					} else if (position == 0){
-						if(highOnly){
+						if(oneCube){
 							script.addAll(RocketScript.splineLeftToRightScale());
 							auto = "leftToRightScale";							
 						} else {
@@ -263,19 +275,24 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					}
 					break;					
 				case "LR":
-					if (test){
-						script.addAll(RocketScript.splineLeftThreeScale());
-					}else
+//					if (test){
+//						script.addAll(RocketScript.splineLeftThreeScale());
+//					}else
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToRightScale());
 							auto = "centerToRightScale";
 						} else {
-							script.addAll(RocketScript.splineCenterToLeftSwitch());
-							auto = "centerToLeftSwitch";
+							if(oneCube){
+								script.addAll(RocketScript.splineCenterToLeftSwitch());
+								auto = "centerToLeftSwitch";
+							} else {
+								script.addAll(RocketScript.splineCenterToLeftSwitchTwo());
+								auto = "centerToLeftSwitchTwo";
+							}
 						}
 					} else if (position == 0){
-						if(highOnly){
+						if(oneCube){
 							script.addAll(RocketScript.splineLeftToRightScale());
 							auto = "leftToRightScale";							
 						} else {
@@ -291,24 +308,32 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					}
 					break;
 				case "RL":
-					if (test){
-						script.addAll(RocketScript.splineLeftThreeScale());
-					}else
+//					if (test){
+//						script.addAll(RocketScript.splineLeftThreeScale());
+//					}else
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToLeftScale());
 							auto = "centerToLeftScale";
 						} else {
-							script.addAll(RocketScript.splineCenterToRightSwitch());
-							auto = "centerToRightSwitch";
+							if(oneCube){
+								script.addAll(RocketScript.splineCenterToRightSwitch());
+								auto = "centerToRightSwitch";
+							} else {
+								script.addAll(RocketScript.splineCenterToRightSwitchTwo());
+								auto = "centerToRightSwitchTwo";
+							}
 						}
 					} else if (position == 0){
-						if(highOnly){
+						if(oneCube){
 							script.addAll(RocketScript.splineLeftToLeftScaleSide());
 							auto = "leftToLeftScaleSide";
+						} else if(threeCube){
+							script.addAll(RocketScript.splineLeftThreeScale());
+							auto = "leftThreeScale";
 						} else {
 							script.addAll(RocketScript.splineLeftTwoScale());
-							auto = "leftTwoScale";
+							auto = "leftTwoScale";							
 						}
 					} else if (position == 5){
 						script.addAll(RocketScript.splineRightToLeftScale());
@@ -321,10 +346,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				}
 				SmartDashboard.putString("DB/String 1", auto);
 				rocketScriptSize = script.size();
-					autoSelected = true;
-//				script.addAll(RocketScript.testS());
-//				rocketScriptSize = script.size();
-				
+				autoSelected = true;				
 			}
 	}
 		//Scripting
@@ -366,7 +388,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					System.out.println("I FINISHED THE AUTO");
 				}
 			}
-			if(Integer.parseInt(values[0]) == RobotModes.SLOW_SPIT){
+			if(Integer.parseInt(values[0]) == RobotModes.SLOW_SPIT_SCALE){
 				if(inNullZone){
 					collector.outtakeSlow();
 					drive.stopDrive();
@@ -374,6 +396,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				} else {
 					drive.drive(-0.3, 0.0, 0.0);
 				}
+			}
+			if(Integer.parseInt(values[0]) == RobotModes.SLOW_SPIT){
+				collector.outtakeSlow();
+				rocketScriptCurrentCount++;
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.OVER_BACK){
 				System.out.println("GOING OVER THE BACK YAYYYYYYYYY**************************************************");
@@ -828,10 +854,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	public boolean spline(double speed, RobotGrid spline) { //TODO negate left encoder comp bot!!!!!
 		if (gotStartingENCClicks == false) {
 			gotStartingENCClicks = true;
-			startingENCClicksLeft = ob.driveMasterLeft.getSelectedSensorPosition(0);
-			startingENCClicksRight = -ob.driveMasterRight.getSelectedSensorPosition(0);
+			startingENCClicksLeft = -ob.driveMasterLeft.getSelectedSensorPosition(0);
+			startingENCClicksRight = ob.driveMasterRight.getSelectedSensorPosition(0);
 		}
-		double robotDistance = Math.abs((((ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (-ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
+		double robotDistance = Math.abs((((-ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
 		speed = spline.speedMultiplier(robotDistance, gyro.getYaw(), speed);
 		if (spline.getDistance() <= robotDistance) {
 			ob.driveMasterLeft.set(ControlMode.PercentOutput, 0.00);
