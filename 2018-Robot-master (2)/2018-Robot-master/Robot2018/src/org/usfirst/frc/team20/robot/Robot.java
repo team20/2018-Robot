@@ -129,9 +129,9 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	}
 	@Override
 	public void autonomousInit() {
+		drive.shiftHigh();
 		ob.elevatorMaster.setSelectedSensorPosition(0, 0, 1000);
-		//logger stuff!
-		
+		//logger stuff!		
 //		if(!socket){
 //			logger.startSocket(); socket = true;
 //		}
@@ -142,7 +142,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 		autoModeSubStep = 0; startingENCClicksLeft = 0; startingENCClicksRight = 0;
 		resetGyro = false; setStartTime = false; waitStartTime = false; gotStartingENCClicks = false; resetGyroTurn = false; done = false;
 		gyroReset = false; elevatorDone = false; driveDone = false; splineDone = false; elevatorSet = false;
-//		collector.armIntakePosition();
 	}
 
 	/**

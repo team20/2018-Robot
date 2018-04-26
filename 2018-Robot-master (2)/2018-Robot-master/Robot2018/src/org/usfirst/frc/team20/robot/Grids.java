@@ -253,13 +253,13 @@ public class Grids {
 		return grid;
 	}
 	private RobotGrid  leftCornerDecelerate(){
-		RobotGrid grid = new RobotGrid(-200,-(30+WIDTH),180,2);
-		grid.addPoint(-270,-75,30);
+		RobotGrid grid = new RobotGrid(-200, -(30+WIDTH), 180, 2);
+		grid.addPoint(-265, -75, 30);
 		return grid;
 	}
 	private RobotGrid leftCornerToCube(){
-		RobotGrid grid = new RobotGrid(-275,-60.5, 30, 2);
-		grid.sCurve(-(185 + WIDTH), -60,-239.493 , -40, -(185+WIDTH), -40);
+		RobotGrid grid = new RobotGrid(-275, -60.5, 30, 2);
+		grid.sCurve(-(194 + WIDTH), -60, -239.493, -40, -(194+WIDTH), -40);
 		return grid;
 	}
 	private RobotGrid leftCornerPickUp(){

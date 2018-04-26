@@ -53,7 +53,7 @@ public class Zenith implements Loggable{
 		driveFollowerRightTwo.follow(driveMasterRight);
 		driveFollowerRightTwo.setInverted(false);
 		//TODO go back to other PCM
-		driveShifter = new DoubleSolenoid(14, 0, 1);
+		driveShifter = new DoubleSolenoid(15, 0, 1);
 
 		//Manipulator
 		collectorMaster = new TalonSRX(7);
@@ -61,9 +61,9 @@ public class Zenith implements Loggable{
 		collectorFollower = new VictorSPX(8);
 		collectorFollower.setInverted(true);
 		collectorFollower.follow(collectorMaster);
-		singleUp = new DoubleSolenoid(14, 2, 3);
-		grabber = new DoubleSolenoid(14, 4, 5);
-		doubleUp = new DoubleSolenoid(14, 6, 7);
+		singleUp = new DoubleSolenoid(15, 2, 3);
+		grabber = new DoubleSolenoid(15, 4, 5);
+		doubleUp = new DoubleSolenoid(15, 6, 7);
 		cubeSensor = new DigitalInput(0);
 		nullZone = new DigitalInput(1);
 		

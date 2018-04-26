@@ -214,6 +214,8 @@ public class RocketScript {
 		auto.add(Integer.toString(RobotModes.OVER_BACK));
 		auto.add(RobotModes.WAIT + ";" + .5);
 		auto.add(Integer.toString(RobotModes.PLACE_SCALE));
+		auto.add(RobotModes.WAIT + ";" + .5);
+		auto.add(RobotModes.ARM_INTAKE_POSITION + "");
 		return auto;
 	}
 	static public ArrayList<String> splineLeftThreeScale(){
