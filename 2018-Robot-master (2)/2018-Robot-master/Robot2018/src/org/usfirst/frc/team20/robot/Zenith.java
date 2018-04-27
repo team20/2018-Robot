@@ -12,7 +12,6 @@ public class Zenith implements Loggable{
 	TalonSRX driveMasterLeft, driveMasterRight;
 	VictorSPX driveFollowerLeft, driveFollowerRight, driveFollowerLeftTwo, driveFollowerRightTwo;
 	TalonSRX collectorMaster, elevatorMaster, climberMaster;
-	VictorSPX collectorFollower;//, climberFollower;
 	DoubleSolenoid driveShifter, grabber, singleUp, doubleUp, climberSpringPin;
 	PS4Controller driverJoy4, operatorJoy4;
 	DigitalInput nullZone, cubeSensor;
@@ -52,15 +51,11 @@ public class Zenith implements Loggable{
 		driveFollowerRightTwo = new VictorSPX(6);
 		driveFollowerRightTwo.follow(driveMasterRight);
 		driveFollowerRightTwo.setInverted(false);
-		//TODO go back to other PCM
 		driveShifter = new DoubleSolenoid(15, 0, 1);
 
 		//Manipulator
 		collectorMaster = new TalonSRX(7);
 		collectorMaster.setInverted(false);
-		collectorFollower = new VictorSPX(8);
-		collectorFollower.setInverted(true);
-		collectorFollower.follow(collectorMaster);
 		singleUp = new DoubleSolenoid(15, 2, 3);
 		grabber = new DoubleSolenoid(15, 4, 5);
 		doubleUp = new DoubleSolenoid(15, 6, 7);
@@ -78,10 +73,6 @@ public class Zenith implements Loggable{
 		//Climber
 		climberMaster = new TalonSRX(11);
 		climberMaster.setInverted(false);
-//		climberFollower = new VictorSPX(12);
-//		climberFollower.setInverted(true);
-//		climberFollower.follow(climberMaster);
-//		climberSpringPin = new DoubleSolenoid(14, 0, 1);
 		
 		//Joysticks
 		driverJoy4 = new PS4Controller(0, 2);
@@ -162,9 +153,8 @@ public class Zenith implements Loggable{
 		double current = 0;
 		current += driveMasterLeft.getOutputCurrent() + driveFollowerLeft.getOutputCurrent() + driveFollowerLeftTwo.getOutputCurrent();
 		current += driveMasterRight.getOutputCurrent() + driveFollowerRight.getOutputCurrent() + driveFollowerRightTwo.getOutputCurrent();
-		current += collectorMaster.getOutputCurrent();// + collectorFollower.getOutputCurrent();
+		current += collectorMaster.getOutputCurrent();
 		current += climberMaster.getOutputCurrent();
-//		current += climberFollower.getOutputCurrent();
 		return current;
 	}
 

@@ -14,7 +14,7 @@ public class RocketScript {
 
 	static public ArrayList<String> cross(){
 		ArrayList<String> auto = new ArrayList<>();
-		auto.add(RobotModes.TIME_DRIVE + ";" + -0.6 + ";" + 3.0);
+		auto.add(RobotModes.TIME_DRIVE + ";" + -0.6 + ";" + 2.0);
 		return auto;
 	}	
 
@@ -130,19 +130,17 @@ public class RocketScript {
 		auto.add(Integer.toString(RobotModes.OVER_BACK));
 		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(Integer.toString(RobotModes.PLACE_SCALE));
-		auto.add(RobotModes.WAIT + ";" + 0.3);
+		auto.add(RobotModes.WAIT + ";" + 0.4);
 		auto.add(Integer.toString(RobotModes.ARM_INTAKE_POSITION));
 		auto.add(RobotModes.WAIT + ";" + 0.1);
 		auto.add(Integer.toString(RobotModes.OPEN));
 		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_INTAKE);
-		auto.add(RobotModes.SPLINE_AND_INTAKE_STOP + ";" + 0.45 + ";" + RobotModes.SPLINE_RIGHT_SCALE_TO_CUBE);
+		auto.add(RobotModes.SPLINE_AND_INTAKE_STOP + ";" + 0.5 + ";" + RobotModes.SPLINE_RIGHT_SCALE_TO_CUBE);
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + -0.65 + ";" + RobotModes.SPLINE_RIGHT_SCALE_TO_SCALE + ";" + RobotModes.POSITION_SCALE);
 		auto.add(RobotModes.WAIT + ";" + 0.3);
 		auto.add(Integer.toString(RobotModes.OVER_BACK));
-		auto.add(Integer.toString(RobotModes.OVER_BACK));
-		auto.add(RobotModes.WAIT + ";" + 0.3);
+		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(Integer.toString(RobotModes.PLACE_SCALE));
-		auto.add(Integer.toString(RobotModes.PRINT_TIME));
 		return auto;
 	}
 
@@ -199,7 +197,7 @@ public class RocketScript {
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + -0.75 + ";" + RobotModes.SPLINE_LEFT_CORNER_SLOW + ";" + RobotModes.POSITION_SCALE);
 		auto.add(Integer.toString(RobotModes.OVER_BACK));
 		auto.add(RobotModes.WAIT + ";" + 0.5);
-		auto.add(Integer.toString(RobotModes.PLACE_SCALE));
+		auto.add(Integer.toString(RobotModes.SLOW_SPIT_SCALE));
 		auto.add(RobotModes.WAIT + ";" + 0.25);
 		auto.add(Integer.toString(RobotModes.ARM_INTAKE_POSITION));
 		auto.add(RobotModes.WAIT + ";" + 0.25);
@@ -210,7 +208,6 @@ public class RocketScript {
 		auto.add(Integer.toString(RobotModes.ARM_100));
 		auto.add(RobotModes.SPLINE + ";" + -0.9 + ";" + RobotModes.SPLINE_LEFT_CUBE_TO_SCALE);
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + -0.5 + ";" + RobotModes.SPLINE_LEFT_NULL_TO_SCALE + ";" + RobotModes.POSITION_SCALE);
-		auto.add(Integer.toString(RobotModes.OVER_BACK));
 		auto.add(Integer.toString(RobotModes.OVER_BACK));
 		auto.add(RobotModes.WAIT + ";" + .5);
 		auto.add(Integer.toString(RobotModes.PLACE_SCALE));

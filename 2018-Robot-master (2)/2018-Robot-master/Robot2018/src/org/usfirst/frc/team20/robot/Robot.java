@@ -150,16 +150,17 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	@Override
 	public void autonomousPeriodic() {
 		System.out.println("Right: " + ob.driveMasterRight.getSelectedSensorPosition(0));
-		if(!ob.nullZone.get() && ob.nullZone.get() != prevValue){
-			if(inNullZone){
-				System.out.println("NOOOOOOPPPPPPEEEEEEEE");
-				inNullZone = false;
-			} else {
-				System.out.println("WE'RE IN THE NULL ZONE FOLKS");
-				inNullZone = true;
-			}
-			prevValue = ob.nullZone.get();
-		}
+//		if(!ob.nullZone.get() && ob.nullZone.get() != prevValue){
+//			if(inNullZone){
+//				System.out.println("NOOOOOOPPPPPPEEEEEEEE");
+//				inNullZone = false;
+//			} else {
+//				System.out.println("WE'RE IN THE NULL ZONE FOLKS");
+//				inNullZone = true;
+//			}
+//			prevValue = ob.nullZone.get();
+//		}
+		inNullZone = true;
 		elevator.limitPosition();
 		//Diagnostic LEDs
 		if(driverJoy.leds){
@@ -235,6 +236,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					} else if (position == 5){
 						script.addAll(RocketScript.splineRightToLeftScale());
 						auto = "rightToLeftScale";
+//						script.addAll(RocketScript.cross());
+//						auto = "cross";
 					} else {
 						script.addAll(RocketScript.cross());
 						auto = "cross";
@@ -337,6 +340,8 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					} else if (position == 5){
 						script.addAll(RocketScript.splineRightToLeftScale());
 						auto = "rightToLeftScale";
+//						script.addAll(RocketScript.cross());
+//						auto = "cross";
 					} else {
 						script.addAll(RocketScript.cross());
 						auto = "cross";
@@ -401,7 +406,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				rocketScriptCurrentCount++;
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.OVER_BACK){
-				System.out.println("GOING OVER THE BACK YAYYYYYYYYY**************************************************");
 				if (!waitStartTime) {
 					startTime = Timer.getFPGATimestamp();
 					waitStartTime = true;
@@ -568,11 +572,9 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					startTime = Timer.getFPGATimestamp();
 					waitStartTime = true;
 					drive.stopDrive();
-					collector.armIntakePosition();
 					collector.outtake();
 				}
 				if (inNullZone && waitStartTime && Timer.getFPGATimestamp() - startTime > 0.3) {
-					collector.open();
 					collector.stopRollers();
 					waitStartTime = false;
 					rocketScriptCurrentCount++;
