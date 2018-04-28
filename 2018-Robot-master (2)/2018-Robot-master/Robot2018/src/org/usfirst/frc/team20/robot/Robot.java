@@ -4,9 +4,9 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
-
+//
 package org.usfirst.frc.team20.robot;
-
+//TODO TA made the IP address for ethernet static, revert
 import java.util.ArrayList;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.kauailabs.navx.frc.AHRS;
@@ -57,12 +57,12 @@ public class Robot extends IterativeRobot implements PIDOutput{
 	DriverVision elevCam, cam1;
 	int rocketScriptCurrentCount = 0, rocketScriptSize = 0, startingENCClicks = 0,
 			autoModeSubStep = 0, startingENCClicksLeft = 0, startingENCClicksRight = 0;
-	double rotateToAngleRate, currentRotationRate, startTime, waitTime;
+	double rotateToAngleRate, currentRotationRate, startTime, waitTime, startTime2;
 	double kP = 0.0, kI = 0.0, kD = 0.0;
 	double nominalVoltage = Constants.NOMINAL_VOLTAGE;
 	boolean resetGyro = false, setStartTime = false, waitStartTime = false, gotStartingENCClicks = false, resetGyroTurn = false, done = false,
 			gyroReset = false, elevatorDone = false, driveDone = false, splineDone = false, elevatorSet = false, autoSelected = false,
-			collectorSet = false, intakeMode = false, inNullZone = false, prevValue = true;
+			collectorSet = false, intakeMode = false, inNullZone = false, prevValue = true, incremented = false;
 
 	//Spline
 	RobotGrid path;
@@ -100,7 +100,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			System.out.println("Camera Isn't Working!!!");
 		}
 		
-		Compressor c = new Compressor(14);
+		Compressor c = new Compressor(15);
 		c.setClosedLoopControl(true);
 
 //		logger = new Logger();
@@ -125,6 +125,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			}
 		}
 		beenEnabled = false;
+		SmartDashboard.putString("DB/String 5", "We are connected");
 		System.out.println("_____________________DISABLE INIT RAN WOOOO__________________________");
 	}
 	@Override
@@ -261,8 +262,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 							}
 						}
 					} else if (position == 5){
-						script.addAll(RocketScript.splineRightToRightScale());
-						auto = "rightToRightScale";
+//						script.addAll(RocketScript.splineRightToRightScale());
+//						auto = "rightToRightScale";
+						script.addAll(RocketScript.cross());
+						auto = "cross";
 					} else if (position == 0){
 						if(oneCube){
 							script.addAll(RocketScript.splineLeftToRightScale());
@@ -302,8 +305,10 @@ public class Robot extends IterativeRobot implements PIDOutput{
 							auto = "leftToRightScaleTwoCube";
 						}
 					} else if (position == 5){
-						script.addAll(RocketScript.splineRightToRightScale());
-						auto = "rightToRightScale";
+//						script.addAll(RocketScript.splineRightToRightScale());
+//						auto = "rightToRightScale";
+						script.addAll(RocketScript.cross());
+						auto = "cross";
 					} else {
 						script.addAll(RocketScript.cross());
 						auto = "cross";
@@ -340,8 +345,6 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					} else if (position == 5){
 						script.addAll(RocketScript.splineRightToLeftScale());
 						auto = "rightToLeftScale";
-//						script.addAll(RocketScript.cross());
-//						auto = "cross";
 					} else {
 						script.addAll(RocketScript.cross());
 						auto = "cross";
@@ -350,7 +353,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				}
 				SmartDashboard.putString("DB/String 1", auto);
 				rocketScriptSize = script.size();
-				autoSelected = true;				
+				autoSelected = true;
 			}
 	}
 		//Scripting
@@ -431,6 +434,15 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					startTime = Timer.getFPGATimestamp();
 					waitStartTime = true;
 				}
+				if(!setStartTime){
+					startTime2 = Timer.getFPGATimestamp();
+					setStartTime = true;
+				}
+				if(Math.abs(Timer.getFPGATimestamp() - startTime2) > 3.5){
+					setStartTime = false;
+					incremented = true; //makes sure only increment once
+					rocketScriptCurrentCount++;
+				}
 				if(!collectorSet){
 					collector.intake(0.5);
 					collectorSet = true;
@@ -444,11 +456,15 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				if (waitStartTime && Timer.getFPGATimestamp() - startTime > 0.3) {
 					collector.stopRollers();
 					drive.stopDrive();
+					setStartTime = false;
 					collectorSet = false;
 					waitStartTime = false;
 					gotStartingENCClicks = false;
 					System.out.println("Rollers Stopped");
-					rocketScriptCurrentCount++;
+					if(!incremented){
+						rocketScriptCurrentCount++;						
+					}
+					incremented = false;
 				}
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.SPLINE_AND_INTAKE){

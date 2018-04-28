@@ -70,4 +70,5 @@ public class RobotModes {
 	public static final int SPLINE_LEFT_THIRD_CUBE_TO_SCALE = 36;
 	public static final int SPLINE_FRONT_OF_SWITCH = 37;
 	public static final int SPLINE_FRONT_OF_SWITCH_SLOW = 38;
+	public static final int SPLINE_FAST_LEFT_CUBE_TO_SCALE_V2 = 39;
 }
