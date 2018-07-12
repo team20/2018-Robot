@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 //
 package org.usfirst.frc.team20.robot;
-//TODO TA made the IP address for ethernet static, revert
+
 import java.util.ArrayList;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.kauailabs.navx.frc.AHRS;
@@ -100,7 +100,7 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			System.out.println("Camera Isn't Working!!!");
 		}
 		
-		Compressor c = new Compressor(15);
+		Compressor c = new Compressor(15); //TODO 15 comp bot, 0 practice bot
 		c.setClosedLoopControl(true);
 
 //		logger = new Logger();
@@ -200,20 +200,20 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				String auto = "";
 				boolean scalePriority = SmartDashboard.getBoolean("DB/Button 0", false);
 				boolean oneCube = SmartDashboard.getBoolean("DB/Button 1", false);
-				boolean threeCube = SmartDashboard.getBoolean("DB/Button 2", false);
-//				boolean test = SmartDashboard.getBoolean("DB/Button 3",false);
+				boolean switchScale = SmartDashboard.getBoolean("DB/Button 2", false);
+				boolean threeCube = SmartDashboard.getBoolean("DB/Button 3", false);
 				double position = SmartDashboard.getNumber("DB/Slider 0", 0.0);
 				System.out.println("Position: " + position);
 				waitTime = 2*SmartDashboard.getNumber("DB/Slider 1", 0.0);
 				switch(field.substring(0, 2)){
 				case "LL":
-//					if (test){
-//						script.addAll(RocketScript.splineLeftThreeScale());
-//					}else
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToLeftScale());
 							auto = "centerToLeftScale";
+						} else if (switchScale){
+							script.addAll(RocketScript.splineLeftSwitchLeftScale());
+							auto = "leftSwitchLeftScale";
 						} else {
 							if(oneCube){
 								script.addAll(RocketScript.splineCenterToLeftSwitch());
@@ -235,23 +235,26 @@ public class Robot extends IterativeRobot implements PIDOutput{
 							auto = "leftTwoScale";
 						}
 					} else if (position == 5){
-						script.addAll(RocketScript.splineRightToLeftScale());
-						auto = "rightToLeftScale";
-//						script.addAll(RocketScript.cross());
-//						auto = "cross";
+						if(oneCube){
+							script.addAll(RocketScript.splineRightToLeftScale());
+							auto = "rightToLeftScale";							
+						} else {
+							script.addAll(RocketScript.splineRightToLeftScaleTwoCube());
+							auto = "rightToLeftScaleTwoCube";
+						}
 					} else {
 						script.addAll(RocketScript.cross());
 						auto = "cross";
 					}
 					break;
 				case "RR":
-//					if (test){
-//						script.addAll(RocketScript.splineLeftThreeScale());
-//					}else
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToRightScale());
 							auto = "centerToRightScale";
+						} else if (switchScale){
+							script.addAll(RocketScript.splineRightSwitchRightScale());
+							auto = "rightSwitchRightScale";
 						} else {
 							if(oneCube){
 								script.addAll(RocketScript.splineCenterToRightSwitch());
@@ -262,10 +265,13 @@ public class Robot extends IterativeRobot implements PIDOutput{
 							}
 						}
 					} else if (position == 5){
-//						script.addAll(RocketScript.splineRightToRightScale());
-//						auto = "rightToRightScale";
-						script.addAll(RocketScript.cross());
-						auto = "cross";
+						if(oneCube){
+							script.addAll(RocketScript.splineRightToRightScale());
+							auto = "rightToRightScale";							
+						} else {
+							script.addAll(RocketScript.splineRightTwoScale());
+							auto = "rightToRightScaleTwoCube";
+						}
 					} else if (position == 0){
 						if(oneCube){
 							script.addAll(RocketScript.splineLeftToRightScale());
@@ -280,13 +286,13 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					}
 					break;					
 				case "LR":
-//					if (test){
-//						script.addAll(RocketScript.splineLeftThreeScale());
-//					}else
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToRightScale());
 							auto = "centerToRightScale";
+						} else if (switchScale){
+							script.addAll(RocketScript.splineLeftSwitchRightScale());
+							auto = "leftSwitchRightScale";
 						} else {
 							if(oneCube){
 								script.addAll(RocketScript.splineCenterToLeftSwitch());
@@ -305,23 +311,26 @@ public class Robot extends IterativeRobot implements PIDOutput{
 							auto = "leftToRightScaleTwoCube";
 						}
 					} else if (position == 5){
-//						script.addAll(RocketScript.splineRightToRightScale());
-//						auto = "rightToRightScale";
-						script.addAll(RocketScript.cross());
-						auto = "cross";
+						if(oneCube){
+							script.addAll(RocketScript.splineRightToRightScale());
+							auto = "rightToRightScale";							
+						} else {
+							script.addAll(RocketScript.splineRightTwoScale());
+							auto = "rightTwoScale";
+						}
 					} else {
 						script.addAll(RocketScript.cross());
 						auto = "cross";
 					}
 					break;
 				case "RL":
-//					if (test){
-//						script.addAll(RocketScript.splineLeftThreeScale());
-//					}else
 					if(position == 2.5){
 						if(scalePriority){
 							script.addAll(RocketScript.splineCenterToLeftScale());
 							auto = "centerToLeftScale";
+						} else if (switchScale){
+							script.addAll(RocketScript.splineRightSwitchLeftScale());
+							auto = "rightSwitchLeftScale";
 						} else {
 							if(oneCube){
 								script.addAll(RocketScript.splineCenterToRightSwitch());
@@ -343,8 +352,13 @@ public class Robot extends IterativeRobot implements PIDOutput{
 							auto = "leftTwoScale";							
 						}
 					} else if (position == 5){
-						script.addAll(RocketScript.splineRightToLeftScale());
-						auto = "rightToLeftScale";
+						if(oneCube){
+							script.addAll(RocketScript.splineRightToLeftScale());
+							auto = "rightToLeftScale";							
+						} else {
+							script.addAll(RocketScript.splineRightToLeftScaleTwoCube());
+							auto = "rightToLeftScaleTwoCube";
+						}
 					} else {
 						script.addAll(RocketScript.cross());
 						auto = "cross";
@@ -396,12 +410,22 @@ public class Robot extends IterativeRobot implements PIDOutput{
 				}
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.SLOW_SPIT_SCALE){
-				if(inNullZone){
-					collector.outtakeSlow();
+				System.out.println("************Placing****************");
+				if(!inNullZone){
+					System.out.println("************CREEPING");
+					arcadeDrive(-0.3, 0.0);
+				}
+				if (!waitStartTime && inNullZone) {
+					startTime = Timer.getFPGATimestamp();
+					waitStartTime = true;
 					drive.stopDrive();
+					collector.outtakeSlow();
+				}
+				if (inNullZone && waitStartTime && Timer.getFPGATimestamp() - startTime > 0.3) {
+					collector.stopRollers();
+					waitStartTime = false;
+					gotStartingENCClicks = false;
 					rocketScriptCurrentCount++;
-				} else {
-					drive.drive(-0.3, 0.0, 0.0);
 				}
 			}
 			if(Integer.parseInt(values[0]) == RobotModes.SLOW_SPIT){
@@ -589,10 +613,12 @@ public class Robot extends IterativeRobot implements PIDOutput{
 					waitStartTime = true;
 					drive.stopDrive();
 					collector.outtake();
+					System.out.println("WE ARE PLACING A CUBE WOW!!!!!!");
 				}
 				if (inNullZone && waitStartTime && Timer.getFPGATimestamp() - startTime > 0.3) {
 					collector.stopRollers();
 					waitStartTime = false;
+					gotStartingENCClicks = false;
 					rocketScriptCurrentCount++;
 				}
 			}
@@ -875,8 +901,11 @@ public class Robot extends IterativeRobot implements PIDOutput{
 			startingENCClicksRight = ob.driveMasterRight.getSelectedSensorPosition(0);
 		}
 		double robotDistance = Math.abs((((-ob.driveMasterLeft.getSelectedSensorPosition(0) - startingENCClicksLeft) + (ob.driveMasterRight.getSelectedSensorPosition(0) - startingENCClicksRight))/Constants.TICKS_PER_INCH)/2);
+		System.out.println("RobotDistance: " + robotDistance);
+		System.out.println("                         Goal Distance: " + spline.getDistance());
 		speed = spline.speedMultiplier(robotDistance, gyro.getYaw(), speed);
 		if (spline.getDistance() <= robotDistance) {
+			System.out.println("**************FINISHED A SPLINE");
 			ob.driveMasterLeft.set(ControlMode.PercentOutput, 0.00);
 			ob.driveMasterRight.set(ControlMode.PercentOutput, 0.00);
 			System.out.println("Final NavX Angle: " + gyro.getYaw());

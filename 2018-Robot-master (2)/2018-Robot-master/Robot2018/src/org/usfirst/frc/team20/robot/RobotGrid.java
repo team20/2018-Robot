@@ -78,7 +78,7 @@ public class RobotGrid {
     		path.add(new Position(distance,angle,true));    		
     	}
     }
-    public void sCurve(double targetX ,double targetY, double x1, double y1,double x2,double y2){
+    public void sCurve(double targetX, double targetY, double x1, double y1, double x2, double y2){
     	Position p0 = path.get(path.size()-1);
     	double pointAngle = p0.getAngle();
     	for (double t = 1/180.0 ; t<=1;t+=1/180.0){

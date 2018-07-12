@@ -6,12 +6,6 @@ public class RocketScript {
 	/*
 	 * each method returns an auto mode auto in the form of an ArrayList of Strings
 	 */
-	static public ArrayList<String> testS(){
-		ArrayList<String> auto = new ArrayList<>();
-		auto.add(RobotModes.SPLINE + ";" + 1.0 + ";" + RobotModes.TEST_S);
-		return auto;
-	}
-
 	static public ArrayList<String> cross(){
 		ArrayList<String> auto = new ArrayList<>();
 		auto.add(RobotModes.TIME_DRIVE + ";" + -0.6 + ";" + 2.0);
@@ -35,6 +29,98 @@ public class RocketScript {
 		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
 		return auto;
 	}
+	
+	static public ArrayList<String> splineLeftSwitchLeftScale(){
+		ArrayList<String> auto = new ArrayList<>();
+		auto.add(Integer.toString(RobotModes.ARM_INTAKE_POSITION));
+		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + 0.9 + ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SWITCH + ";" + RobotModes.POSITION_SWITCH);
+		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
+		auto.add(RobotModes.WAIT + ";" + 0.4);
+		auto.add(RobotModes.SPLINE + ";" + -0.8 + ";" + RobotModes.SPLINE_LEFT_SWITCH_BACK_UP);
+		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_INTAKE);
+		auto.add(Integer.toString(RobotModes.OPEN));
+		auto.add(RobotModes.SPLINE_AND_INTAKE_STOP + ";" + 0.6 + ";" + RobotModes.SPLINE_SWITCH_TO_CUBE);
+		auto.add(RobotModes.SPLINE + ";" + -0.8 + ";" + RobotModes.SPLINE_SWITCH_CUBE_BACKUP);
+		auto.add(RobotModes.ARM_100 + "");
+		auto.add(Integer.toString(RobotModes.WAIT_ENTERED));
+		auto.add(RobotModes.SPLINE + ";" + 0.9 + ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SCALE);
+//		auto.add(RobotModes.SPLINE + ";" + 0.85 + ";" + RobotModes.SPLINE_LEFT_SCALE_DECELERATION);
+//		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SCALE);
+//		auto.add(RobotModes.WAIT + ";" + 0.1);
+//		auto.add(RobotModes.ARM_INTAKE_POSITION + "");
+//		auto.add(RobotModes.WAIT + ";" + 0.1);
+//		auto.add(RobotModes.PLACE_SCALE + "");
+		return auto;
+	}
+
+	static public ArrayList<String> splineLeftSwitchRightScale(){
+		ArrayList<String> auto = new ArrayList<>();
+		auto.add(Integer.toString(RobotModes.ARM_INTAKE_POSITION));
+		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + 0.9 + ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SWITCH + ";" + RobotModes.POSITION_SWITCH);
+		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
+		auto.add(RobotModes.WAIT + ";" + 0.4);
+		auto.add(RobotModes.SPLINE + ";" + -0.8 + ";" + RobotModes.SPLINE_LEFT_SWITCH_BACK_UP);
+		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_INTAKE);
+		auto.add(Integer.toString(RobotModes.OPEN));
+		auto.add(RobotModes.SPLINE_AND_INTAKE_STOP + ";" + 0.6 + ";" + RobotModes.SPLINE_SWITCH_TO_CUBE);
+		auto.add(RobotModes.SPLINE + ";" + -0.8 + ";" + RobotModes.SPLINE_SWITCH_CUBE_BACKUP);
+		auto.add(RobotModes.ARM_100 + "");
+		auto.add(Integer.toString(RobotModes.WAIT_ENTERED));
+		auto.add(RobotModes.SPLINE + ";" + 0.9 + ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SCALE);
+//		auto.add(RobotModes.SPLINE + ";" + 0.85 + ";" + RobotModes.SPLINE_RIGHT_SCALE_DECELERATION);
+//		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SCALE);
+//		auto.add(RobotModes.WAIT + ";" + 0.1);
+//		auto.add(RobotModes.ARM_INTAKE_POSITION + "");
+//		auto.add(RobotModes.WAIT + ";" + 0.1);
+//		auto.add(RobotModes.PLACE_SCALE + "");
+		return auto;
+	}
+
+	static public ArrayList<String> splineRightSwitchRightScale(){
+		ArrayList<String> auto = new ArrayList<>();
+		auto.add(Integer.toString(RobotModes.ARM_INTAKE_POSITION));
+		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + 0.8 + ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SWITCH + ";" + RobotModes.POSITION_SWITCH);
+		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
+		auto.add(RobotModes.WAIT + ";" + 0.4);
+		auto.add(RobotModes.SPLINE + ";" + -0.85 + ";" + RobotModes.SPLINE_RIGHT_SWITCH_BACK_UP);
+		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_INTAKE);
+		auto.add(Integer.toString(RobotModes.OPEN));
+		auto.add(RobotModes.SPLINE_AND_INTAKE_STOP + ";" + 0.6 + ";" + RobotModes.SPLINE_SWITCH_TO_CUBE);
+		auto.add(RobotModes.SPLINE + ";" + -0.8 + ";" + RobotModes.SPLINE_SWITCH_CUBE_BACKUP);
+		auto.add(RobotModes.ARM_100 + "");
+		auto.add(Integer.toString(RobotModes.WAIT_ENTERED));
+		auto.add(RobotModes.SPLINE + ";" + 0.9 + ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SCALE);
+//		auto.add(RobotModes.SPLINE + ";" + 0.85 + ";" + RobotModes.SPLINE_RIGHT_SCALE_DECELERATION);
+//		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SCALE);
+//		auto.add(RobotModes.WAIT + ";" + 0.1);
+//		auto.add(RobotModes.ARM_INTAKE_POSITION + "");
+//		auto.add(RobotModes.WAIT + ";" + 0.1);
+//		auto.add(RobotModes.PLACE_SCALE + "");
+		return auto;
+	}
+
+	static public ArrayList<String> splineRightSwitchLeftScale(){
+		ArrayList<String> auto = new ArrayList<>();
+		auto.add(Integer.toString(RobotModes.ARM_INTAKE_POSITION));
+		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + 0.8 + ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SWITCH + ";" + RobotModes.POSITION_SWITCH);
+		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
+		auto.add(RobotModes.WAIT + ";" + 0.4);
+		auto.add(RobotModes.SPLINE + ";" + -0.85 + ";" + RobotModes.SPLINE_RIGHT_SWITCH_BACK_UP);
+		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_INTAKE);
+		auto.add(Integer.toString(RobotModes.OPEN));
+		auto.add(RobotModes.SPLINE_AND_INTAKE_STOP + ";" + 0.6 + ";" + RobotModes.SPLINE_SWITCH_TO_CUBE);
+		auto.add(RobotModes.SPLINE + ";" + -0.8 + ";" + RobotModes.SPLINE_SWITCH_CUBE_BACKUP);
+		auto.add(RobotModes.ARM_100 + "");
+		auto.add(Integer.toString(RobotModes.WAIT_ENTERED));
+		auto.add(RobotModes.SPLINE + ";" + 0.9 + ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SCALE);
+//		auto.add(RobotModes.SPLINE + ";" + 0.85 + ";" + RobotModes.SPLINE_LEFT_SCALE_DECELERATION);
+//		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SCALE);
+//		auto.add(RobotModes.WAIT + ";" + 0.1);
+//		auto.add(RobotModes.ARM_INTAKE_POSITION + "");
+//		auto.add(RobotModes.WAIT + ";" + 0.1);
+//		auto.add(RobotModes.PLACE_SCALE + "");
+		return auto;
+	}
 
 	static public ArrayList<String> splineCenterToLeftSwitchTwo(){
 		ArrayList<String> auto = new ArrayList<>();
@@ -44,14 +130,15 @@ public class RocketScript {
 		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + -1.0 + ";" + RobotModes.SPLINE_LEFT_SWITCH_BACK_UP + ";" + RobotModes.POSITION_INTAKE);
 		auto.add(Integer.toString(RobotModes.OPEN));
-		auto.add(RobotModes.SPLINE_AND_INTAKE_STOP + ";" + 0.7 + ";" + RobotModes.SPLINE_SWITCH_TO_CUBE);
+		auto.add(RobotModes.SPLINE_AND_INTAKE_STOP + ";" + 0.5 + ";" + RobotModes.SPLINE_SWITCH_TO_CUBE);
 		auto.add(RobotModes.WAIT + ";" + 0.1);
 		auto.add(RobotModes.SPLINE + ";" + -0.6 + ";" + RobotModes.SPLINE_SWITCH_CUBE_BACKUP);
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + 0.9 + ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SWITCH + ";" + RobotModes.POSITION_SWITCH);
 		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
 		return auto;
 	}
-	
+
+
 	static public ArrayList<String> splineCenterToRightSwitchTwo(){
 		ArrayList<String> auto = new ArrayList<>();
 		auto.add(Integer.toString(RobotModes.ARM_INTAKE_POSITION));
@@ -60,7 +147,7 @@ public class RocketScript {
 		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + -1.0 + ";" + RobotModes.SPLINE_RIGHT_SWITCH_BACK_UP + ";" + RobotModes.POSITION_INTAKE);
 		auto.add(Integer.toString(RobotModes.OPEN));
-		auto.add(RobotModes.SPLINE_AND_INTAKE_STOP + ";" + 0.7 + ";" + RobotModes.SPLINE_SWITCH_TO_CUBE);
+		auto.add(RobotModes.SPLINE_AND_INTAKE_STOP + ";" + 0.6 + ";" + RobotModes.SPLINE_SWITCH_TO_CUBE);
 		auto.add(RobotModes.WAIT + ";" + 0.1);
 		auto.add(RobotModes.SPLINE + ";" + -0.6 + ";" + RobotModes.SPLINE_SWITCH_CUBE_BACKUP);
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + 0.9 + ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SWITCH + ";" + RobotModes.POSITION_SWITCH);
@@ -75,8 +162,8 @@ public class RocketScript {
 		auto.add(RobotModes.SPLINE + ";" + 1.0 + ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SCALE);
 		auto.add(RobotModes.SPLINE + ";" + 0.75 + ";" + RobotModes.SPLINE_LEFT_SCALE_DECELERATION);
 		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SCALE);
-		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(RobotModes.ARM_INTAKE_POSITION + "");
+		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(RobotModes.SLOW_SPIT_SCALE + "");
 		return auto;
@@ -89,8 +176,8 @@ public class RocketScript {
 		auto.add(RobotModes.SPLINE + ";" + 1.0 + ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SCALE);
 		auto.add(RobotModes.SPLINE + ";" + 0.75 + ";" + RobotModes.SPLINE_RIGHT_SCALE_DECELERATION);
 		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SCALE);
-		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(RobotModes.ARM_INTAKE_POSITION + "");
+		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(RobotModes.PLACE_SCALE + "");
 		return auto;
@@ -158,6 +245,31 @@ public class RocketScript {
 		return auto;
 	}
 
+	static public ArrayList<String> splineRightToLeftScaleTwoCube(){
+		ArrayList<String> auto = new ArrayList<>();
+		auto.add(Integer.toString(RobotModes.ARM_100));
+		auto.add(Integer.toString(RobotModes.WAIT_ENTERED));
+		auto.add(RobotModes.SPLINE + ";" + -0.9 + ";" + RobotModes.SPLINE_RIGHT_TO_LEFT_SCALE);
+		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SCALE);
+		auto.add(Integer.toString(RobotModes.OVER_BACK));
+		auto.add(RobotModes.WAIT + ";" + 0.5);
+		auto.add(Integer.toString(RobotModes.PLACE_SCALE));
+		auto.add(RobotModes.WAIT + ";" + 0.4);
+		auto.add(Integer.toString(RobotModes.ARM_INTAKE_POSITION));
+		auto.add(RobotModes.WAIT + ";" + 0.1);
+		auto.add(Integer.toString(RobotModes.OPEN));
+		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_INTAKE);
+		auto.add(RobotModes.SPLINE_AND_INTAKE_STOP + ";" + 0.5 + ";" + RobotModes.SPLINE_RIGHT_SCALE_TO_CUBE);
+		auto.add(RobotModes.WAIT + ";" + 0.3);
+		auto.add(Integer.toString(RobotModes.ARM_100));
+		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + -0.65 + ";" + RobotModes.SPLINE_RIGHT_SCALE_TO_SCALE + ";" + RobotModes.POSITION_SCALE);
+		auto.add(RobotModes.WAIT + ";" + 0.3);
+		auto.add(Integer.toString(RobotModes.OVER_BACK));
+		auto.add(RobotModes.WAIT + ";" + 0.7);
+		auto.add(Integer.toString(RobotModes.SLOW_SPIT_SCALE));
+		return auto;
+	}
+
 	static public ArrayList<String> splineRightToLeftScale(){
 		ArrayList<String> auto = new ArrayList<>();
 		auto.add(Integer.toString(RobotModes.ARM_100));
@@ -169,26 +281,30 @@ public class RocketScript {
 		auto.add(Integer.toString(RobotModes.PLACE_SCALE));
 		return auto;
 	}
-	
-	static public ArrayList<String> splineLeftTwoCube(){
+
+	static public ArrayList<String> splineRightTwoScale(){
 		ArrayList<String> auto = new ArrayList<>();
-		auto.add(Integer.toString(RobotModes.ARM_100));
-		auto.add(RobotModes.SPLINE + ";" + -0.9 + ";" + RobotModes.SPLINE_LEFT_TO_LEFT_SCALE);
+		auto.add(RobotModes.ARM_100 + "");
+		auto.add(RobotModes.SPLINE + ";" + -0.9 + ";" + RobotModes.SPLINE_RIGHT_CORNER);
+		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + -0.65 + ";" + RobotModes.SPLINE_RIGHT_CORNER_SLOW + ";" + RobotModes.POSITION_SWITCH);
 		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SCALE);
-		auto.add(Integer.toString(RobotModes.OVER_BACK));
+		auto.add(RobotModes.WAIT + ";" + 0.1);
+		auto.add(RobotModes.OVER_BACK + "");
 		auto.add(RobotModes.WAIT + ";" + 0.5);
-		auto.add(Integer.toString(RobotModes.SLOW_SPIT_SCALE));
-		auto.add(RobotModes.WAIT + ";" + 0.5);
-		auto.add(Integer.toString(RobotModes.ARM_INTAKE_POSITION));
-		auto.add(RobotModes.WAIT + ";" + 0.5);
+		auto.add(RobotModes.PLACE_SCALE + "");
+		auto.add(RobotModes.WAIT + ";" + 0.25);
+		auto.add(RobotModes.ARM_INTAKE_POSITION + "");
+		auto.add(RobotModes.WAIT + ";" + 0.25);
 		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_INTAKE);
-		auto.add(RobotModes.WAIT + ";" + 0.75);
-		auto.add(Integer.toString(RobotModes.OPEN));
-		auto.add(RobotModes.SPLINE + ";" + 0.75 + ";" + RobotModes.SPLINE_LEFT_SCALE_TO_CUBE);
-		auto.add(Integer.toString(RobotModes.INTAKE));
-		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SWITCH);
-		auto.add(RobotModes.TIME_DRIVE + ";" + 0.5 + ";" + 1.0);
-		auto.add(Integer.toString(RobotModes.SLOW_SPIT_SCALE));
+		auto.add(RobotModes.OPEN + "");
+		auto.add(RobotModes.SPLINE + ";" + 0.75 + ";" + RobotModes.SPLINE_RIGHT_CORNER_TO_CUBE_FAST);
+		auto.add(RobotModes.SPLINE_AND_INTAKE_STOP + ";" + 0.4 + ";" + RobotModes.SPLINE_RIGHT_CUBE_PICKUP_FAST);
+		auto.add(RobotModes.ARM_100 + "");
+		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + -0.8 + ";" +  RobotModes.SPLINE_FAST_RIGHT_CUBE_TO_SCALE_V2 + ";" + RobotModes.POSITION_SWITCH);
+		auto.add(RobotModes.MOVE_ELEVATOR + ";" + RobotModes.POSITION_SCALE);
+		auto.add(RobotModes.OVER_BACK + "");
+		auto.add(RobotModes.WAIT + ";" + 0.7);
+		auto.add(RobotModes.SLOW_SPIT_SCALE + "");
 		return auto;
 	}
 	
@@ -217,6 +333,8 @@ public class RocketScript {
 		auto.add(RobotModes.PLACE_SCALE + "");
 		return auto;
 	}
+
+	
 	static public ArrayList<String> splineLeftThreeScale(){
 		ArrayList<String> auto = new ArrayList<>();
 		auto.add(Integer.toString(RobotModes.ARM_100));

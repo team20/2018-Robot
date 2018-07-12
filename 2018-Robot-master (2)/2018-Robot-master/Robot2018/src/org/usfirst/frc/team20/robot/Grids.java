@@ -9,7 +9,8 @@ public class Grids {
 	rightSwitchBackUp, leftSwitchBackUp, switchToCube, leftToLeftCorner,leftToLeftCornerSlow,leftCornerCube,
 	leftCubePickup,leftCubeToScale, leftNullToScale, switchBackupCube, testS, leftCubeToCornerScale,leftCornerToCubeFast,
 	leftCubePickupFast,leftCubeToScaleFast, leftScaleToThirdCube, leftScaleThirdCubePickup, leftThirdCubeToScale,
-	frontOfSwitch, frontOfSwitchSlow, splineFastLeftCubeToScaleV2;
+	frontOfSwitch, frontOfSwitchSlow, splineFastLeftCubeToScaleV2, rightCorner, rightCornerSlow, rightCornerToCubeFast,
+	rightCubePickupFast, rightCubeToScaleV2;
 	
 	public Grids(){
 		centerToLeftSwitch = centerToLeftSwitch();
@@ -49,6 +50,11 @@ public class Grids {
 		frontOfSwitch = frontOfSwitch();
 		frontOfSwitchSlow = frontOfSwitchSlow();
 		splineFastLeftCubeToScaleV2 = splineFastLeftCubeToScaleV2();
+		rightCorner = rightCorner();
+		rightCornerSlow = rightCornerSlow();
+		rightCornerToCubeFast = rightCornerToCubeFast();
+		rightCubePickupFast = rightCubePickupFast();
+		rightCubeToScaleV2 = rightCubeToScaleV2();
 	}
 	
 	/**
@@ -131,22 +137,34 @@ public class Grids {
 				return frontOfSwitchSlow;
 			case RobotModes.SPLINE_FAST_LEFT_CUBE_TO_SCALE_V2:
 				return splineFastLeftCubeToScaleV2;
+			case RobotModes.SPLINE_RIGHT_CORNER:
+				return rightCorner;
+			case RobotModes.SPLINE_RIGHT_CORNER_SLOW:
+				return rightCornerSlow;
+			case RobotModes.SPLINE_RIGHT_CORNER_TO_CUBE_FAST:
+				return rightCornerToCubeFast;
+			case RobotModes.SPLINE_RIGHT_CUBE_PICKUP_FAST:
+				return rightCubePickupFast;
+			case RobotModes.SPLINE_FAST_RIGHT_CUBE_TO_SCALE_V2:
+				return rightCubeToScaleV2;
 		}
 		return null;
 	}
 
 	private RobotGrid centerToLeftSwitch(){
-		RobotGrid grid = new RobotGrid(0, 150+WIDTH, 0, 2);
-		grid.addPoint(35, 134.5, 90);
-		grid.addPoint(130-LENGTH, 91+WIDTH, 0);
+		RobotGrid grid = new RobotGrid(LENGTH, 150+WIDTH, 0, 2);
+		grid.addPoint(60, 134.5, 90);
+		grid.addPoint(125, 105, 0);
 		return grid;
 	}
+	
 	private RobotGrid leftSwitchBackUp(){
-		RobotGrid grid = new RobotGrid(140-LENGTH, 91+WIDTH, 180, 2);
-		grid.addPoint(55.0, 125.25, 90);
-		grid.addPoint(30.0, 180.0, 180);
+		RobotGrid grid = new RobotGrid(125, 91+WIDTH, 0, 2);
+		grid.addPoint(55, 125.25, 90);
+		grid.addPoint(30, 180, 180);
 		return grid;
 	}
+	
 	private RobotGrid switchToCube(){
 		RobotGrid grid = new RobotGrid(30.0, 160.0, 0, 2);
 		grid.addLinearPoint(98.0, 160.0, 0);
@@ -154,43 +172,48 @@ public class Grids {
 	}
 	private RobotGrid switchBackupCube(){
 		RobotGrid grid = new RobotGrid(98.0, 160.0, 180, 2);
-		grid.addPoint(45.0, 160.0, 0);
+		grid.addPoint(50.0, 160.0, 0);
 		return grid;
 	}
 	private RobotGrid centerToRightSwitch(){
-		RobotGrid grid = new RobotGrid(0, 150+WIDTH, 0, 2);
-		grid.addPoint(45.0, 194.25, 90);
-		grid.addPoint(140-LENGTH, 238.5-WIDTH, 0);
+		RobotGrid grid = new RobotGrid(LENGTH, 150+WIDTH, 0, 2);
+		grid.addPoint(85, 194, 90, 75, 166);
+		grid.addPoint(125, 230, 0, 90, 225);
 		return grid;
 	}
 	private RobotGrid rightSwitchBackUp(){
-		RobotGrid grid = new RobotGrid(140-LENGTH, 238.5-WIDTH, 180, 2);
-		grid.addPoint(65.0, 194.25, 90);
-		grid.addPoint(30.0, 160.0, 180);
+		RobotGrid grid = new RobotGrid(125, 230, 180, 2);
+		grid.addPoint(80.0, 194.25, 90);
+		grid.addPoint(45.0, 160.0, 180);
 		return grid;
 	}
+	
 	private RobotGrid centerToLeftScale(){
 		RobotGrid grid = new RobotGrid(LENGTH, 150+WIDTH, 0, 2);
-		grid.addPoint(60, 105, 90);
-		grid.addPoint(120, 40, 0);
-		return grid;
-	}
-	private RobotGrid centerToRightScale(){
-		RobotGrid grid = new RobotGrid(LENGTH, 150+WIDTH, 0, 2);
-		grid.addPoint(60,  220, 90);
-		grid.addPoint(120,  290,  0);
+		grid.addPoint(85, 120, 90, 65, 166);
+		grid.addPoint(155, 45, 0, 85, 45);
+		grid.addLinearPoint(280, 60, 0);
 		return grid;
 	}
 	private RobotGrid leftScaleDeceleration(){
-		RobotGrid grid = new RobotGrid(120, 40, 0, 2);
-		grid.addPoint(295+WIDTH, 67, 90, 295+WIDTH, 35);
+		RobotGrid grid = new RobotGrid(280, 60, 0, 2);
+		grid.addPoint(320+WIDTH, 72, 90, 310+WIDTH, 45);
+		return grid;
+	}
+	
+	private RobotGrid centerToRightScale(){
+		RobotGrid grid = new RobotGrid(LENGTH, 150+WIDTH, 0, 2);
+		grid.addPoint(75, 192, 90, 65, 166);
+		grid.addPoint(155, 300, 0, 95, 300);
+		grid.addLinearPoint(280, 267, 0);
 		return grid;
 	}
 	private RobotGrid rightScaleDeceleration(){
-		RobotGrid grid = new RobotGrid(120, 290, 0, 2);
-		grid.addPoint(295+WIDTH, 254, 90);
+		RobotGrid grid = new RobotGrid(280, 267, 0, 2);
+		grid.addPoint(295+WIDTH, 260, 90);
 		return grid;
 	}
+
 	private RobotGrid leftToSideLeftScale(){
 		RobotGrid grid = new RobotGrid(-LENGTH, -28.813-WIDTH, 180, 2);
 		grid.addLinearPoint(-120, -28.813-WIDTH, 180);
@@ -221,10 +244,7 @@ public class Grids {
 	}
 	private RobotGrid rightToRightScale(){
 		RobotGrid grid = new RobotGrid(-LENGTH, -296+WIDTH, 180, 2);
-//		grid.addPoint(-250, -273, 90, -250, -296);
-//		grid.addPoint(-286, -235, 180);
-		grid.addPoint(-45.0, -194.25, 90);
-		grid.addPoint(-120,  -290,  0);
+		grid.addPoint(-(295+WIDTH), -254, 90);
 		return grid;
 	}
 	private RobotGrid leftToRightScale(){
@@ -241,16 +261,18 @@ public class Grids {
 	}
 	private RobotGrid rightScaleToScale(){
 		RobotGrid grid = new RobotGrid(-225, -265, 180, 2);
-		grid.addLinearPoint(-250, -265, 180);
+		grid.addLinearPoint(-260, -265, 180);
 		return grid;
 	}
+
 	private RobotGrid rightToLeftScale(){
 		RobotGrid grid = new RobotGrid(-LENGTH, -296+WIDTH, 180, 2);
-		grid.addPoint(-265, -273, 90);
-		grid.addLinearPoint(-265, -64, 90);
-		grid.addPoint(-285, -90, 180);
+		grid.addPoint(-255, -273, 90);
+		grid.addLinearPoint(-255, -100, 90);
+		grid.addPoint(-300, -75, 180, -265, -75);
 		return grid;
 	}
+	
 	private RobotGrid leftToLeftCorner(){
 		RobotGrid grid = new RobotGrid(-LENGTH,-(30+WIDTH), 180, 2);
 		grid.addLinearPoint(-170, -(30+WIDTH), 180);
@@ -307,6 +329,32 @@ public class Grids {
 	private RobotGrid splineFastLeftCubeToScaleV2(){
 		RobotGrid grid = new RobotGrid(-218, -61, 150, 2);
 		grid.sCurve(-300, -65, -243.8, -45.8, -299.4, -45); //-300, -80
+		return grid;
+	}
+
+	private RobotGrid rightCorner(){
+		RobotGrid grid = new RobotGrid(-LENGTH, -296+WIDTH, 180, 2);
+		grid.addLinearPoint(-170, -296+WIDTH, 180);
+		return grid;
+	}
+	private RobotGrid  rightCornerSlow(){
+		RobotGrid grid = new RobotGrid(-170, -296+WIDTH, 180, 2);
+		grid.addPoint(-280, -250, 30, -230, -280);
+		return grid;
+	}
+	private RobotGrid rightCornerToCubeFast(){
+		RobotGrid grid = new RobotGrid(-280, -180.5, 30, 2);
+		grid.addPoint(-240, -160, -30, -260, -175);
+		return grid;
+	}
+	private RobotGrid rightCubePickupFast(){
+		RobotGrid grid = new RobotGrid(0, 0, -30, 0);
+		grid.addRelativePoint(7, -30);
+		return grid;
+	}
+	private RobotGrid rightCubeToScaleV2(){
+		RobotGrid grid = new RobotGrid(-218, -179, 150, 2);
+		grid.sCurve(-260, -185, -240, -185, -250, -179);
 		return grid;
 	}
 	

@@ -56,7 +56,7 @@ public class Zenith implements Loggable{
 		//Manipulator
 		collectorMaster = new TalonSRX(7);
 		collectorMaster.setInverted(false);
-		singleUp = new DoubleSolenoid(15, 2, 3);
+		singleUp = new DoubleSolenoid(15, 2, 3); 
 		grabber = new DoubleSolenoid(15, 4, 5);
 		doubleUp = new DoubleSolenoid(15, 6, 7);
 		cubeSensor = new DigitalInput(0);
