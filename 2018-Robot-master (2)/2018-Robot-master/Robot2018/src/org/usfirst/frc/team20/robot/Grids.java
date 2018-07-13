@@ -343,8 +343,8 @@ public class Grids {
 		return grid;
 	}
 	private RobotGrid rightCornerToCubeFast(){
-		RobotGrid grid = new RobotGrid(-280, -180.5, 30, 2);
-		grid.addPoint(-240, -160, -30, -260, -175);
+		RobotGrid grid = new RobotGrid(-280, -250, 30, 2);
+		grid.addPoint(-225, -230, -30, -250, -250);
 		return grid;
 	}
 	private RobotGrid rightCubePickupFast(){

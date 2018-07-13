@@ -125,7 +125,7 @@ public class RocketScript {
 	static public ArrayList<String> splineCenterToLeftSwitchTwo(){
 		ArrayList<String> auto = new ArrayList<>();
 		auto.add(Integer.toString(RobotModes.ARM_INTAKE_POSITION));
-		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + 0.75 + ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SWITCH + ";" + RobotModes.POSITION_SWITCH);
+		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + 0.85 + ";" + RobotModes.SPLINE_CENTER_TO_LEFT_SWITCH + ";" + RobotModes.POSITION_SWITCH);
 		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
 		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + -1.0 + ";" + RobotModes.SPLINE_LEFT_SWITCH_BACK_UP + ";" + RobotModes.POSITION_INTAKE);
@@ -142,7 +142,7 @@ public class RocketScript {
 	static public ArrayList<String> splineCenterToRightSwitchTwo(){
 		ArrayList<String> auto = new ArrayList<>();
 		auto.add(Integer.toString(RobotModes.ARM_INTAKE_POSITION));
-		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + 0.75 + ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SWITCH + ";" + RobotModes.POSITION_SWITCH);
+		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + 0.85 + ";" + RobotModes.SPLINE_CENTER_TO_RIGHT_SWITCH + ";" + RobotModes.POSITION_SWITCH);
 		auto.add(Integer.toString(RobotModes.SLOW_SPIT));
 		auto.add(RobotModes.WAIT + ";" + 0.5);
 		auto.add(RobotModes.SPLINE_AND_ELEVATOR + ";" + -1.0 + ";" + RobotModes.SPLINE_RIGHT_SWITCH_BACK_UP + ";" + RobotModes.POSITION_INTAKE);
